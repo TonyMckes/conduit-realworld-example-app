@@ -28,6 +28,8 @@ router.put("/", async (req, res) => {
 
     await user.save();
 
+    user.dataValues.token = req.headers.authorization;
+
     res.json({ user });
   } catch (error) {
     res.json({ errors: error.message });
