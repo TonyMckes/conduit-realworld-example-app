@@ -26,3 +26,7 @@ module.exports.jwtSign = async (payload) => {
 //     console.log(`Error decoding JWT: ${error}`);
 //   }
 // };
+
+module.exports.jwtVerify = async (token) => {
+  return jwt.verify(token, privateKey);
+};

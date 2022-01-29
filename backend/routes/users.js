@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { User } = require("../models");
-const { jwtSign, jwtVerify } = require("../helper/jwt");
+const { jwtSign } = require("../helper/jwt");
 const { bcryptHash, bcryptCompare } = require("../helper/bcrypt");
 
 router.post("/", async (req, res) => {
@@ -39,7 +39,6 @@ router.post("/login", async (req, res) => {
     const pwd = await bcryptCompare(req.body.user.password, user.password);
     if (!pwd) throw new Error("Password doesn't match!");
 
-    //? Global variable token || Login and Remember Token
     user.dataValues.token = await jwtSign(user);
 
     res.json({ user });
