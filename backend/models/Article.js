@@ -9,9 +9,17 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ User, Tag, Comment }) {
       // define association here
-      this.belongsTo(User, { foreignKey: "userId" });
+      this.belongsTo(User, { foreignKey: "userId", as: "author" });
       this.hasMany(Comment, { foreignKey: "commentId" });
       this.hasMany(Tag, { foreignKey: "articleId" });
+    }
+
+    toJSON() {
+      return {
+        ...this.get(),
+        id: undefined,
+        userId: undefined,
+      };
     }
   }
   Article.init(
