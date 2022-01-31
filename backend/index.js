@@ -1,3 +1,4 @@
+require("dotenv").config();
 const PORT = process.env.PORT || 3001;
 const express = require("express");
 const cors = require("cors");
@@ -14,8 +15,12 @@ app.use(cors());
 app.use(express.json());
 
 (async () => {
-  // await sequelize.sync({ force: true });
-  await sequelize.authenticate();
+  try {
+    // await sequelize.sync({ alter: true });
+    await sequelize.authenticate();
+  } catch (error) {
+    console.error(error);
+  }
 })();
 
 app.get("/", (req, res) => res.json({ status: "API is running on /api" }));
