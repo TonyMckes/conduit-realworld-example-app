@@ -7,10 +7,20 @@ const { User } = require("../models");
 const { Tag } = require("../models");
 
 // All Articles - by Author/by Tag/Favorited by user
-router.get("/", async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
   try {
-    const { author, tag, favorited } = req.query;
     let articles;
+    let loggedUser = req.user;
+
+    if (loggedUser) {
+      loggedUser = await User.findOne({
+        attributes: { exclude: ["email"] },
+        where: { email: loggedUser.email },
+      });
+    }
+
+    const { author, tag, favorited } = req.query;
+
     const searchOptions = {
       include: [
         {
@@ -39,34 +49,44 @@ router.get("/", async (req, res) => {
     //* Tests failing because: https://github.com/gothinkster/realworld/issues/839
     for (let article of articles) {
       const articleTags = await article.getTagList();
+      const dataValues = article.dataValues;
       const tagList = [];
-
       for (const {
         dataValues: { name: name },
       } of articleTags) {
         tagList.push(name);
       }
 
-      article.dataValues.tagList = tagList;
-
-      delete article.dataValues.Favorites;
+      dataValues.tagList = tagList;
+      if (loggedUser) {
+        dataValues.favorited = await article.hasUser(loggedUser);
+        delete dataValues.Favorites;
+      } else {
+        dataValues.favorited = null;
+      }
+      dataValues.favoritesCount = await article.countUsers();
     }
 
     res.json({ articles, articlesCount: articles.length });
   } catch (error) {
-    res.json({ errors: error.message });
+    res.json({ errors: { body: error.message } });
   }
 });
 
 // Create Article
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const userData = req.user;
-    const user = await User.findOne({
-      attributes: { exclude: ["email"] },
-      where: { email: userData.email },
-    });
-    if (!user) throw new Error("You need to login first!");
+    let loggedUser = req.user;
+
+    if (loggedUser) {
+      loggedUser = await User.findOne({
+        attributes: { exclude: ["email"] },
+
+        where: { email: loggedUser.email },
+      });
+    } else {
+      throw new Error("You need to login first!");
+    }
 
     const data = req.body.article;
 
@@ -91,20 +111,37 @@ router.post("/", verifyToken, async (req, res) => {
       }
     }
 
-    article.dataValues.tagList = data.tagList;
+    article.setAuthor(loggedUser);
 
-    article.setAuthor(user);
-    article.dataValues.author = user;
+    const dataValues = article.dataValues;
+
+    dataValues.tagList = data.tagList;
+    dataValues.author = loggedUser;
+    if (loggedUser) {
+      dataValues.favorited = await article.hasUser(loggedUser);
+    } else {
+      dataValues.favorited = false;
+    }
+    dataValues.favoritesCount = await article.countUsers();
 
     res.json({ article });
   } catch (error) {
-    res.json({ errors: error.message });
+    res.json({ errors: { body: error.message } });
   }
 });
 
 // Single Article by slug
 router.get("/:slug", async (req, res) => {
   try {
+    let loggedUser = req.user;
+
+    if (loggedUser) {
+      loggedUser = await User.findOne({
+        attributes: { exclude: ["email"] },
+        where: { email: loggedUser.email },
+      });
+    }
+
     const slug = req.params.slug;
 
     const article = await Article.findOne({
@@ -125,23 +162,31 @@ router.get("/:slug", async (req, res) => {
     if (!article) throw new Error("Article not found!");
 
     const tagList = [];
-
     for (const tag of article.tagList) {
       tagList.push(tag.name);
-      article.dataValues.tagList = tagList;
     }
+
+    const dataValues = article.dataValues;
+
+    dataValues.tagList = tagList;
+    if (loggedUser) {
+      dataValues.favorited = await article.hasUser(loggedUser);
+    } else {
+      dataValues.favorited = false;
+    }
+    dataValues.favoritesCount = await article.countUsers();
 
     res.json({ article });
   } catch (error) {
-    res.json({ errors: error.message });
+    res.json({ errors: { body: error.message } });
   }
 });
 
 // Update Article
 router.put("/:slug", verifyToken, async (req, res) => {
   try {
+    const { title, description, body } = req.body.article;
     const slug = req.params.slug;
-    const updatedBody = req.body.article.body;
 
     const article = await Article.findOne({
       where: { slug: slug },
@@ -160,81 +205,157 @@ router.put("/:slug", verifyToken, async (req, res) => {
     });
     if (!article) throw new Error("Article not found!");
 
-    article.body = updatedBody;
+    const author = await article.getAuthor();
+    let loggedUser = req.user;
+
+    if (loggedUser) {
+      loggedUser = await User.findOne({
+        attributes: { exclude: ["email"] },
+
+        where: { email: loggedUser.email },
+      });
+
+      // if (loggedUser !== author) throw new Error("You are not the author!");
+    } else {
+      throw new Error("You need to login first!");
+    }
+
+    if (title) {
+      article.title = title;
+      article.slug = slugify(title);
+    }
+    if (description) article.description = description;
+    if (body) article.body = body;
     await article.save();
 
     const tagList = [];
-
     for (const tag of article.tagList) {
       tagList.push(tag.name);
-      article.dataValues.tagList = tagList;
     }
+
+    const dataValues = article.dataValues;
+
+    dataValues.tagList = tagList;
+    if (loggedUser) {
+      dataValues.favorited = await article.hasUser(loggedUser);
+    } else {
+      dataValues.favorited = false;
+    }
+    dataValues.favoritesCount = await article.countUsers();
 
     res.json({ article });
   } catch (error) {
-    res.json({ errors: error.message });
+    res.json({ errors: { body: error.message } });
   }
 });
 
-//* Favorite Article
+// Favorite Article TODO: Avoid code repetition
 router.post("/:slug/favorite", verifyToken, async (req, res) => {
   try {
-    // const slug = req.params.slug;
-    // const article = await Article.findOne({
-    //   where: { slug: slug },
-    //   include: [
-    //     {
-    //       model: Tag,
-    //       as: "tagList",
-    //       attributes: ["name"],
-    //     },
-    //     {
-    //       model: User,
-    //       as: "author",
-    //       attributes: ["username", "bio", "image" /* "following" */],
-    //     },
-    //   ],
-    // });
-    // if (!article) throw new Error("Article not found!");
-    // const tagList = [];
-    // for (const tag of article.tagList) {
-    //   tagList.push(tag.name);
-    //   article.dataValues.tagList = tagList;
-    // }
-    // res.json({ article });
+    let loggedUser = req.user;
+
+    if (loggedUser) {
+      loggedUser = await User.findOne({
+        attributes: { exclude: ["email"] },
+        where: { email: loggedUser.email },
+      });
+    } else {
+      throw new Error("You need to login first!");
+    }
+
+    const slug = req.params.slug;
+    const article = await Article.findOne({
+      where: { slug: slug },
+      include: [
+        {
+          model: Tag,
+          as: "tagList",
+          attributes: ["name"],
+        },
+        {
+          model: User,
+          as: "author",
+          attributes: ["username", "bio", "image" /* "following" */],
+        },
+      ],
+    });
+    if (!article) throw new Error("Article not found!");
+
+    const tagList = [];
+    for (const tag of article.tagList) {
+      tagList.push(tag.name);
+    }
+
+    await article.addUser(loggedUser);
+
+    const dataValues = article.dataValues;
+
+    dataValues.tagList = tagList;
+    if (loggedUser) {
+      dataValues.favorited = await article.hasUser(loggedUser);
+    } else {
+      dataValues.favorited = false;
+    }
+    dataValues.favoritesCount = await article.countUsers();
+
+    res.json({ article });
   } catch (error) {
-    res.json({ errors: error.message });
+    res.json({ errors: { body: error.message } });
   }
 });
 
-// Unfavorite Article
+// Unfavorite Article  TODO: Avoid code repetition
 router.delete("/:slug/favorite", verifyToken, async (req, res) => {
   try {
-    // const slug = req.params.slug;
-    // const article = await Article.findOne({
-    //   where: { slug: slug },
-    //   include: [
-    //     {
-    //       model: Tag,
-    //       as: "tagList",
-    //       attributes: ["name"],
-    //     },
-    //     {
-    //       model: User,
-    //       as: "author",
-    //       attributes: ["username", "bio", "image" /* "following" */],
-    //     },
-    //   ],
-    // });
-    // if (!article) throw new Error("Article not found!");
-    // const tagList = [];
-    // for (const tag of article.tagList) {
-    //   tagList.push(tag.name);
-    //   article.dataValues.tagList = tagList;
-    // }
-    // res.json({ article });
+    let loggedUser = req.user;
+
+    if (loggedUser) {
+      loggedUser = await User.findOne({
+        attributes: { exclude: ["email"] },
+        where: { email: loggedUser.email },
+      });
+    } else {
+      throw new Error("You need to login first!");
+    }
+
+    const slug = req.params.slug;
+    const article = await Article.findOne({
+      where: { slug: slug },
+      include: [
+        {
+          model: Tag,
+          as: "tagList",
+          attributes: ["name"],
+        },
+        {
+          model: User,
+          as: "author",
+          attributes: ["username", "bio", "image" /* "following" */],
+        },
+      ],
+    });
+    if (!article) throw new Error("Article not found!");
+
+    const tagList = [];
+    for (const tag of article.tagList) {
+      tagList.push(tag.name);
+    }
+
+    await article.removeUser(loggedUser);
+
+    const dataValues = article.dataValues;
+
+    dataValues.tagList = tagList;
+    if (loggedUser) {
+      dataValues.favorited = await article.hasUser(loggedUser);
+    } else {
+      dataValues.favorited = false;
+    }
+    dataValues.favoritesCount = await article.countUsers();
+
+    res.json({ article });
   } catch (error) {
-    res.json({ errors: error.message });
+    res.json({ errors: { body: error.message } });
   }
 });
 

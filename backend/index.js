@@ -7,6 +7,7 @@ const { sequelize } = require("./models");
 const usersRoutes = require("./routes/users");
 const userRoutes = require("./routes/user");
 const articlesRoutes = require("./routes/articles");
+const favoritesRoutes = require("./routes/articles");
 
 const verifyToken = require("./middleware/authentication");
 
@@ -27,7 +28,7 @@ app.get("/", (req, res) => res.json({ status: "API is running on /api" }));
 app.use("/api/users", usersRoutes);
 app.use("/api/user", verifyToken, userRoutes);
 app.use("/api/articles", articlesRoutes);
-// app.use("/api/articles/:slug/favorite", favoritesRoutes);
+app.use("/api/articles/:slug/favorite", favoritesRoutes);
 // app.use("/api/articles/:slug/comments", commentsRoutes);
 
 app.listen(PORT, () =>
