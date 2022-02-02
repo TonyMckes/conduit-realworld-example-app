@@ -6,11 +6,12 @@ const { Article } = require("../models");
 const { User } = require("../models");
 const { Tag } = require("../models");
 
+// All Articles - by Author/by Tag/Favorited by user
 router.get("/", async (req, res) => {
   try {
-    const { author, tag /* TODO: favorited  */ } = req.query;
-
-    const articleList = await Article.findAll({
+    const { author, tag, favorited } = req.query;
+    let articles;
+    const searchOptions = {
       include: [
         {
           model: Tag,
@@ -25,43 +26,30 @@ router.get("/", async (req, res) => {
           ...(author && { where: { username: author } }),
         },
       ],
-    });
+    };
+
+    if (favorited) {
+      const user = await User.findOne({ where: { username: favorited } });
+
+      articles = await user.getFavorites(searchOptions);
+    } else {
+      articles = await Article.findAll(searchOptions);
+    }
 
     //* Tests failing because: https://github.com/gothinkster/realworld/issues/839
-    const articles = [];
-    for (let article of articleList) {
-      // TODO: I need to refactor this;
-      if (tag) {
-        article = await Article.findOne({
-          where: { id: article.id },
-          include: [
-            {
-              model: Tag,
-              as: "tagList",
-              attributes: ["name"],
-            },
-            {
-              model: User,
-              as: "author",
-              attributes: ["username", "bio", "image" /* "following" */],
-            },
-          ],
-        });
+    for (let article of articles) {
+      const articleTags = await article.getTagList();
+      const tagList = [];
+
+      for (const {
+        dataValues: { name: name },
+      } of articleTags) {
+        tagList.push(name);
       }
 
-      const tagList = [];
-      if (tag) {
-        for (const tag of article.dataValues.tagList) {
-          tagList.push(tag.name);
-          article.dataValues.tagList = tagList;
-        }
-      } else {
-        for (const tag of article.dataValues.tagList) {
-          tagList.push(tag.name);
-          article.dataValues.tagList = tagList;
-        }
-      }
-      articles.push(article);
+      article.dataValues.tagList = tagList;
+
+      delete article.dataValues.Favorites;
     }
 
     res.json({ articles, articlesCount: articles.length });
@@ -70,11 +58,12 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Create Article
 router.post("/", verifyToken, async (req, res) => {
   try {
     const userData = req.user;
     const user = await User.findOne({
-      attributes: ["id", "username", "bio", "image" /* "following" */],
+      attributes: { exclude: ["email"] },
       where: { email: userData.email },
     });
     if (!user) throw new Error("You need to login first!");
@@ -88,7 +77,6 @@ router.post("/", verifyToken, async (req, res) => {
       title: data.title,
       description: data.description,
       body: data.body,
-      userId: user.id,
     });
 
     for (const tag of data.tagList) {
@@ -105,6 +93,7 @@ router.post("/", verifyToken, async (req, res) => {
 
     article.dataValues.tagList = data.tagList;
 
+    article.setAuthor(user);
     article.dataValues.author = user;
 
     res.json({ article });
@@ -112,5 +101,153 @@ router.post("/", verifyToken, async (req, res) => {
     res.json({ errors: error.message });
   }
 });
+
+// Single Article by slug
+router.get("/:slug", async (req, res) => {
+  try {
+    const slug = req.params.slug;
+
+    const article = await Article.findOne({
+      where: { slug: slug },
+      include: [
+        {
+          model: Tag,
+          as: "tagList",
+          attributes: ["name"],
+        },
+        {
+          model: User,
+          as: "author",
+          attributes: ["username", "bio", "image" /* "following" */],
+        },
+      ],
+    });
+    if (!article) throw new Error("Article not found!");
+
+    const tagList = [];
+
+    for (const tag of article.tagList) {
+      tagList.push(tag.name);
+      article.dataValues.tagList = tagList;
+    }
+
+    res.json({ article });
+  } catch (error) {
+    res.json({ errors: error.message });
+  }
+});
+
+// Update Article
+router.put("/:slug", verifyToken, async (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const updatedBody = req.body.article.body;
+
+    const article = await Article.findOne({
+      where: { slug: slug },
+      include: [
+        {
+          model: Tag,
+          as: "tagList",
+          attributes: ["name"],
+        },
+        {
+          model: User,
+          as: "author",
+          attributes: ["username", "bio", "image" /* "following" */],
+        },
+      ],
+    });
+    if (!article) throw new Error("Article not found!");
+
+    article.body = updatedBody;
+    await article.save();
+
+    const tagList = [];
+
+    for (const tag of article.tagList) {
+      tagList.push(tag.name);
+      article.dataValues.tagList = tagList;
+    }
+
+    res.json({ article });
+  } catch (error) {
+    res.json({ errors: error.message });
+  }
+});
+
+//* Favorite Article
+router.post("/:slug/favorite", verifyToken, async (req, res) => {
+  try {
+    // const slug = req.params.slug;
+    // const article = await Article.findOne({
+    //   where: { slug: slug },
+    //   include: [
+    //     {
+    //       model: Tag,
+    //       as: "tagList",
+    //       attributes: ["name"],
+    //     },
+    //     {
+    //       model: User,
+    //       as: "author",
+    //       attributes: ["username", "bio", "image" /* "following" */],
+    //     },
+    //   ],
+    // });
+    // if (!article) throw new Error("Article not found!");
+    // const tagList = [];
+    // for (const tag of article.tagList) {
+    //   tagList.push(tag.name);
+    //   article.dataValues.tagList = tagList;
+    // }
+    // res.json({ article });
+  } catch (error) {
+    res.json({ errors: error.message });
+  }
+});
+
+// Unfavorite Article
+router.delete("/:slug/favorite", verifyToken, async (req, res) => {
+  try {
+    // const slug = req.params.slug;
+    // const article = await Article.findOne({
+    //   where: { slug: slug },
+    //   include: [
+    //     {
+    //       model: Tag,
+    //       as: "tagList",
+    //       attributes: ["name"],
+    //     },
+    //     {
+    //       model: User,
+    //       as: "author",
+    //       attributes: ["username", "bio", "image" /* "following" */],
+    //     },
+    //   ],
+    // });
+    // if (!article) throw new Error("Article not found!");
+    // const tagList = [];
+    // for (const tag of article.tagList) {
+    //   tagList.push(tag.name);
+    //   article.dataValues.tagList = tagList;
+    // }
+    // res.json({ article });
+  } catch (error) {
+    res.json({ errors: error.message });
+  }
+});
+
+// Create Comment for Article
+router.post("/:slug/comments", verifyToken);
+
+// All Comments for Article
+router.get("/:slug/comments");
+
+// Delete Comment for Article
+router.delete("/:slug/comments/:commentId", verifyToken);
+
+// Delete Article
+router.delete("/:slug", verifyToken);
 
 module.exports = router;
