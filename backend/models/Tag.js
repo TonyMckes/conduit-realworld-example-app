@@ -9,8 +9,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate({ Article }) {
       // define association here
+
+      // Tag list
       this.belongsToMany(Article, {
         through: "TagList",
+        foreignKey: "tagName",
         timestamps: false,
       });
     }
