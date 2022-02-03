@@ -8,21 +8,23 @@ const verifyToken = async (req, res, next) => {
     if (headers.authorization) {
       const token = headers.authorization.split(" ")[1];
 
-      let loggedUser = await jwtVerify(token);
-      if (!loggedUser) throw new Error("Invalid Token");
+      const userVerified = await jwtVerify(token);
+      if (!userVerified) throw new Error("Invalid Token");
 
       req.loggedUser = await User.findOne({
         attributes: { exclude: ["email"] },
-        where: { email: loggedUser.email },
+        where: { email: userVerified.email },
       });
 
-      headers.email = loggedUser.email;
-      req.loggedUser.dataValues.token = token;
+      if (req.loggedUser) {
+        headers.email = userVerified.email;
+        req.loggedUser.dataValues.token = token;
+      }
     }
 
     next();
   } catch (error) {
-    res.json({ errors: { body: error.message } });
+    res.json({ errors: { body: [error.message] } });
   }
 };
 

@@ -7,9 +7,6 @@ const { sequelize } = require("./models");
 const usersRoutes = require("./routes/users");
 const userRoutes = require("./routes/user");
 const articlesRoutes = require("./routes/articles");
-const favoritesRoutes = require("./routes/articles");
-
-const verifyToken = require("./middleware/authentication");
 
 const app = express();
 app.use(cors());
@@ -25,11 +22,14 @@ app.use(express.json());
 })();
 
 app.get("/", (req, res) => res.json({ status: "API is running on /api" }));
-app.use("/api/users", verifyToken, usersRoutes);
-app.use("/api/user", verifyToken, userRoutes);
+app.use("/api/users", usersRoutes);
+app.use("/api/user", userRoutes);
 app.use("/api/articles", articlesRoutes);
-app.use("/api/articles/:slug/favorite", favoritesRoutes);
-// app.use("/api/articles/:slug/comments", commentsRoutes);
+// app.use("/api/profiles", profilesRoutes);
+// app.use("/api/tags", tagsRoutes);
+app.get("*", (req, res) =>
+  res.status(404).json({ errors: { body: ["Not found"] } }),
+);
 
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`),
