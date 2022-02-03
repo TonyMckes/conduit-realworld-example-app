@@ -25,7 +25,7 @@ app.use(express.json());
 })();
 
 app.get("/", (req, res) => res.json({ status: "API is running on /api" }));
-app.use("/api/users", usersRoutes);
+app.use("/api/users", verifyToken, usersRoutes);
 app.use("/api/user", verifyToken, userRoutes);
 app.use("/api/articles", articlesRoutes);
 app.use("/api/articles/:slug/favorite", favoritesRoutes);

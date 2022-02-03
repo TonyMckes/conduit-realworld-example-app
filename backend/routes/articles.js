@@ -9,18 +9,8 @@ const { Tag } = require("../models");
 // All Articles - by Author/by Tag/Favorited by user
 router.get("/", verifyToken, async (req, res) => {
   try {
-    let articles;
-    let loggedUser = req.user;
-
-    if (loggedUser) {
-      loggedUser = await User.findOne({
-        attributes: { exclude: ["email"] },
-        where: { email: loggedUser.email },
-      });
-    }
-
+    const { loggedUser } = req;
     const { author, tag, favorited } = req.query;
-
     const searchOptions = {
       include: [
         {
@@ -38,6 +28,7 @@ router.get("/", verifyToken, async (req, res) => {
       ],
     };
 
+    let articles;
     if (favorited) {
       const user = await User.findOne({ where: { username: favorited } });
 
@@ -60,11 +51,13 @@ router.get("/", verifyToken, async (req, res) => {
       dataValues.tagList = tagList;
       if (loggedUser) {
         dataValues.favorited = await article.hasUser(loggedUser);
-        delete dataValues.Favorites;
       } else {
-        dataValues.favorited = null;
+        dataValues.favorited = false;
       }
+
       dataValues.favoritesCount = await article.countUsers();
+
+      delete dataValues.Favorites;
     }
 
     res.json({ articles, articlesCount: articles.length });
@@ -76,17 +69,8 @@ router.get("/", verifyToken, async (req, res) => {
 // Create Article
 router.post("/", verifyToken, async (req, res) => {
   try {
-    let loggedUser = req.user;
-
-    if (loggedUser) {
-      loggedUser = await User.findOne({
-        attributes: { exclude: ["email"] },
-
-        where: { email: loggedUser.email },
-      });
-    } else {
-      throw new Error("You need to login first!");
-    }
+    const { loggedUser } = req;
+    if (!loggedUser) throw new Error("You need to login first!");
 
     const data = req.body.article;
 
@@ -111,6 +95,7 @@ router.post("/", verifyToken, async (req, res) => {
       }
     }
 
+    delete loggedUser.dataValues.token;
     article.setAuthor(loggedUser);
 
     const dataValues = article.dataValues;
@@ -133,17 +118,9 @@ router.post("/", verifyToken, async (req, res) => {
 // Single Article by slug
 router.get("/:slug", async (req, res) => {
   try {
-    let loggedUser = req.user;
+    const { loggedUser } = req;
 
-    if (loggedUser) {
-      loggedUser = await User.findOne({
-        attributes: { exclude: ["email"] },
-        where: { email: loggedUser.email },
-      });
-    }
-
-    const slug = req.params.slug;
-
+    const { slug } = req.params;
     const article = await Article.findOne({
       where: { slug: slug },
       include: [
@@ -185,9 +162,10 @@ router.get("/:slug", async (req, res) => {
 // Update Article
 router.put("/:slug", verifyToken, async (req, res) => {
   try {
-    const { title, description, body } = req.body.article;
-    const slug = req.params.slug;
+    const { loggedUser } = req;
+    if (!loggedUser) throw new Error("You need to login first!");
 
+    const { slug } = req.params;
     const article = await Article.findOne({
       where: { slug: slug },
       include: [
@@ -206,23 +184,12 @@ router.put("/:slug", verifyToken, async (req, res) => {
     if (!article) throw new Error("Article not found!");
 
     const author = await article.getAuthor();
-    let loggedUser = req.user;
+    if (loggedUser !== author) throw new Error("You are not the author!");
 
-    if (loggedUser) {
-      loggedUser = await User.findOne({
-        attributes: { exclude: ["email"] },
-
-        where: { email: loggedUser.email },
-      });
-
-      // if (loggedUser !== author) throw new Error("You are not the author!");
-    } else {
-      throw new Error("You need to login first!");
-    }
-
+    const { title, description, body } = req.body.article;
     if (title) {
-      article.title = title;
       article.slug = slugify(title);
+      article.title = title;
     }
     if (description) article.description = description;
     if (body) article.body = body;
@@ -252,18 +219,10 @@ router.put("/:slug", verifyToken, async (req, res) => {
 // Favorite Article TODO: Avoid code repetition
 router.post("/:slug/favorite", verifyToken, async (req, res) => {
   try {
-    let loggedUser = req.user;
+    const { loggedUser } = req;
+    if (!loggedUser) throw new Error("You need to login first!");
 
-    if (loggedUser) {
-      loggedUser = await User.findOne({
-        attributes: { exclude: ["email"] },
-        where: { email: loggedUser.email },
-      });
-    } else {
-      throw new Error("You need to login first!");
-    }
-
-    const slug = req.params.slug;
+    const { slug } = req.params;
     const article = await Article.findOne({
       where: { slug: slug },
       include: [
@@ -307,18 +266,10 @@ router.post("/:slug/favorite", verifyToken, async (req, res) => {
 // Unfavorite Article  TODO: Avoid code repetition
 router.delete("/:slug/favorite", verifyToken, async (req, res) => {
   try {
-    let loggedUser = req.user;
+    const { loggedUser } = req;
+    if (!loggedUser) throw new Error("You need to login first!");
 
-    if (loggedUser) {
-      loggedUser = await User.findOne({
-        attributes: { exclude: ["email"] },
-        where: { email: loggedUser.email },
-      });
-    } else {
-      throw new Error("You need to login first!");
-    }
-
-    const slug = req.params.slug;
+    const { slug } = req.params;
     const article = await Article.findOne({
       where: { slug: slug },
       include: [

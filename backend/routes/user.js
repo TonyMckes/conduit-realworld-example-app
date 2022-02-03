@@ -1,38 +1,33 @@
 const express = require("express");
 const router = express.Router();
-const { User } = require("../models");
 
+// Current User
 router.get("/", async (req, res) => {
   try {
-    const data = req.user;
+    const { loggedUser } = req;
+    if (!loggedUser) throw new Error("You need to be logged in!");
 
-    const user = await User.findOne({ where: { email: data.email } });
-    if (!user) throw new Error("User doesn't exist!");
+    loggedUser.dataValues.email = req.headers.email;
+    delete req.headers.email;
 
-    user.dataValues.token = req.headers.authorization;
-
-    res.json({ user });
+    res.json({ user: loggedUser });
   } catch (error) {
-    res.json({ errors: error.message });
+    res.json({ errors: { body: error.message } });
   }
 });
 
+// Update User
 router.put("/", async (req, res) => {
   try {
-    const data = req.user;
+    const { loggedUser } = req;
+    if (!loggedUser) throw new Error("You need to be logged in!");
 
-    const user = await User.findOne({ where: { email: data.email } });
-    if (!user) throw new Error("User doesn't exist!");
+    loggedUser.email = req.body.user.email;
+    await loggedUser.save();
 
-    user.email = req.body.user.email;
-
-    await user.save();
-
-    user.dataValues.token = req.headers.authorization;
-
-    res.json({ user });
+    res.json({ user: loggedUser });
   } catch (error) {
-    res.json({ errors: error.message });
+    res.json({ errors: { body: error.message } });
   }
 });
 

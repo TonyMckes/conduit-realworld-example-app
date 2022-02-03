@@ -1,23 +1,28 @@
 const { jwtVerify } = require("../helper/jwt");
+const { User } = require("../models");
 
 const verifyToken = async (req, res, next) => {
   try {
-    const headers = req.headers;
-    // if (!headers.authorization) throw new Error("You need to login first");
+    const { headers } = req;
 
     if (headers.authorization) {
       const token = headers.authorization.split(" ")[1];
 
-      const validToken = await jwtVerify(token);
-      if (!validToken) throw new Error("Invalid Token");
+      let loggedUser = await jwtVerify(token);
+      if (!loggedUser) throw new Error("Invalid Token");
 
-      req.user = validToken;
-      req.user.token = token;
+      req.loggedUser = await User.findOne({
+        attributes: { exclude: ["email"] },
+        where: { email: loggedUser.email },
+      });
+
+      headers.email = loggedUser.email;
+      req.loggedUser.dataValues.token = token;
     }
 
     next();
   } catch (error) {
-    res.json({ errors: error.message });
+    res.json({ errors: { body: error.message } });
   }
 };
 
