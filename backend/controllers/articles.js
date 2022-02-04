@@ -106,6 +106,29 @@ const createArticle = async (req, res) => {
   }
 };
 
+//* Feed
+const articlesFeed = async (req, res) => {
+  try {
+    const { loggedUser } = req;
+    if (!loggedUser) throw new Error("You need to login first!");
+
+    const followers = await loggedUser.getFollowers();
+
+    let articles = [];
+    for (const author of followers) {
+      //TODO:
+      // appendTagList()
+      // appendFollowers()
+      // appendFavorites()
+      articles.push(await author.getArticles());
+    }
+
+    res.json({ articles, articlesCount: articles.length });
+  } catch (error) {
+    res.json({ errors: { body: [error.message] } });
+  }
+};
+
 // Single Article by slug
 const singleArticle = async (req, res) => {
   try {
@@ -195,4 +218,5 @@ module.exports = {
   singleArticle,
   updateArticle,
   deleteArticle,
+  articlesFeed,
 };
