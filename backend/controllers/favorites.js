@@ -1,6 +1,4 @@
-const { Article } = require("../models");
-const { User } = require("../models");
-const { Tag } = require("../models");
+const { Article, Tag, User } = require("../models");
 
 //*  Favorite/Unfavorite Article
 const favoriteToggler = async (req, res) => {
@@ -9,7 +7,7 @@ const favoriteToggler = async (req, res) => {
     if (!loggedUser) throw new Error("You need to login first!");
 
     const { slug } = req.params;
-    console.log(req.params);
+
     const article = await Article.findOne({
       where: { slug: slug },
       include: [
