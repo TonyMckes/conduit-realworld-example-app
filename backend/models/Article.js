@@ -14,11 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(User, { foreignKey: "userId", as: "author" });
 
       // Comments
-      this.belongsToMany(User, {
-        through: Comment,
-        as: "comment",
-        foreignKey: "articleId",
-      });
+      this.hasMany(Comment, { foreignKey: "articleId" });
 
       // Tag list
       this.belongsToMany(Tag, {
