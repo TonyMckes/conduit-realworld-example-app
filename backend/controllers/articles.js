@@ -1,7 +1,5 @@
 const { printFavorites, printTagList, slugify } = require("../helper/helpers");
-const { Article } = require("../models");
-const { User } = require("../models");
-const { Tag } = require("../models");
+const { Article, Tag, User } = require("../models");
 
 const includeOptions = [
   { model: Tag, as: "tagList", attributes: ["name"] },
@@ -63,21 +61,21 @@ const createArticle = async (req, res) => {
     const { loggedUser } = req;
     if (!loggedUser) throw new Error("You need to login first!");
 
-    const { title, description, body } = req.body.article;
-    if (title) throw new Error(`A title is required`);
-    if (description) throw new Error(`A description is required`);
-    if (body) throw new Error(`Article body is required`);
+    const { title, description, body, tagList } = req.body.article;
+    if (!title) throw new Error(`A title is required`);
+    if (!description) throw new Error(`A description is required`);
+    if (!body) throw new Error(`Article body is required`);
 
-    const slug = slugify(data.title);
+    const slug = slugify(title);
 
     const article = await Article.create({
       slug: slug,
-      title: data.title,
-      description: data.description,
-      body: data.body,
+      title: title,
+      description: description,
+      body: body,
     });
 
-    for (const tag of data.tagList) {
+    for (const tag of tagList) {
       const checkTag = await Tag.findByPk(tag);
 
       if (!checkTag) {
@@ -94,7 +92,7 @@ const createArticle = async (req, res) => {
 
     const dataValues = article.dataValues;
 
-    dataValues.tagList = data.tagList;
+    dataValues.tagList = tagList;
 
     dataValues.author = loggedUser;
     await printFavorites(loggedUser, dataValues, article);
