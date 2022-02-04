@@ -27,7 +27,7 @@ const commentsRoutes = require("./articles/comments");
 
 //> Favorites routes
 router.use("/", favoritesRoutes);
-//> TODO: Comments routes
+//> Comments routes
 router.use("/", commentsRoutes);
 
 module.exports = router;

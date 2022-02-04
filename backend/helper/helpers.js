@@ -11,12 +11,14 @@ const slugify = (string) => {
  *
  * @param {array} articleTags
  * @param {object} dataValues
+ * @returns
  */
 const printTagList = (articleTags, dataValues) => {
   const tagList = [];
   for (const tag of articleTags) {
     tagList.push(tag.name);
   }
+  if (!dataValues) return tagList;
   dataValues.tagList = tagList;
 };
 
