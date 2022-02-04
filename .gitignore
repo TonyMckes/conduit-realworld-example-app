@@ -1,8 +1,15 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
-.env
 
 # dependencies
 node_modules
+.pnp
+.pnp.js
+
+# testing
+coverage
+
+# production
+build
 dist
 
 # IDEs and editors
@@ -22,11 +29,13 @@ dist
 !.vscode/extensions.json
 .history/*
 
-
-#System Files
+# misc
 .DS_Store
-Thumbs.db
-
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 #log files
 npm-debug.log*
