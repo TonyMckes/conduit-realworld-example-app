@@ -1,3 +1,8 @@
+const {
+  appendFollowers,
+  appendFavorites,
+  appendTagList,
+} = require("../helper/helpers");
 const { Article, Tag, User } = require("../models");
 
 //*  Favorite/Unfavorite Article
@@ -25,23 +30,12 @@ const favoriteToggler = async (req, res) => {
     });
     if (!article) throw new Error("Article not found!");
 
-    const tagList = [];
-    for (const tag of article.tagList) {
-      tagList.push(tag.name);
-    }
-
     if (req.method === "POST") await article.addUser(loggedUser);
     if (req.method === "DELETE") await article.removeUser(loggedUser);
 
-    const dataValues = article.dataValues;
-
-    dataValues.tagList = tagList;
-    if (loggedUser) {
-      dataValues.favorited = await article.hasUser(loggedUser);
-    } else {
-      dataValues.favorited = false;
-    }
-    dataValues.favoritesCount = await article.countUsers();
+    appendTagList(article.tagList, article);
+    await appendFollowers(loggedUser, article);
+    await appendFavorites(loggedUser, article);
 
     res.json({ article });
   } catch (error) {

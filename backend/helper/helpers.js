@@ -1,40 +1,50 @@
-/**
- *
- * @param {string} string
- * @returns
- */
 const slugify = (string) => {
   return string.trim().toLowerCase().replace(/\W|_/g, "-");
 };
 
-/**
- *
- * @param {array} articleTags
- * @param {object} dataValues
- * @returns
- */
-const printTagList = (articleTags, dataValues) => {
+const appendTagList = (articleTags, article) => {
   const tagList = [];
   for (const tag of articleTags) {
     tagList.push(tag.name);
   }
-  if (!dataValues) return tagList;
-  dataValues.tagList = tagList;
+  if (!article) return tagList;
+  article.dataValues.tagList = tagList;
 };
 
-/**
- *
- * @param {object} loggedUser
- * @param {object} dataValues
- * @param {object} article
- */
-const printFavorites = async (loggedUser, dataValues, article) => {
+const appendFavorites = async (loggedUser, article) => {
   if (loggedUser) {
-    dataValues.favorited = await article.hasUser(loggedUser);
+    article.dataValues.favorited = await article.hasUser(loggedUser);
   } else {
-    dataValues.favorited = false;
+    article.dataValues.favorited = false;
   }
-  dataValues.favoritesCount = await article.countUsers();
+  article.dataValues.favoritesCount = await article.countUsers();
 };
 
-module.exports = { slugify, printTagList, printFavorites };
+async function appendFollowers(loggedUser, toAppend) {
+  //
+  if (loggedUser && toAppend?.author) {
+    //
+    const author = await toAppend.getAuthor();
+    const hasFollower = await author.hasFollower(loggedUser);
+
+    toAppend.author.dataValues.following = hasFollower;
+    //
+  } else if (loggedUser && !toAppend?.author) {
+    //
+    const hasFollower = await toAppend.hasFollower(loggedUser);
+
+    toAppend.dataValues.following = hasFollower;
+    //
+  } else {
+    //
+    if (!toAppend?.author) toAppend.dataValues.following = false;
+    else toAppend.author.dataValues.following = false;
+  }
+}
+
+module.exports = {
+  slugify,
+  appendTagList,
+  appendFavorites,
+  appendFollowers,
+};

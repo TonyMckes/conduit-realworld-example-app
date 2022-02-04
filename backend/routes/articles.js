@@ -16,7 +16,7 @@ router.post("/", verifyToken, createArticle);
 //* TODO: Feed
 router.get("/feed", verifyToken, singleArticle);
 // Single Article by slug
-router.get("/:slug", singleArticle);
+router.get("/:slug", verifyToken, singleArticle);
 //* Update Article
 router.put("/:slug", verifyToken, updateArticle);
 //* Delete Article

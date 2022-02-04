@@ -1,4 +1,9 @@
-const { printFavorites, printTagList, slugify } = require("../helper/helpers");
+const {
+  appendFollowers,
+  appendFavorites,
+  appendTagList,
+  slugify,
+} = require("../helper/helpers");
 const { Article, Tag, User } = require("../models");
 
 const includeOptions = [
@@ -41,12 +46,12 @@ const allArticles = async (req, res) => {
     //* Tests failing because: https://github.com/gothinkster/realworld/issues/839
     for (let article of articles) {
       const articleTags = await article.getTagList();
-      const dataValues = article.dataValues;
 
-      printTagList(articleTags, dataValues);
-      await printFavorites(loggedUser, dataValues, article);
+      appendTagList(articleTags, article);
+      await appendFollowers(loggedUser, article);
+      await appendFavorites(loggedUser, article);
 
-      delete dataValues.Favorites;
+      delete article.dataValues.Favorites;
     }
 
     res.json({ articles, articlesCount: articles.length });
@@ -88,14 +93,12 @@ const createArticle = async (req, res) => {
     }
 
     delete loggedUser.dataValues.token;
+
+    article.dataValues.tagList = tagList;
     article.setAuthor(loggedUser);
-
-    const dataValues = article.dataValues;
-
-    dataValues.tagList = tagList;
-
-    dataValues.author = loggedUser;
-    await printFavorites(loggedUser, dataValues, article);
+    article.dataValues.author = loggedUser;
+    await appendFollowers(loggedUser, loggedUser);
+    await appendFavorites(loggedUser, article);
 
     res.json({ article });
   } catch (error) {
@@ -115,11 +118,9 @@ const singleArticle = async (req, res) => {
     });
     if (!article) throw new Error("Article not found!");
 
-    const dataValues = article.dataValues;
-
-    printTagList(article.tagList, dataValues);
-
-    await printFavorites(loggedUser, dataValues, article);
+    appendTagList(article.tagList, article);
+    await appendFollowers(loggedUser, article);
+    await appendFavorites(loggedUser, article);
 
     res.json({ article });
   } catch (error) {
@@ -140,8 +141,9 @@ const updateArticle = async (req, res) => {
     });
     if (!article) throw new Error("Article not found!");
 
-    const author = await article.getAuthor();
-    if (loggedUser.id !== author.id) throw new Error("You are not the author!");
+    if (loggedUser.id !== article.author.id) {
+      throw new Error("You are not the author!");
+    }
 
     const { title, description, body } = req.body.article;
     if (title) {
@@ -152,11 +154,9 @@ const updateArticle = async (req, res) => {
     if (body) article.body = body;
     await article.save();
 
-    const dataValues = article.dataValues;
-
-    printTagList(article.tagList, dataValues);
-
-    await printFavorites(loggedUser, dataValues, article);
+    appendTagList(article.tagList, article);
+    await appendFollowers(loggedUser, article);
+    await appendFavorites(loggedUser, article);
 
     res.json({ article });
   } catch (error) {
@@ -177,8 +177,9 @@ const deleteArticle = async (req, res) => {
     });
     if (!article) throw new Error("Article not found!");
 
-    const author = await article.getAuthor();
-    if (loggedUser.id !== author.id) throw new Error("You are not the author!");
+    if (loggedUser.id !== article.author.id) {
+      throw new Error("You are not the author!");
+    }
 
     await article.destroy();
 

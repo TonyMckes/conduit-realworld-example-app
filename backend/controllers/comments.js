@@ -1,8 +1,10 @@
+const { appendFollowers } = require("../helper/helpers");
 const { Article, Comment, User } = require("../models");
 
 //? All Comments for Article
 const allComments = async (req, res) => {
   try {
+    const { loggedUser } = req;
     const { slug } = req.params;
 
     const article = await Article.findOne({ where: { slug: slug } });
@@ -13,6 +15,10 @@ const allComments = async (req, res) => {
         { model: User, as: "author", attributes: { exclude: ["email"] } },
       ],
     });
+
+    for (const comment of comments) {
+      await appendFollowers(loggedUser, comment);
+    }
 
     res.json({ comments });
   } catch (error) {
@@ -40,8 +46,8 @@ const createComment = async (req, res) => {
     });
 
     delete loggedUser.dataValues.token;
-
     comment.dataValues.author = loggedUser;
+    await appendFollowers(loggedUser, loggedUser);
 
     res.json({ comment });
   } catch (error) {
