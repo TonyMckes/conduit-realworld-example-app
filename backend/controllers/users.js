@@ -5,8 +5,8 @@ const { bcryptHash, bcryptCompare } = require("../helper/bcrypt");
 // Register
 const signUp = async (req, res) => {
   try {
-    // const userExists = await User.findOne({ where: { email: user.email } });
-    // if (userExists) throw new Error("Email already exists! try logging in");
+    const userExists = await User.findOne({ where: { email: user.email } });
+    if (userExists) throw new Error("Email already exists! try logging in");
 
     const { email, username, bio, image, password } = req.body.user;
     if (!email) throw new Error(`An email is required`);
@@ -44,7 +44,7 @@ const signIn = async (req, res) => {
 
     res.json({ user: existentUser });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    res.status(422).json({ errors: { body: [error.message] } });
   }
 };
 
