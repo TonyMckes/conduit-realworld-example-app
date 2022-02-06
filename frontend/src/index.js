@@ -15,8 +15,8 @@ import SignUp from "./routes/SignUp";
 
 ReactDOM.render(
   <HashRouter>
-    <AuthContextProvider>
-      <React.StrictMode>
+    <React.StrictMode>
+      <AuthContextProvider>
         <Routes>
           <Route element={<App />}>
             <Route path="/" element={<Home />} />
@@ -36,8 +36,8 @@ ReactDOM.render(
             <Route path="profile/:username/favorites" element={<Profile />} />
           </Route>
         </Routes>
-      </React.StrictMode>
-    </AuthContextProvider>
+      </AuthContextProvider>
+    </React.StrictMode>
   </HashRouter>,
   document.getElementById("root"),
 );

@@ -1,10 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../helpers/AuthContextProvider";
 
 function Home() {
   const [tags, setTags] = useState([]);
   const [articles, setArticles] = useState([]);
+  const { authState } = useAuth();
 
   useEffect(() => {
     axios.get("/api/articles").then((res) => setArticles(res.data.articles));
@@ -42,13 +44,15 @@ function Home() {
             <div className="feed-toggle">
               <ul className="nav nav-pills outline-active">
                 <li className="nav-item">
-                  <Link
-                    className="nav-link disabled"
-                    to="/"
-                    onClick={articlesFeed}
-                  >
-                    Your Feed
-                  </Link>
+                  {authState.status && (
+                    <Link
+                      className="nav-link disabled"
+                      to="/"
+                      onClick={articlesFeed}
+                    >
+                      Your Feed
+                    </Link>
+                  )}
                 </li>
 
                 <li className="nav-item">

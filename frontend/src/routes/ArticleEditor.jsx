@@ -1,8 +1,23 @@
 import axios from "axios";
 import { useState } from "react";
+import FormFieldset from "../components/FormFieldset";
 import { useAuth } from "../helpers/AuthContextProvider";
 
-function ArticleEditor() {
+export default function ArticleEditor() {
+  return (
+    <div className="editor-page">
+      <div className="container page">
+        <div className="row">
+          <div className="col-md-10 offset-md-1 col-xs-12">
+            <ArticleEditorForm />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ArticleEditorForm() {
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -46,81 +61,47 @@ function ArticleEditor() {
   };
 
   return (
-    <div className="editor-page">
-      <div className="container page">
-        <div className="row">
-          <div className="col-md-10 offset-md-1 col-xs-12">
-            <form onSubmit={formSubmit}>
-              <fieldset>
-                <Fieldset>
-                  <Input
-                    className="form-control"
-                    placeholder="Article Title"
-                    name="title"
-                    value={form.title}
-                    handler={inputHandler}
-                  />
-                </Fieldset>
-                <Fieldset>
-                  <Input
-                    placeholder="What's this article about?"
-                    name="description"
-                    value={form.description}
-                    handler={inputHandler}
-                  />
-                </Fieldset>
+    <form onSubmit={formSubmit}>
+      <fieldset>
+        <FormFieldset
+          className="form-control-lg"
+          placeholder="Article Title"
+          name="title"
+          value={form.title}
+          onChange={inputHandler}
+        ></FormFieldset>
 
-                <Fieldset>
-                  <textarea
-                    className="form-control"
-                    rows="8"
-                    placeholder="Write your article (in markdown)"
-                    name="body"
-                    value={form.body}
-                    onChange={inputHandler}
-                  ></textarea>
-                </Fieldset>
+        <FormFieldset
+          placeholder="What's this article about?"
+          name="description"
+          value={form.description}
+          onChange={inputHandler}
+        ></FormFieldset>
 
-                <Fieldset>
-                  <Input
-                    placeholder="Enter tags"
-                    name="tags"
-                    value={form.tagList}
-                    handler={tagsInputHandler}
-                  />
-                  <div className="tag-list"></div>
-                </Fieldset>
+        <fieldset className="form-group">
+          <textarea
+            className="form-control"
+            rows="8"
+            placeholder="Write your article (in markdown)"
+            name="body"
+            value={form.body}
+            onChange={inputHandler}
+          ></textarea>
+        </fieldset>
 
-                <button
-                  className="btn btn-lg pull-xs-right btn-primary"
-                  type="submit"
-                >
-                  Publish Article
-                </button>
-              </fieldset>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+        <FormFieldset
+          placeholder="Enter tags"
+          name="tags"
+          value={form.tagList}
+          onChange={tagsInputHandler}
+        >
+          <div className="tag-list"></div>
+        </FormFieldset>
+
+        <button className="btn btn-lg pull-xs-right btn-primary" type="submit">
+          Publish Article
+        </button>
+      </fieldset>
+    </form>
   );
 }
-
-function Fieldset({ children }) {
-  return <fieldset className="form-group">{children}</fieldset>;
-}
-
-function Input({ placeholder, className, name, value, handler }) {
-  return (
-    <input
-      type="text"
-      className={`form-control ${className}`}
-      placeholder={placeholder}
-      name={name}
-      value={value}
-      onChange={handler}
-    />
-  );
-}
-
-export default ArticleEditor;
