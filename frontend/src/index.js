@@ -8,7 +8,9 @@ import reportWebVitals from "./reportWebVitals";
 import Article from "./routes/Article";
 import ArticleEditor from "./routes/ArticleEditor";
 import Home from "./routes/Home";
-import Profile from "./routes/Profile";
+import Profile from "./routes/Profile/Profile";
+import ProfileArticles from "./routes/Profile/ProfileArticles";
+import ProfileFavArticles from "./routes/Profile/ProfileFavArticles";
 import Settings from "./routes/Settings";
 import SignIn from "./routes/SignIn";
 import SignUp from "./routes/SignUp";
@@ -25,15 +27,14 @@ ReactDOM.render(
 
             <Route path="settings" element={<Settings />} />
 
-            <Route path="editor" element={<ArticleEditor />} />
             <Route path="editor/:slug" element={<ArticleEditor />} />
 
-            <Route path="article" element={<Article />} />
             <Route path="article/:slug" element={<Article />} />
 
-            <Route path="profile" element={<Profile />} />
-            <Route path="profile/:username" element={<Profile />} />
-            <Route path="profile/:username/favorites" element={<Profile />} />
+            <Route path="profile/:username" element={<Profile />}>
+              <Route index element={<ProfileArticles />} />
+              <Route path="favorites" element={<ProfileFavArticles />} />
+            </Route>
           </Route>
         </Routes>
       </AuthContextProvider>

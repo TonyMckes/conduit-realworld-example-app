@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import ArticlesPreview from "../components/ArticlesPreview";
 import { useAuth } from "../helpers/AuthContextProvider";
 
 function Home() {
@@ -66,46 +67,13 @@ function Home() {
                 </li>
               </ul>
             </div>
-            <Articles articles={articles} />
+            {articles && <ArticlesPreview articles={articles} />}
           </div>
 
           <PopularTags tags={tags} articleBySlug={articleBySlug} />
         </div>
       </div>
     </div>
-  );
-}
-
-function Articles({ articles }) {
-  return (
-    <>
-      {articles &&
-        articles.map((item) => {
-          return (
-            <div key={item.slug} className="article-preview">
-              <div className="article-meta">
-                <Link to="/profile">
-                  <img src="http://i.imgur.com/Qr71crq.jpg" alt="" />
-                </Link>
-                <div className="info">
-                  <Link to="" className="author">
-                    {item.author.username}
-                  </Link>
-                  <span className="date">{item.createdAt}</span>
-                </div>
-                <button className="btn btn-outline-primary btn-sm pull-xs-right">
-                  <i className="ion-heart"></i> {item.favoritesCount}
-                </button>
-              </div>
-              <Link to="/article" className="preview-link">
-                <h1>{item.title}</h1>
-                <p>{item.description}</p>
-                <span>Read more...</span>
-              </Link>
-            </div>
-          );
-        })}
-    </>
   );
 }
 
