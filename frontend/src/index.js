@@ -27,7 +27,9 @@ ReactDOM.render(
 
             <Route path="settings" element={<Settings />} />
 
-            <Route path="editor/:slug" element={<ArticleEditor />} />
+            <Route path="editor" element={<ArticleEditor />}>
+              <Route path=":slug" element={<ArticleEditor />} />
+            </Route>
 
             <Route path="article/:slug" element={<Article />} />
 

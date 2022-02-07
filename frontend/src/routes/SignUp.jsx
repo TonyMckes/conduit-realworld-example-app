@@ -1,27 +1,26 @@
 import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import ContainerRow from "../components/ContainerRow";
 import FormFieldset from "../components/FormFieldset";
 
 function SignUp() {
   return (
     <div className="auth-page">
-      <div className="container page">
-        <div className="row">
-          <div className="col-md-6 offset-md-3 col-xs-12">
-            <h1 className="text-xs-center">Sign up</h1>
-            <p className="text-xs-center">
-              <Link to="/login">Already have an account?</Link>
-            </p>
+      <ContainerRow className="page">
+        <div className="col-md-6 offset-md-3 col-xs-12">
+          <h1 className="text-xs-center">Sign up</h1>
+          <p className="text-xs-center">
+            <Link to="/login">Already have an account?</Link>
+          </p>
 
-            {/* <ul className="error-messages">
+          {/* <ul className="error-messages">
               <li>That email is already taken</li>
             </ul> */}
 
-            <SignUpForm />
-          </div>
+          <SignUpForm />
         </div>
-      </div>
+      </ContainerRow>
     </div>
   );
 }

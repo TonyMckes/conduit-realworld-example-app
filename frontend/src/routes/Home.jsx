@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ArticlesPreview from "../components/ArticlesPreview";
+import ContainerRow from "../components/ContainerRow";
+import BannerContainer from "../components/BannerContainer";
 import { useAuth } from "../helpers/AuthContextProvider";
 
 function Home() {
@@ -32,47 +34,38 @@ function Home() {
 
   return (
     <div className="home-page">
-      <div className="banner">
-        <div className="container">
-          <h1 className="logo-font">conduit</h1>
-          <p>A place to share your knowledge.</p>
-        </div>
-      </div>
-
-      <div className="container page">
-        <div className="row">
-          <div className="col-md-9">
-            <div className="feed-toggle">
-              <ul className="nav nav-pills outline-active">
-                <li className="nav-item">
-                  {authState.status && (
-                    <Link
-                      className="nav-link disabled"
-                      to="/"
-                      onClick={articlesFeed}
-                    >
-                      Your Feed
-                    </Link>
-                  )}
-                </li>
-
-                <li className="nav-item">
+      <BannerContainer>
+        <h1 className="logo-font">conduit</h1>
+        <p>A place to share your knowledge.</p>
+      </BannerContainer>
+      <ContainerRow className="page">
+        <div className="col-md-9">
+          <div className="feed-toggle">
+            <ul className="nav nav-pills outline-active">
+              <li className="nav-item">
+                {authState.status && (
                   <Link
-                    className="nav-link active"
+                    className="nav-link disabled"
                     to="/"
-                    onClick={allArticles}
+                    onClick={articlesFeed}
                   >
-                    Global Feed
+                    Your Feed
                   </Link>
-                </li>
-              </ul>
-            </div>
-            {articles && <ArticlesPreview articles={articles} />}
-          </div>
+                )}
+              </li>
 
-          <PopularTags tags={tags} articleBySlug={articleBySlug} />
+              <li className="nav-item">
+                <Link className="nav-link active" to="/" onClick={allArticles}>
+                  Global Feed
+                </Link>
+              </li>
+            </ul>
+          </div>
+          {articles && <ArticlesPreview articles={articles} />}
         </div>
-      </div>
+
+        <PopularTags tags={tags} articleBySlug={articleBySlug} />
+      </ContainerRow>
     </div>
   );
 }
