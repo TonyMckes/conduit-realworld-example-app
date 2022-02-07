@@ -1,18 +1,17 @@
 import axios from "axios";
 import { useState } from "react";
+import ContainerRow from "../components/ContainerRow";
 import FormFieldset from "../components/FormFieldset";
 import { useAuth } from "../helpers/AuthContextProvider";
 
 export default function ArticleEditor() {
   return (
     <div className="editor-page">
-      <div className="container page">
-        <div className="row">
-          <div className="col-md-10 offset-md-1 col-xs-12">
-            <ArticleEditorForm />
-          </div>
+      <ContainerRow className="page">
+        <div className="col-md-10 offset-md-1 col-xs-12">
+          <ArticleEditorForm />
         </div>
-      </div>
+      </ContainerRow>
     </div>
   );
 }
@@ -46,10 +45,10 @@ function ArticleEditorForm() {
       .post(
         "api/articles",
         { article: form },
-        { headers: { Authorization: `Token ${authState.token} ` } },
+        { headers: { Authorization: `Token ${authState.loggedUser.token} ` } },
       )
       .then((res) => {
-        if (res.data.errors) return console.log(res.data.errors.body[0]);
+        if (res.data.errors) return console.log(res.data.errors.body);
 
         setForm({
           title: "",

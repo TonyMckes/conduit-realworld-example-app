@@ -1,18 +1,16 @@
 import { Link } from "react-router-dom";
+import dateFormatter from "../helpers/dateFormatter";
+import Avatar from "./Avatar";
 
 export default function ArticlesPreview({ articles }) {
   return articles.map((article) => {
-    const createdAt = new Date(article.createdAt).toLocaleDateString("en", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
+    const createdAt = dateFormatter(article.createdAt);
 
     return (
       <div className="article-preview" key={article.slug}>
         <div className="article-meta">
           <Link to={article.author.username}>
-            <img src={article.author.image} alt="author" />
+            <Avatar src={article.author.image} alt="author" />
           </Link>
 
           <div className="info">

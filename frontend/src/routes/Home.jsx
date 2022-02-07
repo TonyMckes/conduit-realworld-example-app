@@ -2,8 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ArticlesPreview from "../components/ArticlesPreview";
-import ContainerRow from "../components/ContainerRow";
 import BannerContainer from "../components/BannerContainer";
+import ContainerRow from "../components/ContainerRow";
 import { useAuth } from "../helpers/AuthContextProvider";
 
 function Home() {

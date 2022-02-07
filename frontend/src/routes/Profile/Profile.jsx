@@ -1,7 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useParams } from "react-router-dom";
-import { useAuth } from "../../helpers/AuthContextProvider";
+import Avatar from "../../components/Avatar";
+import ContainerRow from "../../components/ContainerRow";
 
 export default function Profile() {
   const [author, setAuthor] = useState({});
@@ -45,41 +46,37 @@ export default function Profile() {
   return (
     <div className="profile-page">
       <div className="user-info">
-        <div className="container">
-          <div className="row">
-            {author && (
-              <div className="col-xs-12 col-md-10 offset-md-1">
-                <img src={author.image} className="user-img" alt="author" />
-                <h4>{author.username}</h4>
-                <p>{author.bio}</p>
-                <button
-                  className="btn btn-sm btn-outline-secondary action-btn"
-                  // onClick={followHandler}
-                >
-                  <i className="ion-plus-round"></i>
-                  {author.following ? " Unfollow " : " Follow "}
-                  {author.username}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="container">
-        <div className="row">
-          <div className="col-xs-12 col-md-10 offset-md-1">
-            <div className="articles-toggle">
-              <ul className="nav nav-pills outline-active">
-                <NavItem body="My Articles" to="" />
-
-                <NavItem body="Favorited Articles" to="favorites" />
-              </ul>
+        <ContainerRow>
+          {author && (
+            <div className="col-xs-12 col-md-10 offset-md-1">
+              <Avatar src={author.image} className="user-img" alt="author" />
+              <h4>{author.username}</h4>
+              <p>{author.bio}</p>
+              <button
+                className="btn btn-sm btn-outline-secondary action-btn"
+                // onClick={followHandler}
+              >
+                <i className="ion-plus-round"></i>
+                {author.following ? " Unfollow " : " Follow "}
+                {author.username}
+              </button>
             </div>
-            <Outlet />
-          </div>
-        </div>
+          )}
+        </ContainerRow>
       </div>
+
+      <ContainerRow>
+        <div className="col-xs-12 col-md-10 offset-md-1">
+          <div className="articles-toggle">
+            <ul className="nav nav-pills outline-active">
+              <NavItem body="My Articles" to="" />
+
+              <NavItem body="Favorited Articles" to="favorites" />
+            </ul>
+          </div>
+          <Outlet />
+        </div>
+      </ContainerRow>
     </div>
   );
 }

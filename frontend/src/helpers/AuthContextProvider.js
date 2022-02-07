@@ -24,10 +24,6 @@ export function AuthContextProvider({ children }) {
     }
   }, []);
 
-  useEffect(() => {
-    console.log("After reload?", authState);
-  }, [authState]);
-
   return (
     <AuthContext.Provider value={{ authState, setAuthState }}>
       {children}
