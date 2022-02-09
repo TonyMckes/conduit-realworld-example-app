@@ -45,6 +45,18 @@ export default function Article() {
     });
   };
 
+  const followHandler = () => {
+    if (authState.status) {
+      axios({
+        url: `api/profiles/${article.author.username}/follow`,
+        method: article.author.following ? "DELETE" : "POST",
+        headers: headers,
+      }).then((res) => {
+        setArticle({ ...article, author: res.data.profile });
+      });
+    } else alert("You need to login first");
+  };
+
   return (
     <>
       {article?.tagList && (
@@ -52,7 +64,7 @@ export default function Article() {
           <BannerContainer>
             <h1>{article.title}</h1>
             <ArticleMeta article={article}>
-              <FollowButton article={article} />
+              <FollowButton article={article} handler={followHandler} />
               <FavButton article={article} event={handleFav} text="Favorite" />
             </ArticleMeta>
           </BannerContainer>
@@ -61,7 +73,7 @@ export default function Article() {
             <hr />
             <div className="article-actions">
               <ArticleMeta article={article}>
-                <FollowButton article={article} />
+                <FollowButton article={article} handler={followHandler} />
                 <FavButton
                   article={article}
                   event={handleFav}

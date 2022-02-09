@@ -1,48 +1,38 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useParams } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
 import Avatar from "../../components/Avatar";
 import ContainerRow from "../../components/ContainerRow";
-import { FavButton, FollowButton } from "../../components/Buttons";
+import { useAuth } from "../../helpers/AuthContextProvider";
+import useAxios from "../../hooks/useAxios";
+import { FollowButton } from "../../components/Buttons";
 
 export default function Profile() {
   const [author, setAuthor] = useState({});
   const { username } = useParams();
+  const { authState, headers } = useAuth();
+  const navigate = useNavigate();
+
+  const { data } = useAxios({
+    url: `api/profiles/${username}`,
+    headers: headers,
+  });
 
   useEffect(() => {
-    axios.get(`api/profiles/${username}`).then((res) => {
-      if (res.data.errors) console.log(res.data.errors.body);
+    setAuthor(data?.profile);
+  }, [data]);
 
-      setAuthor(res.data.profile);
-    });
-  }, []);
-
-  useEffect(() => {}, [author]);
-
-  // FIXME: Following status not being save on db
-  // const followHandler = (arg) => {
-  //   if (author.following) {
-  //     axios
-  //       .delete(`api/profiles/${username}/follow`, {
-  //         headers: { Authorization: `Token ${authState.token}` },
-  //       })
-  //       .then((res) => {
-  //         if (res.data.errors) console.log(res.data.errors.body);
-
-  //         setAuthor({ ...author, following: false });
-  //       });
-  //   } else {
-  //     axios
-  //       .post(`api/profiles/${username}/follow`, null, {
-  //         headers: { Authorization: `Token ${authState.token}` },
-  //       })
-  //       .then((res) => {
-  //         if (res.data.errors) console.log(res.data.errors.body);
-
-  //         setAuthor({ ...author, following: true });
-  //       });
-  //   }
-  // };
+  const followHandler = () => {
+    if (authState.status) {
+      axios({
+        url: `api/profiles/${username}/follow`,
+        method: author.following ? "DELETE" : "POST",
+        headers: headers,
+      }).then((res) => {
+        setAuthor(res.data.profile);
+      });
+    } else alert("You need to login first");
+  };
 
   return (
     <div className="profile-page">
@@ -54,11 +44,13 @@ export default function Profile() {
               <h4>{author.username}</h4>
               <p>{author.bio}</p>
               <button
-                className="btn btn-sm btn-outline-secondary action-btn"
-                // onClick={followHandler}
+                className={`btn btn-sm btn-outline-secondary action-btn ${
+                  author.following ? "active" : ""
+                }`}
+                onClick={followHandler}
               >
                 <i className="ion-plus-round"></i>
-                {author.following ? " Unfollow " : " Follow "}
+                {author.following ? " Following " : " Follow "}
                 {author.username}
               </button>
             </div>
