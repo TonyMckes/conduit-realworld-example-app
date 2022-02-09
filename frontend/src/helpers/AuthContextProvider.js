@@ -9,6 +9,9 @@ export function useAuth() {
 
 export function AuthContextProvider({ children }) {
   const [authState, setAuthState] = useState({ status: false, loggedUser: {} });
+  const headers = authState.status
+    ? { Authorization: `Token ${authState.loggedUser.token}` }
+    : null;
 
   useEffect(() => {
     const token = localStorage.getItem("Token");
@@ -25,7 +28,7 @@ export function AuthContextProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ authState, setAuthState }}>
+    <AuthContext.Provider value={{ authState, setAuthState, headers }}>
       {children}
     </AuthContext.Provider>
   );

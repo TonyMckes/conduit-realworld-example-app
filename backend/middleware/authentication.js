@@ -7,6 +7,7 @@ const verifyToken = async (req, res, next) => {
 
     if (headers.authorization) {
       const token = headers.authorization.split(" ")[1];
+      if (!token) throw new Error("You need to log in first!");
 
       const userVerified = await jwtVerify(token);
       if (!userVerified) throw new Error("Invalid Token");

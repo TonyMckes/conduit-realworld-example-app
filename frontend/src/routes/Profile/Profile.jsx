@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { NavLink, Outlet, useParams } from "react-router-dom";
 import Avatar from "../../components/Avatar";
 import ContainerRow from "../../components/ContainerRow";
+import { FavButton, FollowButton } from "../../components/Buttons";
 
 export default function Profile() {
   const [author, setAuthor] = useState({});

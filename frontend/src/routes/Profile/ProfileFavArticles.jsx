@@ -1,29 +1,25 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ArticlesPreview from "../../components/ArticlesPreview";
+import useAxios from "../../hooks/useAxios";
 
 export default function AuthorFavArticles() {
   const [articles, setArticles] = useState([]);
   const { username } = useParams();
 
+  const { data, loading } = useAxios({
+    url: `api/articles?favorited=${username}`,
+  });
+
   useEffect(() => {
-    axios.get(`api/articles?favorited=${username}`).then((res) => {
-      if (res.data.errors) console.log(res.data.errors.body);
+    setArticles(data?.articles);
+  }, [data]);
 
-      setArticles(res.data.articles);
-    });
-  }, []);
-
-  return (
-    <>
-      {articles.length !== 0 ? (
-        <ArticlesPreview articles={articles} />
-      ) : (
-        <div className="article-preview">
-          {username} doesn't have favorite articles
-        </div>
-      )}
-    </>
+  return articles ? (
+    <ArticlesPreview articles={articles} setArticles={setArticles} />
+  ) : (
+    <div className="article-preview">
+      {username} doesn't have favorite articles
+    </div>
   );
 }

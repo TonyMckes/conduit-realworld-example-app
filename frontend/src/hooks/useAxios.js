@@ -1,0 +1,33 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useAuth } from "../helpers/AuthContextProvider";
+
+export default function useAxios({ url, method }) {
+  const [data, setData] = useState();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const { authState, headers } = useAuth();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+
+        const res = await axios({
+          url: url,
+          method: method,
+          // baseURL: ""
+          headers: headers,
+        });
+
+        setData(res.data);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [authState.status]);
+
+  return { data: data, error: error, loading: loading };
+}

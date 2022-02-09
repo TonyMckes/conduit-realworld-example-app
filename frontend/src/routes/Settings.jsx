@@ -25,7 +25,7 @@ function SettingsForm() {
     email: "",
     password: "",
   });
-  const { authState, setAuthState } = useAuth();
+  const { authState, setAuthState, headers } = useAuth();
 
   useEffect(() => {
     if (authState.status) {
@@ -51,17 +51,11 @@ function SettingsForm() {
   const formSubmit = (e) => {
     e.preventDefault();
 
-    axios
-      .put(
-        "api/user",
-        { user: form },
-        { headers: { Authorization: `Token ${authState.loggedUser.token} ` } },
-      )
-      .then((res) => {
-        if (res.data.errors) return console.log(res.data.errors.body);
+    axios.put("api/user", { user: form }, { headers: headers }).then((res) => {
+      if (res.data.errors) return console.log(res.data.errors.body);
 
-        setAuthState({ ...authState, loggedUser: res.data.user });
-      });
+      setAuthState({ ...authState, loggedUser: res.data.user });
+    });
   };
 
   return (

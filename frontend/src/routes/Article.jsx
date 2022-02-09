@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import ArticleMeta from "../components/ArticleMeta";
 import Avatar from "../components/Avatar";
 import BannerContainer from "../components/BannerContainer";
+import { FavButton, FollowButton } from "../components/Buttons";
 import { useAuth } from "../helpers/AuthContextProvider";
 import dateFormatter from "../helpers/dateFormatter";
 
@@ -12,36 +13,61 @@ export default function Article() {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const { slug } = useParams();
+  const { authState, headers } = useAuth();
 
   useEffect(() => {
-    axios.get(`api/articles/${slug}`).then((res) => {
+    axios.get(`api/articles/${slug}`, { headers: headers }).then((res) => {
       if (res.data.errors) return console.log(res.data.errors.body);
 
       setArticle(res.data.article);
     });
-  }, [slug]);
+  }, [authState.status]);
 
   useEffect(() => {
-    axios.get(`api/articles/${slug}/comments`).then((res) => {
+    axios
+      .get(`api/articles/${slug}/comments`, { headers: headers })
+      .then((res) => {
+        if (res.data.errors) return console.log(res.data.errors.body);
+
+        setComments(res.data.comments);
+      });
+  }, [article, slug, newComment]);
+
+  const handleFav = ({ favorited }) => {
+    axios({
+      url: `api/articles/${slug}/favorite`,
+      method: favorited ? "delete" : "post",
+      headers: headers,
+    }).then((res) => {
       if (res.data.errors) return console.log(res.data.errors.body);
 
-      setComments(res.data.comments);
+      setArticle(res.data.article);
     });
-  }, [article, slug, newComment]);
+  };
 
   return (
     <>
-      {article.tagList && (
+      {article?.tagList && (
         <div className="article-page">
           <BannerContainer>
             <h1>{article.title}</h1>
-            <article>{<ArticleMeta article={article} />}</article>
+            <ArticleMeta article={article}>
+              <FollowButton article={article} />
+              <FavButton article={article} event={handleFav} text="Favorite" />
+            </ArticleMeta>
           </BannerContainer>
           <div className="container page">
             <ArticleContent article={article} />
             <hr />
             <div className="article-actions">
-              <ArticleMeta article={article} />
+              <ArticleMeta article={article}>
+                <FollowButton article={article} />
+                <FavButton
+                  article={article}
+                  event={handleFav}
+                  text="Favorite"
+                />
+              </ArticleMeta>
             </div>
             <div className="row">
               <div className="col-xs-12 col-md-8 offset-md-2">
@@ -62,22 +88,20 @@ export default function Article() {
 
 function ArticleContent({ article }) {
   return (
-    <>
-      {article.tagList && (
-        <div className="row article-content">
-          <div className="col-md-12">
-            <p>{article.body}</p>
-            <ul>
-              {article.tagList.map((tag) => (
-                <li className="tag-default tag-pill tag-outline" key={tag}>
-                  {tag}
-                </li>
-              ))}
-            </ul>
-          </div>
+    article.tagList && (
+      <div className="row article-content">
+        <div className="col-md-12">
+          <p>{article.body}</p>
+          <ul>
+            {article.tagList.map((tag) => (
+              <li className="tag-default tag-pill tag-outline" key={tag}>
+                {tag}
+              </li>
+            ))}
+          </ul>
         </div>
-      )}
-    </>
+      </div>
+    )
   );
 }
 

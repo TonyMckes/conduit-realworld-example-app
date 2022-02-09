@@ -5,31 +5,39 @@ import ArticlesPreview from "../components/ArticlesPreview";
 import BannerContainer from "../components/BannerContainer";
 import ContainerRow from "../components/ContainerRow";
 import { useAuth } from "../helpers/AuthContextProvider";
+import useAxios from "../hooks/useAxios";
 
 function Home() {
-  const [tags, setTags] = useState([]);
   const [articles, setArticles] = useState([]);
-  const { authState } = useAuth();
+  const { authState, headers } = useAuth();
+
+  const { data } = useAxios({
+    url: "api/articles",
+  });
 
   useEffect(() => {
-    axios.get("/api/articles").then((res) => setArticles(res.data.articles));
-    axios.get("/api/tags").then((res) => setTags(res.data.tags));
-  }, []);
+    setArticles(data?.articles);
+  }, [data]);
 
-  const allArticles = (e) => {
-    axios.get("/api/articles").then((res) => setArticles(res.data.articles));
+  const allArticles = async () => {
+    const res = await axios.get("/api/articles", { headers: headers });
+
+    setArticles(res.data.articles);
   };
 
-  const articlesFeed = (e) => {
-    axios
-      .get("/api/articles/feed")
-      .then((res) => setArticles(res.data.articles));
+  const articlesFeed = async () => {
+    const res = await axios.get("/api/articles/feed", { headers: headers });
+    console.log(res.data);
+    setArticles(res.data.articles);
   };
 
-  const articleBySlug = (e) => {
-    axios
-      .get(`/api/articles?tag=${e.target.textContent}`)
-      .then((res) => setArticles(res.data.articles));
+  const articleBySlug = async (e) => {
+    const res = await axios.get(`/api/articles?tag=${e.target.innerText}`, {
+      headers: headers,
+    });
+
+    setArticles(res.data.articles);
+    // TODO: open "tab"
   };
 
   return (
@@ -61,34 +69,48 @@ function Home() {
               </li>
             </ul>
           </div>
-          {articles && <ArticlesPreview articles={articles} />}
+          {articles && (
+            <ArticlesPreview articles={articles} setArticles={setArticles} />
+          )}
         </div>
 
-        <PopularTags tags={tags} articleBySlug={articleBySlug} />
+        <PopularTags articleBySlug={articleBySlug} />
       </ContainerRow>
     </div>
   );
 }
 
-function PopularTags({ tags, articleBySlug }) {
+function PopularTags({ articleBySlug }) {
+  const [tags, setTags] = useState([]);
+  const { data, loading } = useAxios({
+    url: "/api/tags",
+  });
+
+  useEffect(() => {
+    setTags(data?.tags);
+  }, [data]);
+
   return (
     <div className="col-md-3">
       <div className="sidebar">
         <p>Popular Tags</p>
-
-        <div className="tag-list">
-          {tags &&
-            tags.map((item) => (
-              <Link
-                key={item}
-                to={"/"}
-                className="tag-pill tag-default"
-                onClick={(e) => articleBySlug(e)}
-              >
-                {item}
-              </Link>
-            ))}
-        </div>
+        {loading ? (
+          <p>Tags list not available</p>
+        ) : (
+          <div className="tag-list">
+            {tags &&
+              tags.map((item) => (
+                <Link
+                  key={item}
+                  to={"/"}
+                  className="tag-pill tag-default"
+                  onClick={(e) => articleBySlug(e)}
+                >
+                  {item}
+                </Link>
+              ))}
+          </div>
+        )}
       </div>
     </div>
   );
