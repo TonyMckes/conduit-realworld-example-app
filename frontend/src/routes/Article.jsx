@@ -64,7 +64,7 @@ export default function Article() {
           <BannerContainer>
             <h1>{article.title}</h1>
             <ArticleMeta article={article}>
-              <FollowButton article={article} handler={followHandler} />
+              <FollowButton author={article.author} handler={followHandler} />
               <FavButton article={article} event={handleFav} text="Favorite" />
             </ArticleMeta>
           </BannerContainer>
@@ -73,7 +73,7 @@ export default function Article() {
             <hr />
             <div className="article-actions">
               <ArticleMeta article={article}>
-                <FollowButton article={article} handler={followHandler} />
+                <FollowButton author={article.author} handler={followHandler} />
                 <FavButton
                   article={article}
                   event={handleFav}

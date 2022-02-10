@@ -1,21 +1,21 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
+import { Link, NavLink, Outlet, useParams } from "react-router-dom";
 import Avatar from "../../components/Avatar";
+import { FollowButton } from "../../components/Buttons";
 import ContainerRow from "../../components/ContainerRow";
 import { useAuth } from "../../helpers/AuthContextProvider";
 import useAxios from "../../hooks/useAxios";
-import { FollowButton } from "../../components/Buttons";
 
 export default function Profile() {
   const [author, setAuthor] = useState({});
-  const { username } = useParams();
   const { authState, headers } = useAuth();
-  const navigate = useNavigate();
+  const { username } = useParams();
 
   const { data } = useAxios({
     url: `api/profiles/${username}`,
     headers: headers,
+    dep: username,
   });
 
   useEffect(() => {
@@ -43,16 +43,17 @@ export default function Profile() {
               <Avatar src={author.image} className="user-img" alt="author" />
               <h4>{author.username}</h4>
               <p>{author.bio}</p>
-              <button
-                className={`btn btn-sm btn-outline-secondary action-btn ${
-                  author.following ? "active" : ""
-                }`}
-                onClick={followHandler}
-              >
-                <i className="ion-plus-round"></i>
-                {author.following ? " Following " : " Follow "}
-                {author.username}
-              </button>
+
+              {username === authState.loggedUser.username ? (
+                <Link
+                  className="btn btn-sm btn-outline-secondary action-btn"
+                  to="/settings"
+                >
+                  <i className="ion-gear-a"></i> Edit Profile Settings
+                </Link>
+              ) : (
+                <FollowButton author={author} handler={followHandler} />
+              )}
             </div>
           )}
         </ContainerRow>

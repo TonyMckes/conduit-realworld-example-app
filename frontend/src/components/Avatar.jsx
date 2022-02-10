@@ -1,4 +1,4 @@
-import avatar from "../assets/demo-avatar.png";
+import avatar from "../assets/smiley-cyrus.jpeg";
 
 export default function Avatar({ alt, className, src }) {
   return (

@@ -19,7 +19,7 @@ export function AuthContextProvider({ children }) {
       axios
         .get("api/user", { headers: { Authorization: `Token ${token}` } })
         .then((res) => {
-          if (res.data.error) return alert(res.data.error.body);
+          if (res.data.errors) return alert(res.data.errors.body);
 
           setAuthState({ status: true, loggedUser: res.data.user });
         })

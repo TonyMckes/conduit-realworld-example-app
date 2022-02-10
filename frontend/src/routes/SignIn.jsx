@@ -6,6 +6,8 @@ import FormFieldset from "../components/FormFieldset";
 import { useAuth } from "../helpers/AuthContextProvider";
 
 function SignIn() {
+  const [error, setError] = useState();
+
   return (
     <div className="auth-page">
       <ContainerRow className="page">
@@ -15,18 +17,20 @@ function SignIn() {
             <Link to="/register">Need an account?</Link>
           </p>
 
-          {/* <ul className="error-messages">
-              <li>Wrong email/password combination</li>
-            </ul> */}
+          {error && (
+            <ul className="error-messages">
+              <li>{error}</li>
+            </ul>
+          )}
 
-          <SignInForm />
+          <SignInForm setError={setError} />
         </div>
       </ContainerRow>
     </div>
   );
 }
 
-function SignInForm() {
+function SignInForm({ setError }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { setAuthState } = useAuth();
@@ -40,13 +44,16 @@ function SignInForm() {
         user: { email: email, password: password },
       })
       .then((res) => {
-        if (res.data.error) return console.log(res.data.error);
-        
+        if (res.data.errors) return console.log(res.data.errors.body);
+
         localStorage.setItem("Token", res.data.user.token);
         setAuthState({ status: true, loggedUser: res.data.user });
         navigate("/");
       })
-      .catch((arg) => console.log("Error", arg));
+      .catch((error) => {
+        setError(error.response.data.errors.body);
+        console.log(error.response.data.errors.body);
+      });
   };
 
   return (

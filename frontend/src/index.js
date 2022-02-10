@@ -16,8 +16,8 @@ import SignIn from "./routes/SignIn";
 import SignUp from "./routes/SignUp";
 
 ReactDOM.render(
-  <HashRouter>
-    <React.StrictMode>
+  <React.StrictMode>
+    <HashRouter>
       <AuthContextProvider>
         <Routes>
           <Route element={<App />}>
@@ -40,8 +40,8 @@ ReactDOM.render(
           </Route>
         </Routes>
       </AuthContextProvider>
-    </React.StrictMode>
-  </HashRouter>,
+    </HashRouter>
+  </React.StrictMode>,
   document.getElementById("root"),
 );
 

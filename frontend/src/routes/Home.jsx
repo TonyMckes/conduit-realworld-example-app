@@ -42,10 +42,12 @@ function Home() {
 
   return (
     <div className="home-page">
-      <BannerContainer>
-        <h1 className="logo-font">conduit</h1>
-        <p>A place to share your knowledge.</p>
-      </BannerContainer>
+      {!authState.status && (
+        <BannerContainer>
+          <h1 className="logo-font">conduit</h1>
+          <p>A place to share your knowledge.</p>
+        </BannerContainer>
+      )}
       <ContainerRow className="page">
         <div className="col-md-9">
           <div className="feed-toggle">

@@ -9,6 +9,7 @@ export default function AuthorFavArticles() {
 
   const { data, loading } = useAxios({
     url: `api/articles?favorited=${username}`,
+    dep: username,
   });
 
   useEffect(() => {

@@ -1,13 +1,10 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../helpers/AuthContextProvider";
+import Avatar from "./Avatar";
 
 function Navbar() {
-  const { authState, setAuthState } = useAuth();
-
-  const logout = () => {
-    localStorage.removeItem("Token");
-    setAuthState({ status: false, token: "" });
-  };
+  const { authState } = useAuth();
 
   return (
     <nav className="navbar navbar-light">
@@ -16,20 +13,19 @@ function Navbar() {
           conduit
         </Link>
         <ul className="nav navbar-nav pull-xs-right">
-          <NavButton body="Home" icon="ion-compose" url="/" />
+          <NavItem body="Home" icon="ion-compose" url="/" />
 
           {authState.status && (
             <>
-              <NavButton body="New Article" icon="ion-compose" url="/editor" />
-              <NavButton body="Settings" icon="ion-gear-a" url="/settings" />
-              <NavButton body="Logout" url="/" logout={logout} />
+              <NavItem body="New Article" icon="ion-compose" url="/editor" />
+              <Dropdown />
             </>
           )}
 
           {!authState.status && (
             <>
-              <NavButton body="Sign in" url="/login" />
-              <NavButton body="Sign up" url="/register" />
+              <NavItem body="Sign in" icon="ion-log-in" url="/login" />
+              <NavItem body="Sign up" url="/register" />
             </>
           )}
         </ul>
@@ -38,12 +34,63 @@ function Navbar() {
   );
 }
 
-function NavButton({ body, icon, url, logout }) {
+function Dropdown() {
+  const [dropdown, setDropdown] = useState(false);
+  const { authState, setAuthState } = useAuth();
+
+  const logout = () => {
+    localStorage.removeItem("Token");
+    setAuthState({ status: false, loggedUser: {} });
+  };
+
+  return (
+    <li className="nav-item dropdown">
+      <Link
+        className="nav-link dropdown-toggle"
+        to="#"
+        onClick={() => setDropdown(!dropdown)}
+      >
+        <Avatar className="user-pic" />
+        {authState.loggedUser.username}
+      </Link>
+
+      <div
+        className="dropdown-menu"
+        style={{ display: dropdown ? "block" : "none" }}
+        onMouseLeave={() => setDropdown(!dropdown)}
+      >
+        <DropdownItem
+          icon="ion-person"
+          text="Profile"
+          url={`/profile/${authState.loggedUser.username}`}
+        />
+        <DropdownItem icon="ion-gear-a" text="Settings" url="/settings" />
+        <div className="dropdown-divider"></div>
+        <DropdownItem icon="ion-log-out" text="Logout" handler={logout} />
+      </div>
+    </li>
+  );
+}
+
+function DropdownItem({ handler, icon, text, url }) {
+  return (
+    <Link className="dropdown-item" to={url ? url : "#"} onClick={handler}>
+      {icon && <i className={icon}></i>} {text}
+    </Link>
+  );
+}
+
+function NavItem({ body, className, icon, url }) {
   return (
     <li className="nav-item">
-      <Link className="nav-link" to={url} onClick={logout}>
+      <NavLink
+        className={({ isActive }) =>
+          `nav-link ${className}${isActive ? "ng-binding active" : ""}`
+        }
+        to={url ? url : "#"}
+      >
         {icon && <i className={icon}></i>} {body}
-      </Link>
+      </NavLink>
     </li>
   );
 }

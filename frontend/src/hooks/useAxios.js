@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useAuth } from "../helpers/AuthContextProvider";
 
-export default function useAxios({ url, method }) {
+export default function useAxios({ url, method, dep }) {
   const [data, setData] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -27,7 +27,7 @@ export default function useAxios({ url, method }) {
         setLoading(false);
       }
     })();
-  }, [authState.status]);
+  }, [authState.status, dep]);
 
   return { data: data, error: error, loading: loading };
 }

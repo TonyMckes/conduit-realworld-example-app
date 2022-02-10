@@ -5,6 +5,8 @@ import ContainerRow from "../components/ContainerRow";
 import FormFieldset from "../components/FormFieldset";
 
 function SignUp() {
+  const [error, setError] = useState();
+
   return (
     <div className="auth-page">
       <ContainerRow className="page">
@@ -14,18 +16,20 @@ function SignUp() {
             <Link to="/login">Already have an account?</Link>
           </p>
 
-          {/* <ul className="error-messages">
-              <li>That email is already taken</li>
-            </ul> */}
+          {error && (
+            <ul className="error-messages">
+              <li>{error}</li>
+            </ul>
+          )}
 
-          <SignUpForm />
+          <SignUpForm setError={setError} />
         </div>
       </ContainerRow>
     </div>
   );
 }
 
-function SignUpForm() {
+function SignUpForm({ setError }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,7 +42,18 @@ function SignUpForm() {
       .post("api/users", {
         user: { username: username, email: email, password: password },
       })
-      .then((res) => navigate("/login"));
+      .then((res) => {
+        if (res.data.errors) {
+          setError(res.data.errors.body);
+          return console.log(res.data.errors.body);
+        }
+
+        navigate("/login");
+      })
+      .catch((error) => {
+        setError(error.response.data.errors.body);
+        console.log(error.response.data.errors.body);
+      });
   };
 
   return (

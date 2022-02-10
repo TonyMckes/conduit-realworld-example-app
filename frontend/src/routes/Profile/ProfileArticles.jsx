@@ -9,6 +9,7 @@ export default function AuthorFavArticles() {
 
   const { data } = useAxios({
     url: `api/articles?author=${username}`,
+    dep: username,
   });
 
   useEffect(() => {
