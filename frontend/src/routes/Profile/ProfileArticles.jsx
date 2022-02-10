@@ -16,9 +16,9 @@ export default function AuthorFavArticles() {
     setArticles(data?.articles);
   }, [data]);
 
-  return articles ? (
+  return articles && articles.length !== 0 ? (
     <ArticlesPreview articles={articles} setArticles={setArticles} />
   ) : (
-    <div className="article-preview">{username} doesn't have any articles</div>
+    <div className="article-preview">{username} doesn't have articles</div>
   );
 }

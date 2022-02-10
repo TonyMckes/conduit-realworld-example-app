@@ -1,8 +1,10 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import ContainerRow from "../components/ContainerRow";
 import FormFieldset from "../components/FormFieldset";
 import { useAuth } from "../helpers/AuthContextProvider";
+import useAxios from "../hooks/useAxios";
 
 export default function ArticleEditor() {
   return (
@@ -23,7 +25,24 @@ function ArticleEditorForm() {
     body: "",
     tagList: "",
   });
-  const { authState } = useAuth();
+  const { authState, headers } = useAuth();
+  const navigate = useNavigate();
+  const { slug } = useParams();
+  const { data } = useAxios({ url: `api/articles/${slug}`, headers: headers });
+
+  useEffect(() => {
+    if (
+      slug &&
+      authState.loggedUser.username === data?.article.author.username
+    ) {
+      setForm({
+        title: data ? data.article.title : "",
+        description: data ? data.article.description : "",
+        body: data ? data.article.body : "",
+        tagList: data ? data.article.tagList : "",
+      });
+    }
+  }, [data]);
 
   const inputHandler = (e) => {
     const input = e.currentTarget.name;
@@ -41,22 +60,22 @@ function ArticleEditorForm() {
   const formSubmit = (e) => {
     e.preventDefault();
 
-    axios
-      .post(
-        "api/articles",
-        { article: form },
-        { headers: { Authorization: `Token ${authState.loggedUser.token} ` } },
-      )
-      .then((res) => {
-        if (res.data.errors) return console.log(res.data.errors.body);
+    axios({
+      url: slug ? `api/articles/${slug}` : "api/articles",
+      method: slug ? "PUT" : "POST",
+      data: { article: form },
+      headers: headers,
+    }).then((res) => {
+      if (res.data.errors) return console.log(res.data.errors.body);
 
-        setForm({
-          title: "",
-          description: "",
-          body: "",
-          tagList: "",
-        });
+      setForm({
+        title: "",
+        description: "",
+        body: "",
+        tagList: "",
       });
+      navigate(`/article/${res.data.article.slug}`);
+    });
   };
 
   return (
@@ -98,7 +117,7 @@ function ArticleEditorForm() {
         </FormFieldset>
 
         <button className="btn btn-lg pull-xs-right btn-primary" type="submit">
-          Publish Article
+          {slug ? "Update Article" : "Publish Article"}
         </button>
       </fieldset>
     </form>

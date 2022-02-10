@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(User, { foreignKey: "userId", as: "author" });
 
       // Comments
-      this.hasMany(Comment, { foreignKey: "articleId" });
+      this.hasMany(Comment, { foreignKey: "articleId", onDelete: "cascade" });
 
       // Tag list
       this.belongsToMany(Tag, {
@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         as: "tagList",
         foreignKey: "articleId",
         timestamps: false,
+        onDelete: "cascade", // FIXME: delete tags
       });
 
       // Favorites

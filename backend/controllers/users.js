@@ -10,9 +10,9 @@ const signUp = async (req, res) => {
     });
     if (userExists) throw new Error("Email already exists! try logging in");
 
-    const { email, username, bio, image, password } = req.body.user;
-    if (!email) throw new Error(`An email is required`);
+    const { username, email, bio, image, password } = req.body.user;
     if (!username) throw new Error(`A username is required`);
+    if (!email) throw new Error(`An email is required`);
     if (!password) throw new Error(`A password is required`);
 
     const newUser = await User.create({
@@ -37,13 +37,12 @@ const signIn = async (req, res) => {
     const { user } = req.body;
 
     const existentUser = await User.findOne({ where: { email: user.email } });
-    if (!existentUser) throw new Error("Email doesn't exist! sign in first");
+    if (!existentUser) throw new Error("Email doesn't exist! Sign in first");
 
     const pwd = await bcryptCompare(user.password, existentUser.password);
-    if (!pwd) throw new Error("Password doesn't match!");
+    if (!pwd) throw new Error("Wrong email/password combination");
 
     existentUser.dataValues.token = await jwtSign(user);
-
     res.json({ user: existentUser });
   } catch (error) {
     res.status(422).json({ errors: { body: [error.message] } });

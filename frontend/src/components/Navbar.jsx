@@ -80,12 +80,12 @@ function DropdownItem({ handler, icon, text, url }) {
   );
 }
 
-function NavItem({ body, className, icon, url }) {
+function NavItem({ body, icon, url }) {
   return (
     <li className="nav-item">
       <NavLink
         className={({ isActive }) =>
-          `nav-link ${className}${isActive ? "ng-binding active" : ""}`
+          `nav-link ${isActive ? "ng-binding active" : ""}`
         }
         to={url ? url : "#"}
       >

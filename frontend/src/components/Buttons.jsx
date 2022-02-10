@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export function FavButton({ article, event, index, size, text, arr }) {
   return (
     article.author && (
@@ -25,9 +27,7 @@ export function FollowButton({ author, handler }) {
   return (
     <>
       <button
-        className={`btn text-dark btn-sm action-btn ng-binding ${
-          author.following ? "btn-secondary" : ""
-        }`}
+        className={`btn btn-sm ${author.following ? "btn-secondary" : ""}`}
         style={{ color: "#777" }}
         onClick={handler}
       >
@@ -37,6 +37,25 @@ export function FollowButton({ author, handler }) {
         {author.following ? " Unfollow " : " Follow "}
         {author.username}
         <span className="counter">{/* TODO:Add followers count */}</span>
+      </button>{" "}
+    </>
+  );
+}
+
+export function ArticleButtons({ url, handler }) {
+  return (
+    <>
+      <button
+        className="btn btn-sm"
+        style={{ color: "#d00" }}
+        onClick={handler}
+      >
+        <i className="ion-trash-a"></i> Delete Article
+      </button>{" "}
+      <button className="btn btn-sm" style={{ color: "#777" }}>
+        <Link className="nav-link" to={url}>
+          <i className="ion-edit"></i> Edit Article
+        </Link>
       </button>{" "}
     </>
   );

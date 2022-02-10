@@ -1,10 +1,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import ArticleMeta from "../components/ArticleMeta";
 import Avatar from "../components/Avatar";
 import BannerContainer from "../components/BannerContainer";
-import { FavButton, FollowButton } from "../components/Buttons";
+import { ArticleButtons, FavButton, FollowButton } from "../components/Buttons";
 import { useAuth } from "../helpers/AuthContextProvider";
 import dateFormatter from "../helpers/dateFormatter";
 
@@ -12,8 +12,9 @@ export default function Article() {
   const [article, setArticle] = useState({});
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const { slug } = useParams();
   const { authState, headers } = useAuth();
+  const navigate = useNavigate();
+  const { slug } = useParams();
 
   useEffect(() => {
     axios.get(`api/articles/${slug}`, { headers: headers }).then((res) => {
@@ -57,6 +58,22 @@ export default function Article() {
     } else alert("You need to login first");
   };
 
+  const deleteArticle = () => {
+    const confirmation = window.confirm("You want to delete ?");
+
+    if (authState.status) {
+      if (!confirmation) return;
+
+      axios({
+        url: `api/articles/${slug}/`,
+        method: "DELETE",
+        headers: headers,
+      }).then((res) => {
+        navigate("/");
+      });
+    } else alert("You need to login first");
+  };
+
   return (
     <>
       {article?.tagList && (
@@ -64,7 +81,14 @@ export default function Article() {
           <BannerContainer>
             <h1>{article.title}</h1>
             <ArticleMeta article={article}>
-              <FollowButton author={article.author} handler={followHandler} />
+              {authState.loggedUser.username === article.author.username ? (
+                <ArticleButtons
+                  url={`/editor/${slug}`}
+                  handler={deleteArticle}
+                />
+              ) : (
+                <FollowButton author={article.author} handler={followHandler} />
+              )}
               <FavButton article={article} event={handleFav} text="Favorite" />
             </ArticleMeta>
           </BannerContainer>
@@ -73,7 +97,17 @@ export default function Article() {
             <hr />
             <div className="article-actions">
               <ArticleMeta article={article}>
-                <FollowButton author={article.author} handler={followHandler} />
+                {authState.loggedUser.username === article.author.username ? (
+                  <ArticleButtons
+                    url={`/editor/${slug}`}
+                    handler={deleteArticle}
+                  />
+                ) : (
+                  <FollowButton
+                    author={article.author}
+                    handler={followHandler}
+                  />
+                )}
                 <FavButton
                   article={article}
                   event={handleFav}
@@ -122,7 +156,8 @@ function NewComment({ refresh }) {
   const { authState } = useAuth();
   const { slug } = useParams();
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     axios
       .post(
         `api/articles/${slug}/comments`,
@@ -144,7 +179,7 @@ function NewComment({ refresh }) {
   return (
     <>
       {authState.status ? (
-        <form className="card comment-form" onSubmit={handleSubmit}>
+        <form className="card comment-form" onSubmit={(e) => handleSubmit(e)}>
           <div className="card-block">
             <textarea
               className="form-control"
