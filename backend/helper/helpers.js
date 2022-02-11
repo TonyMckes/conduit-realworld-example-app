@@ -26,19 +26,30 @@ async function appendFollowers(loggedUser, toAppend) {
     //
     const author = await toAppend.getAuthor();
     const hasFollower = await author.hasFollower(loggedUser);
+    const followersCount = await author.countFollowers();
 
     toAppend.author.dataValues.following = hasFollower;
+    toAppend.author.dataValues.followersCount = followersCount;
     //
   } else if (loggedUser && !toAppend?.author) {
     //
     const hasFollower = await toAppend.hasFollower(loggedUser);
+    const followersCount = await toAppend.countFollowers();
 
     toAppend.dataValues.following = hasFollower;
+    toAppend.dataValues.followersCount = followersCount;
     //
   } else {
     //
-    if (!toAppend?.author) toAppend.dataValues.following = false;
-    else toAppend.author.dataValues.following = false;
+    const followersCount = await toAppend.countFollowers();
+
+    if (!toAppend?.author) {
+      toAppend.dataValues.following = false;
+      toAppend.dataValues.followersCount = followersCount;
+    } else {
+      toAppend.author.dataValues.following = false;
+      toAppend.author.dataValues.followersCount = followersCount;
+    }
   }
 }
 

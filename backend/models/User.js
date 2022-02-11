@@ -31,6 +31,12 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userId",
         timestamps: false,
       });
+      this.belongsToMany(User, {
+        through: "Followers",
+        as: "following",
+        foreignKey: "followerId",
+        timestamps: false,
+      });
     }
 
     toJSON() {

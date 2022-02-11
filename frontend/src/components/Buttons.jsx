@@ -16,8 +16,8 @@ export function FavButton({ article, event, index, size, text, arr }) {
           })
         }
       >
-        <i className="ion-heart"></i> {text ? text : ""}{" "}
-        <span className="counter">{article.favoritesCount}</span>
+        <i className="ion-heart"></i> {text ? text : ""}
+        <span className="counter"> ( {article.favoritesCount} )</span>
       </button>
     )
   );
@@ -27,7 +27,9 @@ export function FollowButton({ author, handler }) {
   return (
     <>
       <button
-        className={`btn btn-sm ${author.following ? "btn-secondary" : ""}`}
+        className={`btn btn-sm action-btn ${
+          author.following ? "btn-secondary" : ""
+        }`}
         style={{ color: "#777" }}
         onClick={handler}
       >
@@ -36,7 +38,7 @@ export function FollowButton({ author, handler }) {
         ></i>
         {author.following ? " Unfollow " : " Follow "}
         {author.username}
-        <span className="counter">{/* TODO:Add followers count */}</span>
+        <span className="counter"> ( {author.followersCount} )</span>
       </button>{" "}
     </>
   );
