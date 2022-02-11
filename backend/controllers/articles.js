@@ -32,6 +32,8 @@ const allArticles = async (req, res) => {
           ...(author && { where: { username: author } }),
         },
       ],
+      limit: 10,
+      order: [["createdAt", "DESC"]],
     };
 
     let articles;
@@ -112,15 +114,25 @@ const articlesFeed = async (req, res) => {
     const { loggedUser } = req;
     if (!loggedUser) throw new Error("You need to login first!");
 
-    const followers = await loggedUser.getFollowers();
+    const followers = await loggedUser.getFollowing();
 
     let articles = [];
     for (const author of followers) {
-      //TODO:
-      // appendTagList()
-      // appendFollowers()
-      // appendFavorites()
-      articles.push(await author.getArticles());
+      const articlesByAuthor = await author.getArticles({
+        include: includeOptions,
+        limit: 10,
+        order: [["createdAt", "DESC"]],
+      });
+
+      for (const article of articlesByAuthor) {
+        const articleTags = await article.getTagList();
+
+        appendTagList(articleTags, article);
+        await appendFollowers(loggedUser, article);
+        await appendFavorites(loggedUser, article);
+
+        articles.push(article);
+      }
     }
 
     res.json({ articles, articlesCount: articles.length });

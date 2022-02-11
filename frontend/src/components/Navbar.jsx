@@ -50,7 +50,7 @@ function Dropdown() {
         to="#"
         onClick={() => setDropdown(!dropdown)}
       >
-        <Avatar className="user-pic" />
+        <Avatar className="user-pic" src={authState.loggedUser.image} />
         {authState.loggedUser.username}
       </Link>
 

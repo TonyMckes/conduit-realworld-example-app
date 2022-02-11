@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { Link } from "react-router-dom";
 import ArticlesPreview from "../components/ArticlesPreview";
 import BannerContainer from "../components/BannerContainer";
@@ -7,27 +7,53 @@ import ContainerRow from "../components/ContainerRow";
 import { useAuth } from "../helpers/AuthContextProvider";
 import useAxios from "../hooks/useAxios";
 
+const initialState = { global: true };
+
+function reducer(activeTab, action) {
+  switch (action.type) {
+    case "feed":
+      return { feed: true };
+
+    case "global":
+      return { global: true };
+
+    case "tag":
+      return { tag: true, name: action.payload.tagName };
+
+    default:
+      return activeTab;
+  }
+}
+
 function Home() {
   const [articles, setArticles] = useState([]);
+  const [activeTab, dispatch] = useReducer(reducer, initialState);
   const { authState, headers } = useAuth();
 
   const { data } = useAxios({
-    url: "api/articles",
+    url: authState.status ? "/api/articles/feed" : "api/articles",
   });
 
   useEffect(() => {
+    dispatch(
+      authState.status
+        ? { type: "feed", feed: true }
+        : { type: "global", feed: true },
+    );
     setArticles(data?.articles);
   }, [data]);
 
   const allArticles = async () => {
     const res = await axios.get("/api/articles", { headers: headers });
 
+    dispatch({ type: "global" });
     setArticles(res.data.articles);
   };
 
   const articlesFeed = async () => {
     const res = await axios.get("/api/articles/feed", { headers: headers });
-    console.log(res.data);
+
+    dispatch({ type: "feed" });
     setArticles(res.data.articles);
   };
 
@@ -36,8 +62,8 @@ function Home() {
       headers: headers,
     });
 
+    dispatch({ type: "tag", payload: { tagName: e.target.innerText } });
     setArticles(res.data.articles);
-    // TODO: open "tab"
   };
 
   return (
@@ -52,23 +78,39 @@ function Home() {
         <div className="col-md-9">
           <div className="feed-toggle">
             <ul className="nav nav-pills outline-active">
-              <li className="nav-item">
-                {authState.status && (
+              {authState.status && (
+                <li className="nav-item">
                   <Link
-                    className="nav-link disabled"
-                    to="/"
+                    className={`nav-link ${activeTab.feed ? "active" : ""}`}
+                    to="#"
                     onClick={articlesFeed}
                   >
                     Your Feed
                   </Link>
-                )}
-              </li>
+                </li>
+              )}
 
               <li className="nav-item">
-                <Link className="nav-link active" to="/" onClick={allArticles}>
+                <Link
+                  className={`nav-link ${activeTab.global ? "active" : ""}`}
+                  to="#"
+                  onClick={allArticles}
+                >
                   Global Feed
                 </Link>
               </li>
+
+              {activeTab.tag && (
+                <li className="nav-item">
+                  <Link
+                    className={`nav-link ${activeTab.tag ? "active" : ""}`}
+                    to="#"
+                    onClick={allArticles}
+                  >
+                    <i className="ion-pound"></i> {activeTab.name}
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
           {articles && (

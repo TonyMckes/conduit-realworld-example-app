@@ -23,39 +23,43 @@ export default function ArticlesPreview({ articles, setArticles }) {
     });
   };
 
-  return articles.map((article, index, arr) => {
-    return (
-      article.author && (
-        <div className="article-preview" key={article.slug}>
-          <ArticleMeta article={article}>
-            <FavButton
-              article={article}
-              event={handleFav}
-              index={index}
-              size="compact"
-              arr={arr}
-            />
-          </ArticleMeta>
+  return articles.length !== 0 ? (
+    articles.map((article, index, arr) => {
+      return (
+        article.author && (
+          <div className="article-preview" key={article.slug}>
+            <ArticleMeta article={article}>
+              <FavButton
+                article={article}
+                event={handleFav}
+                index={index}
+                size="compact"
+                arr={arr}
+              />
+            </ArticleMeta>
 
-          <Link to={`/article/${article.slug}`} className="preview-link">
-            <h1>{article.title}</h1>
+            <Link to={`/article/${article.slug}`} className="preview-link">
+              <h1>{article.title}</h1>
 
-            <p>{article.description}</p>
+              <p>{article.description}</p>
 
-            <span>Read more...</span>
+              <span>Read more...</span>
 
-            {article.tagList !== 0 && (
-              <ul className="tag-list">
-                {article.tagList.map((tag) => (
-                  <li key={tag} className="tag-default tag-pill tag-outline">
-                    {tag}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Link>
-        </div>
-      )
-    );
-  });
+              {article.tagList !== 0 && (
+                <ul className="tag-list">
+                  {article.tagList.map((tag) => (
+                    <li key={tag} className="tag-default tag-pill tag-outline">
+                      {tag}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Link>
+          </div>
+        )
+      );
+    })
+  ) : (
+    <div className="article-preview">No articles available..</div>
+  );
 }

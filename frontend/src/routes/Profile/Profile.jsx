@@ -74,13 +74,13 @@ export default function Profile() {
     </div>
   );
 }
-
 function NavItem({ to, body }) {
   return (
     <li className="nav-item">
       <NavLink
         className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
         to={to}
+        end
       >
         {body}
       </NavLink>
