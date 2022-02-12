@@ -16,7 +16,7 @@ const allArticles = async (req, res) => {
   try {
     const { loggedUser } = req;
 
-    const { author, tag, favorited } = req.query;
+    const { author, tag, favorited, limit = 3, offset = 0 } = req.query;
     const searchOptions = {
       include: [
         {
@@ -32,7 +32,8 @@ const allArticles = async (req, res) => {
           ...(author && { where: { username: author } }),
         },
       ],
-      limit: 10,
+      limit: limit,
+      offset: offset * limit,
       order: [["createdAt", "DESC"]],
     };
 
@@ -42,11 +43,11 @@ const allArticles = async (req, res) => {
 
       articles = await user.getFavorites(searchOptions);
     } else {
-      articles = await Article.findAll(searchOptions);
+      articles = await Article.findAndCountAll(searchOptions);
     }
 
     //* Tests failing because: https://github.com/gothinkster/realworld/issues/839
-    for (let article of articles) {
+    for (let article of articles.rows) {
       const articleTags = await article.getTagList();
 
       appendTagList(articleTags, article);
@@ -56,7 +57,7 @@ const allArticles = async (req, res) => {
       delete article.dataValues.Favorites;
     }
 
-    res.json({ articles, articlesCount: articles.length });
+    res.json({ articles: articles.rows, articlesCount: articles.count });
   } catch (error) {
     res.json({ errors: { body: [error.message] } });
   }

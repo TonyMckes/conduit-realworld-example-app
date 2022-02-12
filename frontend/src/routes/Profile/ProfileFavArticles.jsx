@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import ArticlePagination from "../../components/ArticlePagination";
 import ArticlesPreview from "../../components/ArticlesPreview";
 import useAxios from "../../hooks/useAxios";
 
@@ -13,11 +14,19 @@ export default function AuthorFavArticles() {
   });
 
   useEffect(() => {
-    setArticles(data?.articles);
+    setArticles(data);
   }, [data]);
 
   return articles && articles.length !== 0 ? (
-    <ArticlesPreview articles={articles} setArticles={setArticles} />
+    <>
+      <ArticlesPreview articles={articles} setArticles={setArticles} />
+
+      <ArticlePagination
+        articles={articles}
+        setArticles={setArticles}
+        username={username}
+      />
+    </>
   ) : (
     <div className="article-preview">{username} doesn't have favorites</div>
   );

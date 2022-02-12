@@ -15,16 +15,16 @@ export default function ArticlesPreview({ articles, setArticles }) {
     }).then((res) => {
       if (res.data.errors) return console.log(res.data.errors.body);
 
-      const items = [...articles];
+      const items = [...articles.articles];
 
       items[index] = res.data.article;
 
-      setArticles(items);
+      setArticles({ ...articles, articles: items });
     });
   };
 
-  return articles.length !== 0 ? (
-    articles.map((article, index, arr) => {
+  return articles.articles.length !== 0 ? (
+    articles.articles.map((article, index, arr) => {
       return (
         article.author && (
           <div className="article-preview" key={article.slug}>

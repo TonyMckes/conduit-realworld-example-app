@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useReducer, useState } from "react";
 import { Link } from "react-router-dom";
+import ArticlePagination from "../components/ArticlePagination";
 import ArticlesPreview from "../components/ArticlesPreview";
 import BannerContainer from "../components/BannerContainer";
 import ContainerRow from "../components/ContainerRow";
@@ -26,12 +27,12 @@ function reducer(activeTab, action) {
 }
 
 function Home() {
-  const [articles, setArticles] = useState([]);
+  const [articles, setArticles] = useState();
   const [activeTab, dispatch] = useReducer(reducer, initialState);
   const { authState, headers } = useAuth();
 
   const { data } = useAxios({
-    url: authState.status ? "/api/articles/feed" : "api/articles",
+    url: authState.status ? "api/articles/feed" : "api/articles",
   });
 
   useEffect(() => {
@@ -40,21 +41,21 @@ function Home() {
         ? { type: "feed", feed: true }
         : { type: "global", feed: true },
     );
-    setArticles(data?.articles);
+    setArticles(data);
   }, [data]);
 
   const allArticles = async () => {
     const res = await axios.get("/api/articles", { headers: headers });
 
     dispatch({ type: "global" });
-    setArticles(res.data.articles);
+    setArticles(res.data);
   };
 
   const articlesFeed = async () => {
     const res = await axios.get("/api/articles/feed", { headers: headers });
 
     dispatch({ type: "feed" });
-    setArticles(res.data.articles);
+    setArticles(res.data);
   };
 
   const articleBySlug = async (e) => {
@@ -63,7 +64,7 @@ function Home() {
     });
 
     dispatch({ type: "tag", payload: { tagName: e.target.innerText } });
-    setArticles(res.data.articles);
+    setArticles(res.data);
   };
 
   return (
@@ -114,7 +115,14 @@ function Home() {
             </ul>
           </div>
           {articles && (
-            <ArticlesPreview articles={articles} setArticles={setArticles} />
+            <>
+              <ArticlesPreview articles={articles} setArticles={setArticles} />
+
+              <ArticlePagination
+                articles={articles}
+                setArticles={setArticles}
+              />
+            </>
           )}
         </div>
 
