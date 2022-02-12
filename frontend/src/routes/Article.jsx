@@ -59,7 +59,7 @@ export default function Article() {
   };
 
   const deleteArticle = () => {
-    const confirmation = window.confirm("You want to delete ?");
+    const confirmation = window.confirm("Want to delete the article?");
 
     if (authState.status) {
       if (!confirmation) return;
@@ -212,15 +212,21 @@ function Comments({ comments, slug, refresh }) {
   const { authState } = useAuth();
 
   const handleDelete = (commentId) => {
-    axios
-      .delete(`api/articles/${slug}/comments/${commentId}`, {
-        headers: { Authorization: `Token ${authState.loggedUser.token}` },
-      })
-      .then((res) => {
-        if (res.data.errors) return console.log(res.data.errors.body);
+    const confirmation = window.confirm("Want to delete the comment?");
 
-        refresh(res.data.message.body);
-      });
+    if (authState.status) {
+      if (!confirmation) return;
+
+      axios
+        .delete(`api/articles/${slug}/comments/${commentId}`, {
+          headers: { Authorization: `Token ${authState.loggedUser.token}` },
+        })
+        .then((res) => {
+          if (res.data.errors) return console.log(res.data.errors.body);
+
+          refresh(res.data.message.body);
+        });
+    } else alert("You need to login first");
   };
 
   return (
