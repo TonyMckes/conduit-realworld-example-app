@@ -41,7 +41,7 @@ async function appendFollowers(loggedUser, toAppend) {
     //
   } else {
     //
-    const followersCount = await toAppend.countFollowers();
+    const followersCount = await toAppend.author.countFollowers();
 
     if (!toAppend?.author) {
       toAppend.dataValues.following = false;
