@@ -37,11 +37,12 @@ const allArticles = async (req, res) => {
       order: [["createdAt", "DESC"]],
     };
 
-    let articles;
+    let articles = { rows: [], count: 0 };
     if (favorited) {
       const user = await User.findOne({ where: { username: favorited } });
 
-      articles = await user.getFavorites(searchOptions);
+      articles.rows = await user.getFavorites(searchOptions);
+      articles.count = await user.countFavorites();
     } else {
       articles = await Article.findAndCountAll(searchOptions);
     }
