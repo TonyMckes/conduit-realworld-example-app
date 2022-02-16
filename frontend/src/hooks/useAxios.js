@@ -3,16 +3,14 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../helpers/AuthContextProvider";
 
 export default function useAxios({ url, method, dep }) {
-  const [data, setData] = useState();
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({});
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { authState, headers } = useAuth();
 
   useEffect(() => {
     (async () => {
       try {
-        setLoading(true);
-
         const res = await axios({
           url: url,
           method: method,

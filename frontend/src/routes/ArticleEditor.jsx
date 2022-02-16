@@ -26,20 +26,35 @@ function ArticleEditorForm() {
     tagList: "",
   });
   const { authState, headers } = useAuth();
+
   const navigate = useNavigate();
   const { slug } = useParams();
-  const { data } = useAxios({ url: `api/articles/${slug}`, headers: headers });
+
+  const { data, loading } = useAxios({
+    url: `api/articles/${slug}`,
+    headers: headers,
+  });
 
   useEffect(() => {
-    if (
-      slug &&
-      authState.loggedUser.username === data?.article.author.username
-    ) {
+    const {
+      article: {
+        title,
+        description,
+        body,
+        tagList,
+
+        author: { username } = {},
+      } = {},
+
+      article,
+    } = data || {};
+
+    if (slug && article && authState.loggedUser.username === username) {
       setForm({
-        title: data ? data.article.title : "",
-        description: data ? data.article.description : "",
-        body: data ? data.article.body : "",
-        tagList: data ? data.article.tagList : "",
+        title: title,
+        description: description,
+        body: body,
+        tagList: tagList,
       });
     }
   }, [data]);
@@ -74,52 +89,59 @@ function ArticleEditorForm() {
         body: "",
         tagList: "",
       });
+
       navigate(`/article/${res.data.article.slug}`);
     });
   };
 
   return (
-    <form onSubmit={formSubmit}>
-      <fieldset>
-        <FormFieldset
-          className="form-control-lg"
-          placeholder="Article Title"
-          name="title"
-          value={form.title}
-          onChange={inputHandler}
-        ></FormFieldset>
+    !loading && (
+      <form onSubmit={formSubmit}>
+        <fieldset>
+          <FormFieldset
+            placeholder="Article Title"
+            name="title"
+            value={form.title}
+            handler={inputHandler}
+          ></FormFieldset>
 
-        <FormFieldset
-          placeholder="What's this article about?"
-          name="description"
-          value={form.description}
-          onChange={inputHandler}
-        ></FormFieldset>
+          <FormFieldset
+            normal
+            placeholder="What's this article about?"
+            name="description"
+            value={form.description}
+            handler={inputHandler}
+          ></FormFieldset>
 
-        <fieldset className="form-group">
-          <textarea
-            className="form-control"
-            rows="8"
-            placeholder="Write your article (in markdown)"
-            name="body"
-            value={form.body}
-            onChange={inputHandler}
-          ></textarea>
+          <fieldset className="form-group">
+            <textarea
+              className="form-control"
+              rows="8"
+              placeholder="Write your article (in markdown)"
+              name="body"
+              value={form.body}
+              onChange={inputHandler}
+            ></textarea>
+          </fieldset>
+
+          <FormFieldset
+            normal
+            placeholder="Enter tags"
+            name="tags"
+            value={form.tagList}
+            handler={tagsInputHandler}
+          >
+            <div className="tag-list"></div>
+          </FormFieldset>
+
+          <button
+            className="btn btn-lg pull-xs-right btn-primary"
+            type="submit"
+          >
+            {slug ? "Update Article" : "Publish Article"}
+          </button>
         </fieldset>
-
-        <FormFieldset
-          placeholder="Enter tags"
-          name="tags"
-          value={form.tagList}
-          onChange={tagsInputHandler}
-        >
-          <div className="tag-list"></div>
-        </FormFieldset>
-
-        <button className="btn btn-lg pull-xs-right btn-primary" type="submit">
-          {slug ? "Update Article" : "Publish Article"}
-        </button>
-      </fieldset>
-    </form>
+      </form>
+    )
   );
 }

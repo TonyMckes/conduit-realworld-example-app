@@ -1,10 +1,12 @@
 import axios from "axios";
 import { Link } from "react-router-dom";
+import ArticleTags from "../components/ArticleTags";
 import { useAuth } from "../helpers/AuthContextProvider";
 import ArticleMeta from "./ArticleMeta";
 import { FavButton } from "./Buttons";
 
-export default function ArticlesPreview({ articles, setArticles }) {
+function ArticlesPreview({ articlesData, loading, setArticlesData }) {
+  const { articles } = articlesData || {};
   const { headers } = useAuth();
 
   const handleFav = ({ slug, favorited, index }) => {
@@ -14,52 +16,46 @@ export default function ArticlesPreview({ articles, setArticles }) {
       headers: headers,
     }).then((res) => {
       if (res.data.errors) return console.log(res.data.errors.body);
-
-      const items = [...articles.articles];
+      const items = [...articles];
 
       items[index] = res.data.article;
 
-      setArticles({ ...articles, articles: items });
+      setArticlesData({ ...articlesData, articles: items });
     });
   };
 
-  return articles.articles.length !== 0 ? (
-    articles.articles.map((article, index, arr) => {
+  return loading ? (
+    <div className="article-preview">Loading articles...</div>
+  ) : articles?.length === 0 ? (
+    <div className="article-preview">No articles available.</div>
+  ) : (
+    articles.map((article, index) => {
+      const { slug, title, description, tagList } = article;
+
       return (
-        article.author && (
-          <div className="article-preview" key={article.slug}>
-            <ArticleMeta article={article}>
-              <FavButton
-                article={article}
-                event={handleFav}
-                index={index}
-                size="compact"
-                arr={arr}
-              />
-            </ArticleMeta>
+        <div className="article-preview" key={slug}>
+          <ArticleMeta article={article}>
+            <FavButton
+              article={article}
+              handler={handleFav}
+              index={index}
+              compact
+            />
+          </ArticleMeta>
 
-            <Link to={`/article/${article.slug}`} className="preview-link">
-              <h1>{article.title}</h1>
+          <Link to={`/article/${slug}`} className="preview-link">
+            <h1>{title}</h1>
 
-              <p>{article.description}</p>
+            <p>{description}</p>
 
-              <span>Read more...</span>
+            <span>Read more...</span>
 
-              {article.tagList !== 0 && (
-                <ul className="tag-list">
-                  {article.tagList.map((tag) => (
-                    <li key={tag} className="tag-default tag-pill tag-outline">
-                      {tag}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Link>
-          </div>
-        )
+            <ArticleTags tagList={tagList} />
+          </Link>
+        </div>
       );
     })
-  ) : (
-    <div className="article-preview">No articles available..</div>
   );
 }
+
+export default ArticlesPreview;

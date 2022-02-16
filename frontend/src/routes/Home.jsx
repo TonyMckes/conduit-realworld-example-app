@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useReducer, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ArticlePagination from "../components/ArticlePagination";
 import ArticlesPreview from "../components/ArticlesPreview";
@@ -8,63 +8,44 @@ import ContainerRow from "../components/ContainerRow";
 import { useAuth } from "../helpers/AuthContextProvider";
 import useAxios from "../hooks/useAxios";
 
-const initialState = { global: true };
-
-function reducer(activeTab, action) {
-  switch (action.type) {
-    case "feed":
-      return { feed: true };
-
-    case "global":
-      return { global: true };
-
-    case "tag":
-      return { tag: true, name: action.payload.tagName };
-
-    default:
-      return activeTab;
-  }
-}
+const FeedContext = createContext();
 
 function Home() {
-  const [articles, setArticles] = useState();
-  const [activeTab, dispatch] = useReducer(reducer, initialState);
+  const [articlesData, setArticlesData] = useState({});
+  const [{ selectedFeed, selectedTagName }, setSelectedFeed] = useState({
+    selectedFeed: "",
+    selectedTagName: "",
+  });
   const { authState, headers } = useAuth();
 
-  const { data } = useAxios({
+  const { data, loading } = useAxios({
     url: authState.status ? "api/articles/feed" : "api/articles",
   });
 
   useEffect(() => {
-    dispatch(
+    setArticlesData(data);
+    setSelectedFeed(
       authState.status
-        ? { type: "feed", feed: true }
-        : { type: "global", feed: true },
+        ? { selectedFeed: "feed", ...selectedTagName }
+        : { selectedFeed: "global", ...selectedTagName },
     );
-    setArticles(data);
   }, [data]);
 
-  const allArticles = async () => {
-    const res = await axios.get("/api/articles", { headers: headers });
+  const feedHandler = async (e, feedName) => {
+    const tagName = e.target.innerText.trim();
+    const url = {
+      feed: "/api/articles/feed",
+      global: "/api/articles",
+      tag: `/api/articles?tag=${tagName}`,
+    };
 
-    dispatch({ type: "global" });
-    setArticles(res.data);
-  };
+    const res = await axios.get(url[feedName], { headers: headers });
 
-  const articlesFeed = async () => {
-    const res = await axios.get("/api/articles/feed", { headers: headers });
-
-    dispatch({ type: "feed" });
-    setArticles(res.data);
-  };
-
-  const articleBySlug = async (e) => {
-    const res = await axios.get(`/api/articles?tag=${e.target.innerText}`, {
-      headers: headers,
+    setArticlesData(res.data);
+    setSelectedFeed({
+      selectedFeed: feedName,
+      selectedTagName: tagName,
     });
-
-    dispatch({ type: "tag", payload: { tagName: e.target.innerText } });
-    setArticles(res.data);
   };
 
   return (
@@ -76,64 +57,70 @@ function Home() {
         </BannerContainer>
       )}
       <ContainerRow className="page">
-        <div className="col-md-9">
-          <div className="feed-toggle">
-            <ul className="nav nav-pills outline-active">
-              {authState.status && (
-                <li className="nav-item">
-                  <Link
-                    className={`nav-link ${activeTab.feed ? "active" : ""}`}
-                    to="#"
-                    onClick={articlesFeed}
-                  >
-                    Your Feed
-                  </Link>
-                </li>
-              )}
+        <FeedContext.Provider value={{ feedHandler, selectedFeed }}>
+          <div className="col-md-9">
+            <FeedToggler
+              authState={authState}
+              selectedFeed={selectedFeed}
+              selectedTagName={selectedTagName}
+            />
 
-              <li className="nav-item">
-                <Link
-                  className={`nav-link ${activeTab.global ? "active" : ""}`}
-                  to="#"
-                  onClick={allArticles}
-                >
-                  Global Feed
-                </Link>
-              </li>
+            <ArticlesPreview
+              loading={loading}
+              articlesData={articlesData}
+              setArticlesData={setArticlesData}
+            />
 
-              {activeTab.tag && (
-                <li className="nav-item">
-                  <Link
-                    className={`nav-link ${activeTab.tag ? "active" : ""}`}
-                    to="#"
-                    onClick={allArticles}
-                  >
-                    <i className="ion-pound"></i> {activeTab.name}
-                  </Link>
-                </li>
-              )}
-            </ul>
+            <ArticlePagination
+              loading={loading}
+              articlesData={articlesData}
+              setArticlesData={setArticlesData}
+              location="articles"
+            />
           </div>
-          {articles && (
-            <>
-              <ArticlesPreview articles={articles} setArticles={setArticles} />
 
-              <ArticlePagination
-                articles={articles}
-                setArticles={setArticles}
-              />
-            </>
-          )}
-        </div>
-
-        <PopularTags articleBySlug={articleBySlug} />
+          <PopularTags feedHandler={feedHandler} />
+        </FeedContext.Provider>
       </ContainerRow>
     </div>
   );
 }
 
-function PopularTags({ articleBySlug }) {
+function FeedToggler({ authState, selectedFeed, selectedTagName }) {
+  return (
+    <div className="feed-toggle">
+      <ul className="nav nav-pills outline-active">
+        {authState.status && <FeedNavLink tabName="feed" text="YourFeed" />}
+
+        <FeedNavLink tabName="global" text="Global Feed" />
+
+        {selectedFeed === "tag" && (
+          <FeedNavLink icon tabName="tag" text={selectedTagName} />
+        )}
+      </ul>
+    </div>
+  );
+}
+
+function FeedNavLink({ icon, tabName, text }) {
+  const { feedHandler, selectedFeed } = useContext(FeedContext);
+
+  return (
+    <li className="nav-item">
+      <Link
+        className={`nav-link ${selectedFeed === tabName ? "active" : ""}`}
+        onClick={(e) => feedHandler(e, tabName)}
+        to="#"
+      >
+        {icon && <i className="ion-pound"></i>} {text}
+      </Link>
+    </li>
+  );
+}
+
+function PopularTags({ feedHandler }) {
   const [tags, setTags] = useState([]);
+
   const { data, loading } = useAxios({
     url: "/api/tags",
   });
@@ -147,20 +134,21 @@ function PopularTags({ articleBySlug }) {
       <div className="sidebar">
         <p>Popular Tags</p>
         {loading ? (
+          <p>Loading tags...</p>
+        ) : tags.length === 0 ? (
           <p>Tags list not available</p>
         ) : (
           <div className="tag-list">
-            {tags &&
-              tags.map((item) => (
-                <Link
-                  key={item}
-                  to={"/"}
-                  className="tag-pill tag-default"
-                  onClick={(e) => articleBySlug(e)}
-                >
-                  {item}
-                </Link>
-              ))}
+            {tags.map((item) => (
+              <Link
+                key={item}
+                to={"/"}
+                className="tag-pill tag-default"
+                onClick={(e) => feedHandler(e, "tag")}
+              >
+                {item}
+              </Link>
+            ))}
           </div>
         )}
       </div>

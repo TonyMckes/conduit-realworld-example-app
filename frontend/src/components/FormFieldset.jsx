@@ -1,21 +1,21 @@
 function FormFieldset({
   children,
   type,
-  className,
+  normal,
   placeholder,
   name,
   value,
-  onChange,
+  handler,
 }) {
   return (
     <fieldset className="form-group">
       <input
         type={type}
-        className={`form-control ${className ? className : ""}`}
+        className={`form-control ${!normal ? "form-control-lg" : ""}`}
         placeholder={placeholder}
         name={name}
         value={value}
-        onChange={onChange}
+        onChange={handler}
       />
       {children}
     </fieldset>

@@ -64,19 +64,17 @@ function SettingsForm() {
         <form onSubmit={formSubmit}>
           <fieldset>
             <FormFieldset
-              className="form-control-lg"
               placeholder="URL of profile picture"
               name="image"
               value={form.image}
-              onChange={inputHandler}
+              handler={inputHandler}
             ></FormFieldset>
 
             <FormFieldset
-              className="form-control-lg"
               placeholder="Your Name"
               name="username"
               value={form.username}
-              onChange={inputHandler}
+              handler={inputHandler}
             ></FormFieldset>
 
             <fieldset className="form-group">
@@ -91,20 +89,18 @@ function SettingsForm() {
             </fieldset>
 
             <FormFieldset
-              className="form-control-lg"
               placeholder="Email"
               name="email"
               value={form.email}
-              onChange={inputHandler}
+              handler={inputHandler}
             ></FormFieldset>
 
             <FormFieldset
-              className="form-control-lg"
               type="password"
               name="password"
               value={form.password}
               placeholder="Password"
-              onChange={inputHandler}
+              handler={inputHandler}
             ></FormFieldset>
 
             <button

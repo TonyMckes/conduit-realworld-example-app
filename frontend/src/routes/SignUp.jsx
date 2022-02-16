@@ -59,25 +59,22 @@ function SignUpForm({ setError }) {
   return (
     <form onSubmit={handleSubmit}>
       <FormFieldset
-        className="form-control-lg"
         placeholder="Your Name"
         value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        handler={(e) => setUsername(e.target.value)}
       ></FormFieldset>
 
       <FormFieldset
-        className="form-control-lg"
         placeholder="Email"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        handler={(e) => setEmail(e.target.value)}
       ></FormFieldset>
 
       <FormFieldset
-        className="form-control-lg"
         type="password"
         placeholder="Password"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        handler={(e) => setPassword(e.target.value)}
       ></FormFieldset>
       <button className="btn btn-lg btn-primary pull-xs-right">Sign up</button>
     </form>

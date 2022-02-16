@@ -5,7 +5,8 @@ import App from "./App";
 import { AuthContextProvider } from "./helpers/AuthContextProvider";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
-import Article from "./routes/Article";
+import Article from "./routes/Article/Article";
+import CommentsSection from "./routes/Article/CommentsSection";
 import ArticleEditor from "./routes/ArticleEditor";
 import Home from "./routes/Home";
 import Profile from "./routes/Profile/Profile";
@@ -31,7 +32,9 @@ ReactDOM.render(
               <Route path=":slug" element={<ArticleEditor />} />
             </Route>
 
-            <Route path="article/:slug" element={<Article />} />
+            <Route path="article/:slug" element={<Article />}>
+              <Route index element={<CommentsSection />} />
+            </Route>
 
             <Route path="profile/:username" element={<Profile />}>
               <Route index element={<ProfileArticles />} />

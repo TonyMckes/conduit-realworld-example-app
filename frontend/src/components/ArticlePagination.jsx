@@ -3,25 +3,31 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../helpers/AuthContextProvider";
 
-export default function ArticlePagination({ articles, setArticles, username }) {
+function ArticlePagination({
+  articlesData,
+  location,
+  setArticlesData,
+  username,
+}) {
   const [activePage, setActivePage] = useState(0);
+  const { articlesCount } = articlesData || 0;
   const { headers } = useAuth();
 
-  const totalPages = Math.ceil(articles.articlesCount / 3);
+  const totalPages = Math.ceil(articlesCount / 3);
 
   const handlePagination = async (pageNumber) => {
     if (pageNumber === -1 || pageNumber === totalPages) return;
 
-    const res = await axios({
-      url: username
-        ? `api/articles?author=${username}&&offset=${pageNumber}`
-        : `api/articles?offset=${pageNumber}`,
-      method: "GET",
-      headers: headers,
-    });
+    const url = {
+      articles: `api/articles?offset=${pageNumber}`,
+      profile: `api/articles?author=${username}&&offset=${pageNumber}`,
+      favorites: `api/articles?favorited=${username}&&offset=${pageNumber}`,
+    };
+
+    const res = await axios.get(url[location], { headers: headers });
 
     setActivePage(pageNumber);
-    setArticles(res.data);
+    setArticlesData(res.data);
   };
 
   return (
@@ -64,3 +70,5 @@ export default function ArticlePagination({ articles, setArticles, username }) {
     )
   );
 }
+
+export default ArticlePagination;

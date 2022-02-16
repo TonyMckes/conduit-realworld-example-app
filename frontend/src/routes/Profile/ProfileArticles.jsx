@@ -5,29 +5,37 @@ import ArticlesPreview from "../../components/ArticlesPreview";
 import useAxios from "../../hooks/useAxios";
 
 export default function AuthorFavArticles() {
-  const [articles, setArticles] = useState([]);
+  const [articlesData, setArticlesData] = useState({});
+  const { articles } = articlesData || {};
   const { username } = useParams();
 
-  const { data } = useAxios({
+  const { data, loading } = useAxios({
     url: `api/articles?author=${username}`,
     dep: username,
   });
 
   useEffect(() => {
-    setArticles(data);
+    setArticlesData(data);
   }, [data]);
 
-  return articles && articles.length !== 0 ? (
+  return loading ? (
+    <div className="article-preview">Loading {username} articles</div>
+  ) : articles?.length === 0 ? (
+    <div className="article-preview">{username} doesn't have articles</div>
+  ) : (
     <>
-      <ArticlesPreview articles={articles} setArticles={setArticles} />
+      <ArticlesPreview
+        loading={loading}
+        articlesData={articlesData}
+        setArticlesData={setArticlesData}
+      />
 
       <ArticlePagination
-        articles={articles}
-        setArticles={setArticles}
+        articlesData={articlesData}
+        setArticlesData={setArticlesData}
         username={username}
+        location="profile"
       />
     </>
-  ) : (
-    <div className="article-preview">{username} doesn't have articles</div>
   );
 }

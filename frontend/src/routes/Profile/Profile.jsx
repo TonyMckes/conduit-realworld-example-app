@@ -9,10 +9,11 @@ import useAxios from "../../hooks/useAxios";
 
 export default function Profile() {
   const [author, setAuthor] = useState({});
+  const { bio, following, image, username: authorName } = author || {};
   const { authState, headers } = useAuth();
   const { username } = useParams();
 
-  const { data } = useAxios({
+  const { data, loading } = useAxios({
     url: `api/profiles/${username}`,
     headers: headers,
     dep: username,
@@ -26,7 +27,7 @@ export default function Profile() {
     if (authState.status) {
       axios({
         url: `api/profiles/${username}/follow`,
-        method: author.following ? "DELETE" : "POST",
+        method: following ? "DELETE" : "POST",
         headers: headers,
       }).then((res) => {
         setAuthor(res.data.profile);
@@ -38,11 +39,11 @@ export default function Profile() {
     <div className="profile-page">
       <div className="user-info">
         <ContainerRow>
-          {author && (
+          {!loading && (
             <div className="col-xs-12 col-md-10 offset-md-1">
-              <Avatar src={author.image} className="user-img" alt="author" />
-              <h4>{author.username}</h4>
-              <p>{author.bio}</p>
+              <Avatar src={image} className="user-img" alt="author" />
+              <h4>{authorName}</h4>
+              <p>{bio}</p>
 
               {username === authState.loggedUser.username ? (
                 <Link
@@ -63,9 +64,9 @@ export default function Profile() {
         <div className="col-xs-12 col-md-10 offset-md-1">
           <div className="articles-toggle">
             <ul className="nav nav-pills outline-active">
-              <NavItem body="My Articles" to="" />
+              <NavItem text="My Articles" url="" />
 
-              <NavItem body="Favorited Articles" to="favorites" />
+              <NavItem text="Favorited Articles" url="favorites" />
             </ul>
           </div>
           <Outlet />
@@ -74,15 +75,15 @@ export default function Profile() {
     </div>
   );
 }
-function NavItem({ to, body }) {
+function NavItem({ url, text }) {
   return (
     <li className="nav-item">
       <NavLink
         className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
-        to={to}
+        to={url}
         end
       >
-        {body}
+        {text}
       </NavLink>
     </li>
   );
