@@ -7,28 +7,38 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
+const token = localStorage.getItem("Token");
+
 export function AuthContextProvider({ children }) {
-  const [authState, setAuthState] = useState({ status: false, loggedUser: {} });
-  const headers = authState.status
-    ? { Authorization: `Token ${authState.loggedUser.token}` }
-    : null;
+  const [{ headerToken, loggedUser, isAuth }, setAuthState] = useState({
+    headerToken: token ? { Authorization: `Token ${token}` } : null,
+    isAuth: token ? true : false,
+    loggedUser: {},
+  });
 
   useEffect(() => {
-    const token = localStorage.getItem("Token");
     if (token) {
-      axios
-        .get("api/user", { headers: { Authorization: `Token ${token}` } })
-        .then((res) => {
-          if (res.data.errors) return alert(res.data.errors.body);
+      (async () => {
+        try {
+          const res = await axios.get("api/user", { headers: headerToken });
 
-          setAuthState({ status: true, loggedUser: res.data.user });
-        })
-        .catch((arg) => console.log("Error", arg));
+          if (res.data.errors) return console.log(res.data.errors.body);
+
+          setAuthState((authState) => ({
+            ...authState,
+            loggedUser: res.data.user,
+          }));
+        } catch (error) {
+          console.log(error.response);
+        }
+      })();
     }
   }, []);
 
   return (
-    <AuthContext.Provider value={{ authState, setAuthState, headers }}>
+    <AuthContext.Provider
+      value={{ headerToken, isAuth, loggedUser, setAuthState }}
+    >
       {children}
     </AuthContext.Provider>
   );
