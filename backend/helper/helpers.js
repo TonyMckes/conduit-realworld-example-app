@@ -41,12 +41,15 @@ async function appendFollowers(loggedUser, toAppend) {
     //
   } else {
     //
-    const followersCount = await toAppend.author.countFollowers();
-
     if (!toAppend?.author) {
+      const followersCount = await toAppend.countFollowers();
+
       toAppend.dataValues.following = false;
       toAppend.dataValues.followersCount = followersCount;
+      //
     } else {
+      const followersCount = await toAppend.author.countFollowers();
+
       toAppend.author.dataValues.following = false;
       toAppend.author.dataValues.followersCount = followersCount;
     }
