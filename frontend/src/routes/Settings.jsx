@@ -25,21 +25,21 @@ function SettingsForm() {
     email: "",
     password: "",
   });
-  const { authState, setAuthState, headers } = useAuth();
+  const { headerToken, isAuth, loggedUser, setAuthState } = useAuth();
 
   useEffect(() => {
-    if (authState.status) {
-      const user = authState.loggedUser;
+    if (isAuth) {
+      const { image, username, bio, email } = loggedUser;
 
       setForm({
-        image: user.image ? user.image : "",
-        username: user.username,
-        bio: user.bio ? user.bio : "",
-        email: user.email,
+        image: image ? image : "",
+        username: username,
+        bio: bio ? bio : "",
+        email: email,
         password: "",
       });
     }
-  }, [authState.loggedUser]);
+  }, [isAuth, loggedUser]);
 
   const inputHandler = (e) => {
     const input = e.currentTarget.name;
@@ -48,70 +48,79 @@ function SettingsForm() {
     setForm({ ...form, [input]: value });
   };
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     e.preventDefault();
 
-    axios.put("api/user", { user: form }, { headers: headers }).then((res) => {
+    try {
+      const res = await axios.put(
+        "api/user",
+        { user: form },
+        { headers: headerToken },
+      );
+
       if (res.data.errors) return console.log(res.data.errors.body);
 
-      setAuthState({ ...authState, loggedUser: res.data.user });
-    });
+      setAuthState((authState) => ({
+        ...authState,
+        loggedUser: res.data.user,
+      }));
+    } catch (error) {
+      console.log(error.response);
+    }
   };
 
   return (
-    <>
-      {form && (
-        <form onSubmit={formSubmit}>
-          <fieldset>
-            <FormFieldset
-              placeholder="URL of profile picture"
-              name="image"
-              value={form.image}
-              handler={inputHandler}
-            ></FormFieldset>
+    form && (
+      <form onSubmit={formSubmit}>
+        <fieldset>
+          <FormFieldset
+            placeholder="URL of profile picture"
+            name="image"
+            value={form.image}
+            handler={inputHandler}
+          ></FormFieldset>
 
-            <FormFieldset
-              placeholder="Your Name"
-              name="username"
-              value={form.username}
-              handler={inputHandler}
-            ></FormFieldset>
+          <FormFieldset
+            placeholder="Your Name"
+            name="username"
+            value={form.username}
+            handler={inputHandler}
+          ></FormFieldset>
 
-            <fieldset className="form-group">
-              <textarea
-                className="form-control form-control-lg"
-                rows="8"
-                placeholder="Short bio about you"
-                name="bio"
-                value={form.bio}
-                onChange={inputHandler}
-              ></textarea>
-            </fieldset>
-
-            <FormFieldset
-              placeholder="Email"
-              name="email"
-              value={form.email}
-              handler={inputHandler}
-            ></FormFieldset>
-
-            <FormFieldset
-              type="password"
-              name="password"
-              value={form.password}
-              placeholder="Password"
-              handler={inputHandler}
-            ></FormFieldset>
-
-            <button
-              type="submit"
-              className="btn btn-lg btn-primary pull-xs-right"
-            >
-              Update Settings
-            </button>
+          <fieldset className="form-group">
+            <textarea
+              className="form-control form-control-lg"
+              rows="8"
+              placeholder="Short bio about you"
+              name="bio"
+              value={form.bio}
+              onChange={inputHandler}
+            ></textarea>
           </fieldset>
-        </form>
-      )}
-    </>
+
+          <FormFieldset
+            placeholder="Email"
+            name="email"
+            value={form.email}
+            handler={inputHandler}
+          ></FormFieldset>
+
+          <FormFieldset
+            type="password"
+            name="password"
+            value={form.password}
+            placeholder="Password"
+            handler={inputHandler}
+          ></FormFieldset>
+
+          <button
+            type="submit"
+            className="btn btn-lg btn-primary pull-xs-right"
+          >
+            Update Settings
+          </button>
+        </fieldset>
+      </form>
+    )
   );
 }

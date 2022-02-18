@@ -5,17 +5,17 @@ import { useAuth } from "../../helpers/AuthContextProvider";
 import dateFormatter from "../../helpers/dateFormatter";
 
 function Comments({ comments, setNewComment, slug }) {
-  const { authState, headers } = useAuth();
+  const { headerToken, isAuth, loggedUser } = useAuth();
 
   const handleDelete = (commentId) => {
     const confirmation = window.confirm("Want to delete the comment?");
 
-    if (authState.status) {
+    if (isAuth) {
       if (!confirmation) return;
 
       axios
         .delete(`api/articles/${slug}/comments/${commentId}`, {
-          headers: headers,
+          headers: headerToken,
         })
         .then((res) => {
           if (res.data.errors) return console.log(res.data.errors.body);
@@ -25,9 +25,7 @@ function Comments({ comments, setNewComment, slug }) {
     } else alert("You need to login first");
   };
 
-  return comments.length === 0 ? (
-    <div>There are no comments yet...</div>
-  ) : (
+  return comments?.length > 0 ? (
     comments.map(({ id, body, author: { username, image }, createdAt }) => (
       <div className="card" key={id}>
         <div className="card-block">
@@ -42,7 +40,7 @@ function Comments({ comments, setNewComment, slug }) {
             {username}
           </Link>
           <span className="date-posted">{dateFormatter(createdAt)}</span>
-          {authState.status && username === authState.loggedUser.username && (
+          {isAuth && username === loggedUser.username && (
             <button
               className="btn btn-sm btn-outline-secondary pull-xs-right"
               onClick={() => handleDelete(id)}
@@ -53,6 +51,8 @@ function Comments({ comments, setNewComment, slug }) {
         </div>
       </div>
     ))
+  ) : (
+    <div>There are no comments yet...</div>
   );
 }
 

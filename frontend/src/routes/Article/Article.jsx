@@ -7,7 +7,7 @@ import BannerContainer from "../../components/BannerContainer";
 import {
   ArticleButtons,
   FavButton,
-  FollowButton
+  FollowButton,
 } from "../../components/Buttons";
 import { useAuth } from "../../helpers/AuthContextProvider";
 import useAxios from "../../hooks/useAxios";
@@ -15,17 +15,17 @@ import useAxios from "../../hooks/useAxios";
 export default function Article() {
   const [article, setArticle] = useState({});
   const { title, body, tagList } = article || {};
-  const { authState, headers } = useAuth();
+  const { headerToken, isAuth } = useAuth();
   const { slug } = useParams();
 
   const { data, loading } = useAxios({
     url: `api/articles/${slug}`,
-    headers: headers,
+    headers: headerToken,
   });
 
   useEffect(() => {
     setArticle(data.article);
-  }, [data, authState.status]);
+  }, [data, isAuth]);
 
   return (
     !loading && (
@@ -65,24 +65,21 @@ export default function Article() {
 }
 
 function ArticlesButtons({ article, setArticle }) {
-  const {
-    author: { username, following },
-    author,
-  } = article;
-  const { authState, headers } = useAuth();
+  const { author: { username, following } = {}, author } = article || {};
+  const { headerToken, isAuth, loggedUser } = useAuth();
   const navigate = useNavigate();
   const { slug } = useParams();
 
   const deleteArticle = () => {
     const confirmation = window.confirm("Want to delete the article?");
 
-    if (authState.status) {
+    if (isAuth) {
       if (!confirmation) return;
 
       axios({
         url: `api/articles/${slug}/`,
         method: "DELETE",
-        headers: headers,
+        headers: headerToken,
       }).then((res) => {
         navigate("/");
       });
@@ -90,11 +87,11 @@ function ArticlesButtons({ article, setArticle }) {
   };
 
   const followHandler = () => {
-    if (authState.status) {
+    if (isAuth) {
       axios({
         url: `api/profiles/${username}/follow`,
         method: following ? "DELETE" : "POST",
-        headers: headers,
+        headers: headerToken,
       }).then((res) => {
         setArticle({ ...article, author: res.data.profile });
       });
@@ -102,11 +99,10 @@ function ArticlesButtons({ article, setArticle }) {
   };
 
   const handleFav = ({ favorited }) => {
-    console.log("favorited", favorited);
     axios({
       url: `api/articles/${slug}/favorite`,
       method: favorited ? "DELETE" : "POST",
-      headers: headers,
+      headers: headerToken,
     }).then((res) => {
       if (res.data.errors) return console.log(res.data.errors.body);
 
@@ -115,8 +111,9 @@ function ArticlesButtons({ article, setArticle }) {
   };
 
   return (
+    // TODO: if username's are undefined, then is still truthy
     <>
-      {authState.loggedUser.username === username ? (
+      {loggedUser.username === username ? (
         <ArticleButtons handler={deleteArticle} slug={slug} />
       ) : (
         <FollowButton author={author} handler={followHandler} />

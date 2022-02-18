@@ -33,27 +33,32 @@ function SignUpForm({ setError }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // const { setAuthState } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    axios
-      .post("api/users", {
+    try {
+      const res = await axios.post("api/users", {
         user: { username: username, email: email, password: password },
-      })
-      .then((res) => {
-        if (res.data.errors) {
-          setError(res.data.errors.body);
-          return console.log(res.data.errors.body);
-        }
-
-        navigate("/login");
-      })
-      .catch((error) => {
-        setError(error.response.data.errors.body);
-        console.log(error.response.data.errors.body);
       });
+
+      if (res.data.errors) return console.log(res.data.errors.body);
+      // setError(res.data.errors.body);
+
+      // setAuthState((authState) => ({
+      //   ...authState,
+      //   headerToken: headerToken,
+      //   isAuth: true,
+      //   loggedUser: res.data.user,
+      // }));
+
+      navigate("/login");
+    } catch (error) {
+      // setError(error.response.data.errors.body);
+      console.log(error.response);
+    }
   };
 
   return (

@@ -25,14 +25,14 @@ function ArticleEditorForm() {
     body: "",
     tagList: "",
   });
-  const { authState, headers } = useAuth();
+  const { headerToken, loggedUser } = useAuth();
 
   const navigate = useNavigate();
   const { slug } = useParams();
 
   const { data, loading } = useAxios({
     url: `api/articles/${slug}`,
-    headers: headers,
+    headers: headerToken,
   });
 
   useEffect(() => {
@@ -43,13 +43,13 @@ function ArticleEditorForm() {
         body,
         tagList,
 
-        author: { username } = {},
+        author: { username: author } = {},
       } = {},
 
       article,
     } = data || {};
 
-    if (slug && article && authState.loggedUser.username === username) {
+    if (slug && article && author === loggedUser.username) {
       setForm({
         title: title,
         description: description,
@@ -57,7 +57,7 @@ function ArticleEditorForm() {
         tagList: tagList,
       });
     }
-  }, [data]);
+  }, [data, loggedUser.username, slug]);
 
   const inputHandler = (e) => {
     const input = e.currentTarget.name;
@@ -79,7 +79,7 @@ function ArticleEditorForm() {
       url: slug ? `api/articles/${slug}` : "api/articles",
       method: slug ? "PUT" : "POST",
       data: { article: form },
-      headers: headers,
+      headers: headerToken,
     }).then((res) => {
       if (res.data.errors) return console.log(res.data.errors.body);
 

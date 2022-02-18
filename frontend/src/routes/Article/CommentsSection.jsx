@@ -8,7 +8,7 @@ import NewComment from "./NewComment";
 function CommentsSection() {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const { headers } = useAuth();
+  const { headerToken } = useAuth();
   const { slug } = useParams();
 
   useEffect(() => {
@@ -16,7 +16,7 @@ function CommentsSection() {
       try {
         const res = await axios({
           url: `api/articles/${slug}/comments`,
-          headers: headers,
+          headers: headerToken,
         });
 
         setComments(res.data.comments);
@@ -24,7 +24,7 @@ function CommentsSection() {
         console.log(error);
       }
     })();
-  }, [slug, newComment, headers]);
+  }, [slug, newComment, headerToken]);
 
   return (
     <>

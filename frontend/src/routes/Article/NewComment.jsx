@@ -6,7 +6,7 @@ import { useAuth } from "../../helpers/AuthContextProvider";
 
 function NewComment({ setNewComment }) {
   const [form, setForm] = useState({ body: "" });
-  const { authState, headers } = useAuth();
+  const { headerToken, isAuth, loggedUser } = useAuth();
   const { slug } = useParams();
 
   const handleSubmit = async (e) => {
@@ -16,7 +16,7 @@ function NewComment({ setNewComment }) {
       const res = await axios.post(
         `api/articles/${slug}/comments`,
         { comment: { body: form.body } },
-        { headers: headers },
+        { headers: headerToken },
       );
 
       setNewComment(res.data.comment);
@@ -30,7 +30,7 @@ function NewComment({ setNewComment }) {
     setForm({ body: e.target.value });
   };
 
-  return authState.status ? (
+  return isAuth ? (
     <form className="card comment-form" onSubmit={(e) => handleSubmit(e)}>
       <div className="card-block">
         <textarea
@@ -44,7 +44,7 @@ function NewComment({ setNewComment }) {
       <div className="card-footer">
         <Avatar
           alt="author"
-          src={authState.loggedUser.image}
+          src={loggedUser.image}
           className="comment-author-img"
         />
         <button className="btn btn-sm btn-primary">Post Comment</button>

@@ -10,28 +10,32 @@ import useAxios from "../../hooks/useAxios";
 export default function Profile() {
   const [author, setAuthor] = useState({});
   const { bio, following, image, username: authorName } = author || {};
-  const { authState, headers } = useAuth();
+  const { headerToken, isAuth, loggedUser } = useAuth();
   const { username } = useParams();
 
   const { data, loading } = useAxios({
     url: `api/profiles/${username}`,
-    headers: headers,
+    headers: headerToken,
     dep: username,
   });
 
   useEffect(() => {
     setAuthor(data?.profile);
-  }, [data]);
+  }, [data, author]);
 
-  const followHandler = () => {
-    if (authState.status) {
-      axios({
-        url: `api/profiles/${username}/follow`,
-        method: following ? "DELETE" : "POST",
-        headers: headers,
-      }).then((res) => {
+  const followHandler = async () => {
+    if (isAuth) {
+      try {
+        const res = await axios({
+          url: `api/profiles/${username}/follow`,
+          method: following ? "DELETE" : "POST",
+          headers: headerToken,
+        });
+
         setAuthor(res.data.profile);
-      });
+      } catch (error) {
+        console.log(error.response);
+      }
     } else alert("You need to login first");
   };
 
@@ -45,7 +49,7 @@ export default function Profile() {
               <h4>{authorName}</h4>
               <p>{bio}</p>
 
-              {username === authState.loggedUser.username ? (
+              {username === loggedUser.username ? (
                 <Link
                   className="btn btn-sm btn-outline-secondary action-btn"
                   to="/settings"

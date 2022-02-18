@@ -4,7 +4,7 @@ import { useAuth } from "../helpers/AuthContextProvider";
 import Avatar from "./Avatar";
 
 function Navbar() {
-  const { authState } = useAuth();
+  const { isAuth } = useAuth();
 
   return (
     <nav className="navbar navbar-light">
@@ -15,14 +15,14 @@ function Navbar() {
         <ul className="nav navbar-nav pull-xs-right">
           <NavItem body="Home" icon="ion-compose" url="/" />
 
-          {authState.status && (
+          {isAuth && (
             <>
               <NavItem body="New Article" icon="ion-compose" url="/editor" />
               <Dropdown />
             </>
           )}
 
-          {!authState.status && (
+          {!isAuth && (
             <>
               <NavItem body="Sign in" icon="ion-log-in" url="/login" />
               <NavItem body="Sign up" url="/register" />
@@ -36,11 +36,11 @@ function Navbar() {
 
 function Dropdown() {
   const [dropdown, setDropdown] = useState(false);
-  const { authState, setAuthState } = useAuth();
+  const { loggedUser, setAuthState } = useAuth();
 
   const logout = () => {
     localStorage.removeItem("Token");
-    setAuthState({ status: false, loggedUser: {} });
+    setAuthState({ headerToken: null, isAuth: false, loggedUser: {} });
   };
 
   return (
@@ -50,8 +50,8 @@ function Dropdown() {
         to="#"
         onClick={() => setDropdown(!dropdown)}
       >
-        <Avatar className="user-pic" src={authState.loggedUser.image} />
-        {authState.loggedUser.username}
+        <Avatar className="user-pic" src={loggedUser.image} />
+        {loggedUser.username}
       </Link>
 
       <div
@@ -62,7 +62,7 @@ function Dropdown() {
         <DropdownItem
           icon="ion-person"
           text="Profile"
-          url={`/profile/${authState.loggedUser.username}`}
+          url={`/profile/${loggedUser.username}`}
         />
         <DropdownItem icon="ion-gear-a" text="Settings" url="/settings" />
         <div className="dropdown-divider"></div>

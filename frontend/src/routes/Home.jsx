@@ -16,20 +16,20 @@ function Home() {
     selectedFeed: "",
     selectedTagName: "",
   });
-  const { authState, headers } = useAuth();
+  const { headerToken, isAuth } = useAuth();
 
   const { data, loading } = useAxios({
-    url: authState.status ? "api/articles/feed" : "api/articles",
+    url: isAuth ? "api/articles/feed" : "api/articles",
   });
 
   useEffect(() => {
     setArticlesData(data);
     setSelectedFeed(
-      authState.status
+      isAuth
         ? { selectedFeed: "feed", ...selectedTagName }
         : { selectedFeed: "global", ...selectedTagName },
     );
-  }, [data]);
+  }, [data, isAuth]);
 
   const feedHandler = async (e, feedName) => {
     const tagName = e.target.innerText.trim();
@@ -39,7 +39,7 @@ function Home() {
       tag: `/api/articles?tag=${tagName}`,
     };
 
-    const res = await axios.get(url[feedName], { headers: headers });
+    const res = await axios.get(url[feedName], { headers: headerToken });
 
     setArticlesData(res.data);
     setSelectedFeed({
@@ -50,7 +50,7 @@ function Home() {
 
   return (
     <div className="home-page">
-      {!authState.status && (
+      {!isAuth && (
         <BannerContainer>
           <h1 className="logo-font">conduit</h1>
           <p>A place to share your knowledge.</p>
@@ -60,7 +60,7 @@ function Home() {
         <FeedContext.Provider value={{ feedHandler, selectedFeed }}>
           <div className="col-md-9">
             <FeedToggler
-              authState={authState}
+              isAuth={isAuth}
               selectedFeed={selectedFeed}
               selectedTagName={selectedTagName}
             />
@@ -86,11 +86,11 @@ function Home() {
   );
 }
 
-function FeedToggler({ authState, selectedFeed, selectedTagName }) {
+function FeedToggler({ isAuth, selectedFeed, selectedTagName }) {
   return (
     <div className="feed-toggle">
       <ul className="nav nav-pills outline-active">
-        {authState.status && <FeedNavLink tabName="feed" text="YourFeed" />}
+        {isAuth && <FeedNavLink tabName="feed" text="YourFeed" />}
 
         <FeedNavLink tabName="global" text="Global Feed" />
 
@@ -135,9 +135,7 @@ function PopularTags({ feedHandler }) {
         <p>Popular Tags</p>
         {loading ? (
           <p>Loading tags...</p>
-        ) : tags.length === 0 ? (
-          <p>Tags list not available</p>
-        ) : (
+        ) : tags?.length > 0 ? (
           <div className="tag-list">
             {tags.map((item) => (
               <Link
@@ -150,6 +148,8 @@ function PopularTags({ feedHandler }) {
               </Link>
             ))}
           </div>
+        ) : (
+          <p>Tags list not available</p>
         )}
       </div>
     </div>

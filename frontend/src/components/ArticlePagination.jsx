@@ -11,7 +11,7 @@ function ArticlePagination({
 }) {
   const [activePage, setActivePage] = useState(0);
   const { articlesCount } = articlesData || 0;
-  const { headers } = useAuth();
+  const { headerToken } = useAuth();
 
   const totalPages = Math.ceil(articlesCount / 3);
 
@@ -24,7 +24,7 @@ function ArticlePagination({
       favorites: `api/articles?favorited=${username}&&offset=${pageNumber}`,
     };
 
-    const res = await axios.get(url[location], { headers: headers });
+    const res = await axios.get(url[location], { headers: headerToken });
 
     setActivePage(pageNumber);
     setArticlesData(res.data);

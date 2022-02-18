@@ -6,7 +6,7 @@ export default function useAxios({ url, method, dep }) {
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { authState, headers } = useAuth();
+  const { headerToken, isAuth } = useAuth();
 
   useEffect(() => {
     (async () => {
@@ -15,7 +15,7 @@ export default function useAxios({ url, method, dep }) {
           url: url,
           method: method,
           // baseURL: ""
-          headers: headers,
+          headers: headerToken,
         });
 
         setData(res.data);
@@ -25,7 +25,7 @@ export default function useAxios({ url, method, dep }) {
         setLoading(false);
       }
     })();
-  }, [authState.status, dep]);
+  }, [headerToken, isAuth, url, method, dep]);
 
   return { data: data, error: error, loading: loading };
 }

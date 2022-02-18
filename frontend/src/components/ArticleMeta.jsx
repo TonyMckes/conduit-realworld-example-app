@@ -3,10 +3,8 @@ import Avatar from "./Avatar";
 import dateFormatter from "../helpers/dateFormatter";
 
 export default function ArticleMeta({ article, children }) {
-  const {
-    author: { username, image },
-  } = article || {};
-  const createdAt = dateFormatter(article.createdAt);
+  const { author: { username, image } = {} } = article || {};
+  const createdAt = dateFormatter(article?.createdAt);
 
   return (
     <div className="article-meta">

@@ -7,13 +7,13 @@ import { FavButton } from "./Buttons";
 
 function ArticlesPreview({ articlesData, loading, setArticlesData }) {
   const { articles } = articlesData || {};
-  const { headers } = useAuth();
+  const { headerToken } = useAuth();
 
   const handleFav = ({ slug, favorited, index }) => {
     axios({
       url: `api/articles/${slug}/favorite`,
       method: favorited ? "delete" : "post",
-      headers: headers,
+      headers: headerToken,
     }).then((res) => {
       if (res.data.errors) return console.log(res.data.errors.body);
       const items = [...articles];
@@ -26,9 +26,7 @@ function ArticlesPreview({ articlesData, loading, setArticlesData }) {
 
   return loading ? (
     <div className="article-preview">Loading articles...</div>
-  ) : articles?.length === 0 ? (
-    <div className="article-preview">No articles available.</div>
-  ) : (
+  ) : articles?.length > 0 ? (
     articles.map((article, index) => {
       const { slug, title, description, tagList } = article;
 
@@ -55,6 +53,8 @@ function ArticlesPreview({ articlesData, loading, setArticlesData }) {
         </div>
       );
     })
+  ) : (
+    <div className="article-preview">No articles available.</div>
   );
 }
 
