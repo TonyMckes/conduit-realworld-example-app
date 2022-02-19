@@ -7,21 +7,28 @@ import { FavButton } from "./Buttons";
 
 function ArticlesPreview({ articlesData, loading, setArticlesData }) {
   const { articles } = articlesData || {};
-  const { headerToken } = useAuth();
+  const { headerToken, isAuth } = useAuth();
 
-  const handleFav = ({ slug, favorited, index }) => {
-    axios({
-      url: `api/articles/${slug}/favorite`,
-      method: favorited ? "delete" : "post",
-      headers: headerToken,
-    }).then((res) => {
-      if (res.data.errors) return console.log(res.data.errors.body);
-      const items = [...articles];
+  const handleFav = async ({ slug, favorited, index }) => {
+    if (isAuth) {
+      try {
+        const res = await axios({
+          url: `api/articles/${slug}/favorite`,
+          method: favorited ? "DELETE" : "POST",
+          headers: headerToken,
+        });
 
-      items[index] = res.data.article;
+        if (res.data.errors) return console.log(res.data.errors.body);
 
-      setArticlesData({ ...articlesData, articles: items });
-    });
+        const items = [...articles];
+
+        items[index] = res.data.article;
+
+        setArticlesData({ ...articlesData, articles: items });
+      } catch (error) {
+        console.log(error);
+      }
+    } else alert("You need to login first");
   };
 
   return loading ? (

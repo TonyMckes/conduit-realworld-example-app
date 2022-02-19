@@ -20,9 +20,7 @@ export default function AuthorFavArticles() {
 
   return loading ? (
     <div className="article-preview">Loading {username} favorites articles</div>
-  ) : articles?.length === 0 ? (
-    <div className="article-preview">{username} doesn't have favorites</div>
-  ) : (
+  ) : articles?.length > 0 ? (
     <>
       <ArticlesPreview
         loading={loading}
@@ -37,5 +35,7 @@ export default function AuthorFavArticles() {
         location="favorites"
       />
     </>
+  ) : (
+    <div className="article-preview">{username} doesn't have favorites</div>
   );
 }

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ContainerRow from "../components/ContainerRow";
 import FormFieldset from "../components/FormFieldset";
 import { useAuth } from "../helpers/AuthContextProvider";
@@ -24,32 +25,37 @@ function SettingsForm() {
     bio: "",
     email: "",
     password: "",
+    disabled: true,
   });
   const { headerToken, isAuth, loggedUser, setAuthState } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuth) {
       const { image, username, bio, email } = loggedUser;
 
       setForm({
+        ...form,
         image: image ? image : "",
-        username: username,
+        username: username ? username : "",
         bio: bio ? bio : "",
-        email: email,
+        email: email ? email : "",
         password: "",
       });
-    }
+    } else navigate("/");
   }, [isAuth, loggedUser]);
 
   const inputHandler = (e) => {
     const input = e.currentTarget.name;
     const value = e.currentTarget.value;
 
-    setForm({ ...form, [input]: value });
+    setForm({ ...form, [input]: value, disabled: false });
   };
 
   const formSubmit = async (e) => {
     e.preventDefault();
+
+    if (form.disabled) return;
 
     try {
       const res = await axios.put(
@@ -60,17 +66,19 @@ function SettingsForm() {
 
       if (res.data.errors) return console.log(res.data.errors.body);
 
+      setForm({ ...form, disabled: true });
+
       setAuthState((authState) => ({
         ...authState,
         loggedUser: res.data.user,
       }));
     } catch (error) {
-      console.log(error.response);
+      console.log(error);
     }
   };
 
   return (
-    form && (
+    isAuth && (
       <form onSubmit={formSubmit}>
         <fieldset>
           <FormFieldset
@@ -113,12 +121,14 @@ function SettingsForm() {
             handler={inputHandler}
           ></FormFieldset>
 
-          <button
-            type="submit"
-            className="btn btn-lg btn-primary pull-xs-right"
-          >
-            Update Settings
-          </button>
+          {!form.disabled && (
+            <button
+              type="submit"
+              className="btn btn-lg btn-primary pull-xs-right"
+            >
+              Update Settings
+            </button>
+          )}
         </fieldset>
       </form>
     )

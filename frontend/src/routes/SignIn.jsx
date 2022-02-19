@@ -6,7 +6,7 @@ import FormFieldset from "../components/FormFieldset";
 import { useAuth } from "../helpers/AuthContextProvider";
 
 function SignIn() {
-  const [error, setError] = useState();
+  const [errorMessage, setErrorMessage] = useState();
 
   return (
     <div className="auth-page">
@@ -17,20 +17,20 @@ function SignIn() {
             <Link to="/register">Need an account?</Link>
           </p>
 
-          {error && (
+          {errorMessage && (
             <ul className="error-messages">
-              <li>{error}</li>
+              <li>{errorMessage}</li>
             </ul>
           )}
 
-          <SignInForm setError={setError} />
+          <SignInForm setErrorMessage={setErrorMessage} />
         </div>
       </ContainerRow>
     </div>
   );
 }
 
-function SignInForm({ setError }) {
+function SignInForm({ setErrorMessage }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { setAuthState } = useAuth();
@@ -58,8 +58,8 @@ function SignInForm({ setError }) {
 
       navigate("/");
     } catch (error) {
-      // setError(error.response.data.errors.body);
-      console.log(error.response);
+      setErrorMessage(error.response.data.errors.body);
+      console.log(error);
     }
   };
 

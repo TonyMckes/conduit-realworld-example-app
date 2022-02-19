@@ -25,7 +25,7 @@ function ArticleEditorForm() {
     body: "",
     tagList: "",
   });
-  const { headerToken, loggedUser } = useAuth();
+  const { isAuth, headerToken, loggedUser } = useAuth();
 
   const navigate = useNavigate();
   const { slug } = useParams();
@@ -36,28 +36,38 @@ function ArticleEditorForm() {
   });
 
   useEffect(() => {
-    const {
-      article: {
-        title,
-        description,
-        body,
-        tagList,
+    if (isAuth) {
+      const {
+        article: {
+          title,
+          description,
+          body,
+          tagList,
 
-        author: { username: author } = {},
-      } = {},
+          author: { username: author } = {},
+        } = {},
 
-      article,
-    } = data || {};
+        article,
+      } = data || {};
 
-    if (slug && article && author === loggedUser.username) {
+      if (slug && article && author === loggedUser.username) {
+        setForm({
+          title: title,
+          description: description,
+          body: body,
+          tagList: tagList,
+        });
+      }
+    } else navigate("/");
+
+    return () =>
       setForm({
-        title: title,
-        description: description,
-        body: body,
-        tagList: tagList,
+        title: "",
+        description: "",
+        body: "",
+        tagList: "",
       });
-    }
-  }, [data, loggedUser.username, slug]);
+  }, [data, isAuth, loggedUser.username, slug]);
 
   const inputHandler = (e) => {
     const input = e.currentTarget.name;

@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ContainerRow from "../components/ContainerRow";
 import FormFieldset from "../components/FormFieldset";
+import { useAuth } from "../helpers/AuthContextProvider";
 
 function SignUp() {
-  const [error, setError] = useState();
+  const [errorMessage, setErrorMessage] = useState();
 
   return (
     <div className="auth-page">
@@ -16,24 +17,24 @@ function SignUp() {
             <Link to="/login">Already have an account?</Link>
           </p>
 
-          {error && (
+          {errorMessage && (
             <ul className="error-messages">
-              <li>{error}</li>
+              <li>{errorMessage}</li>
             </ul>
           )}
 
-          <SignUpForm setError={setError} />
+          <SignUpForm setErrorMessage={setErrorMessage} />
         </div>
       </ContainerRow>
     </div>
   );
 }
 
-function SignUpForm({ setError }) {
+function SignUpForm({ setErrorMessage }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const { setAuthState } = useAuth();
+  const { setAuthState } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -44,20 +45,25 @@ function SignUpForm({ setError }) {
         user: { username: username, email: email, password: password },
       });
 
-      if (res.data.errors) return console.log(res.data.errors.body);
-      // setError(res.data.errors.body);
+      if (res.data.errors) {
+        setErrorMessage(res.data.errors.body);
+        return console.log(res.data.errors.body);
+      }
 
-      // setAuthState((authState) => ({
-      //   ...authState,
-      //   headerToken: headerToken,
-      //   isAuth: true,
-      //   loggedUser: res.data.user,
-      // }));
+      localStorage.setItem("Token", res.data.user.token);
 
-      navigate("/login");
+      const headerToken = { Authorization: `Token ${res.data.user.token}` };
+
+      setAuthState((authState) => ({
+        ...authState,
+        headerToken: headerToken,
+        isAuth: true,
+        loggedUser: res.data.user,
+      }));
+
+      navigate("/");
     } catch (error) {
-      // setError(error.response.data.errors.body);
-      console.log(error.response);
+      console.log(error);
     }
   };
 

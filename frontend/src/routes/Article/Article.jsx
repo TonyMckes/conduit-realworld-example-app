@@ -70,44 +70,61 @@ function ArticlesButtons({ article, setArticle }) {
   const navigate = useNavigate();
   const { slug } = useParams();
 
-  const deleteArticle = () => {
-    const confirmation = window.confirm("Want to delete the article?");
-
+  const deleteArticle = async () => {
     if (isAuth) {
-      if (!confirmation) return;
+      const confirmation = window.confirm("Want to delete the article?");
+      try {
+        if (!confirmation) return;
 
-      axios({
-        url: `api/articles/${slug}/`,
-        method: "DELETE",
-        headers: headerToken,
-      }).then((res) => {
+        const res = await axios({
+          url: `api/articles/${slug}/`,
+          method: "DELETE",
+          headers: headerToken,
+        });
+
+        if (res.data.errors) return console.log(res.data.errors.body);
+
         navigate("/");
-      });
+      } catch (error) {
+        console.log(error);
+      }
     } else alert("You need to login first");
   };
 
-  const followHandler = () => {
+  const followHandler = async () => {
     if (isAuth) {
-      axios({
-        url: `api/profiles/${username}/follow`,
-        method: following ? "DELETE" : "POST",
-        headers: headerToken,
-      }).then((res) => {
+      try {
+        const res = await axios({
+          url: `api/profiles/${username}/follow`,
+          method: following ? "DELETE" : "POST",
+          headers: headerToken,
+        });
+
+        if (res.data.errors) return console.log(res.data.errors.body);
+
         setArticle({ ...article, author: res.data.profile });
-      });
+      } catch (error) {
+        console.log(error);
+      }
     } else alert("You need to login first");
   };
 
-  const handleFav = ({ favorited }) => {
-    axios({
-      url: `api/articles/${slug}/favorite`,
-      method: favorited ? "DELETE" : "POST",
-      headers: headerToken,
-    }).then((res) => {
-      if (res.data.errors) return console.log(res.data.errors.body);
+  const handleFav = async ({ favorited }) => {
+    if (isAuth) {
+      try {
+        const res = await axios({
+          url: `api/articles/${slug}/favorite`,
+          method: favorited ? "DELETE" : "POST",
+          headers: headerToken,
+        });
 
-      setArticle(res.data.article);
-    });
+        if (res.data.errors) return console.log(res.data.errors.body);
+
+        setArticle(res.data.article);
+      } catch (error) {
+        console.log(error);
+      }
+    } else alert("You need to login first");
   };
 
   return (
