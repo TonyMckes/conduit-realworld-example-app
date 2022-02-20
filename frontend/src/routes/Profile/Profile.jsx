@@ -21,7 +21,7 @@ export default function Profile() {
 
   useEffect(() => {
     setAuthor(data?.profile);
-  }, [data, author]);
+  }, [data]);
 
   const followHandler = async () => {
     if (isAuth) {
@@ -32,9 +32,11 @@ export default function Profile() {
           headers: headerToken,
         });
 
+        if (res.data.errors) return console.log(res.data.errors.body);
+
         setAuthor(res.data.profile);
       } catch (error) {
-        console.log(error.response);
+        console.log(error);
       }
     } else alert("You need to login first");
   };
