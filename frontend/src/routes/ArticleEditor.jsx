@@ -111,6 +111,7 @@ function ArticleEditorForm() {
           <FormFieldset
             placeholder="Article Title"
             name="title"
+            required
             value={form.title}
             handler={inputHandler}
           ></FormFieldset>
@@ -119,6 +120,7 @@ function ArticleEditorForm() {
             normal
             placeholder="What's this article about?"
             name="description"
+            required
             value={form.description}
             handler={inputHandler}
           ></FormFieldset>
@@ -129,6 +131,7 @@ function ArticleEditorForm() {
               rows="8"
               placeholder="Write your article (in markdown)"
               name="body"
+              required
               value={form.body}
               onChange={inputHandler}
             ></textarea>

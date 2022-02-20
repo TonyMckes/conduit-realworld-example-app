@@ -91,6 +91,7 @@ function SettingsForm() {
           <FormFieldset
             placeholder="Your Name"
             name="username"
+            required
             value={form.username}
             handler={inputHandler}
           ></FormFieldset>
@@ -109,6 +110,7 @@ function SettingsForm() {
           <FormFieldset
             placeholder="Email"
             name="email"
+            required
             value={form.email}
             handler={inputHandler}
           ></FormFieldset>

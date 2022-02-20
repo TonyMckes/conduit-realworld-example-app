@@ -31,9 +31,11 @@ function SignUp() {
 }
 
 function SignUpForm({ setErrorMessage }) {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [{ username, email, password }, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
   const { setAuthState } = useAuth();
   const navigate = useNavigate();
 
@@ -67,25 +69,39 @@ function SignUpForm({ setErrorMessage }) {
     }
   };
 
+  const inputHandler = (e) => {
+    const input = e.currentTarget.name;
+    const value = e.currentTarget.value;
+
+    setForm((form) => ({ ...form, [input]: value }));
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <FormFieldset
+        name="username"
+        required
         placeholder="Your Name"
         value={username}
-        handler={(e) => setUsername(e.target.value)}
+        handler={inputHandler}
       ></FormFieldset>
 
       <FormFieldset
+        name="email"
+        type="email"
+        required
         placeholder="Email"
         value={email}
-        handler={(e) => setEmail(e.target.value)}
+        handler={inputHandler}
       ></FormFieldset>
 
       <FormFieldset
+        name="password"
         type="password"
+        required
         placeholder="Password"
         value={password}
-        handler={(e) => setPassword(e.target.value)}
+        handler={inputHandler}
       ></FormFieldset>
       <button className="btn btn-lg btn-primary pull-xs-right">Sign up</button>
     </form>

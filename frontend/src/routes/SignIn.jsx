@@ -31,8 +31,7 @@ function SignIn() {
 }
 
 function SignInForm({ setErrorMessage }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [{ email, password }, setForm] = useState({ email: "", password: "" });
   const { setAuthState } = useAuth();
   const navigate = useNavigate();
 
@@ -63,19 +62,29 @@ function SignInForm({ setErrorMessage }) {
     }
   };
 
+  const inputHandler = (e) => {
+    const input = e.currentTarget.type;
+    const value = e.currentTarget.value;
+
+    setForm((form) => ({ ...form, [input]: value }));
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <FormFieldset
+        type="email"
+        required
         placeholder="Email"
         value={email}
-        handler={(e) => setEmail(e.target.value)}
+        handler={inputHandler}
       ></FormFieldset>
 
       <FormFieldset
         type="password"
+        required
         placeholder="Password"
         value={password}
-        handler={(e) => setPassword(e.target.value)}
+        handler={inputHandler}
       ></FormFieldset>
       <button className="btn btn-lg btn-primary pull-xs-right">Sign in</button>
     </form>

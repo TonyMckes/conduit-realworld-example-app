@@ -6,6 +6,7 @@ function FormFieldset({
   name,
   value,
   handler,
+  required,
 }) {
   return (
     <fieldset className="form-group">
@@ -16,6 +17,7 @@ function FormFieldset({
         name={name}
         value={value}
         onChange={handler}
+        required={required}
       />
       {children}
     </fieldset>
