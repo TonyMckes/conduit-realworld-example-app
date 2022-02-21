@@ -3,62 +3,40 @@ const slugify = (string) => {
 };
 
 const appendTagList = (articleTags, article) => {
-  const tagList = [];
-  for (const tag of articleTags) {
-    tagList.push(tag.name);
-  }
+  const tagList = articleTags.map((tag) => tag.name);
+
   if (!article) return tagList;
   article.dataValues.tagList = tagList;
 };
 
 const appendFavorites = async (loggedUser, article) => {
-  if (loggedUser) {
-    article.dataValues.favorited = await article.hasUser(loggedUser);
-  } else {
-    article.dataValues.favorited = false;
-  }
-  article.dataValues.favoritesCount = await article.countUsers();
+  const favorited = await article.hasUser(loggedUser ? loggedUser : null);
+  article.dataValues.favorited = loggedUser ? favorited : false;
+
+  const favoritesCount = await article.countUsers();
+  article.dataValues.favoritesCount = favoritesCount;
 };
 
-async function appendFollowers(loggedUser, toAppend) {
+const appendFollowers = async (loggedUser, toAppend) => {
   //
-  if (loggedUser && toAppend?.author) {
-    //
+  if (toAppend?.author) {
     const author = await toAppend.getAuthor();
-    const hasFollower = await author.hasFollower(loggedUser);
-    const followersCount = await author.countFollowers();
 
-    toAppend.author.dataValues.following = hasFollower;
+    const following = await author.hasFollower(loggedUser ? loggedUser : null);
+    toAppend.author.dataValues.following = loggedUser ? following : false;
+
+    const followersCount = await author.countFollowers();
     toAppend.author.dataValues.followersCount = followersCount;
     //
-  } else if (loggedUser && !toAppend?.author) {
-    //
-    const hasFollower = await toAppend.hasFollower(loggedUser);
-    const followersCount = await toAppend.countFollowers();
-
-    toAppend.dataValues.following = hasFollower;
-    toAppend.dataValues.followersCount = followersCount;
-    //
   } else {
-    //
-    if (!toAppend?.author) {
-      const followersCount = await toAppend.countFollowers();
+    const following = await toAppend.hasFollower(
+      loggedUser ? loggedUser : null,
+    );
+    toAppend.dataValues.following = loggedUser ? following : false;
 
-      toAppend.dataValues.following = false;
-      toAppend.dataValues.followersCount = followersCount;
-      //
-    } else {
-      const followersCount = await toAppend.author.countFollowers();
-
-      toAppend.author.dataValues.following = false;
-      toAppend.author.dataValues.followersCount = followersCount;
-    }
+    const followersCount = await toAppend.countFollowers();
+    toAppend.dataValues.followersCount = followersCount;
   }
-}
-
-module.exports = {
-  slugify,
-  appendTagList,
-  appendFavorites,
-  appendFollowers,
 };
+
+module.exports = { slugify, appendTagList, appendFavorites, appendFollowers };
