@@ -25,6 +25,7 @@ function ArticleEditorForm() {
     body: "",
     tagList: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
   const { isAuth, headerToken, loggedUser } = useAuth();
 
   const navigate = useNavigate();
@@ -73,25 +74,29 @@ function ArticleEditorForm() {
     const input = e.currentTarget.name;
     const value = e.currentTarget.value;
 
+    if (e.currentTarget.name === "title") setErrorMessage("");
+
     setForm({ ...form, [input]: value });
   };
 
   const tagsInputHandler = (e) => {
     const value = e.currentTarget.value;
 
-    setForm({ ...form, tagList: value.split(",") });
+    setForm({ ...form, tagList: value.split(/,| /) });
   };
 
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     e.preventDefault();
 
-    axios({
-      url: slug ? `api/articles/${slug}` : "api/articles",
-      method: slug ? "PUT" : "POST",
-      data: { article: form },
-      headers: headerToken,
-    }).then((res) => {
-      if (res.data.errors) return console.log(res.data.errors.body);
+    try {
+      const res = await axios({
+        url: slug ? `api/articles/${slug}` : "api/articles",
+        method: slug ? "PUT" : "POST",
+        data: { article: form },
+        headers: headerToken,
+      });
+
+      if (res.data.errors) return setErrorMessage(res.data.errors.body);
 
       setForm({
         title: "",
@@ -101,13 +106,18 @@ function ArticleEditorForm() {
       });
 
       navigate(`/article/${res.data.article.slug}`);
-    });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     !loading && (
       <form onSubmit={formSubmit}>
         <fieldset>
+          {errorMessage && (
+            <span className="error-messages">{errorMessage}</span>
+          )}
           <FormFieldset
             placeholder="Article Title"
             name="title"

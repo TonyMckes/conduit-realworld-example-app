@@ -47,7 +47,6 @@ const allArticles = async (req, res) => {
       articles = await Article.findAndCountAll(searchOptions);
     }
 
-    //* Tests failing because: https://github.com/gothinkster/realworld/issues/839
     for (let article of articles.rows) {
       const articleTags = await article.getTagList();
 
@@ -76,6 +75,8 @@ const createArticle = async (req, res) => {
     if (!body) throw new Error(`Article body is required`);
 
     const slug = slugify(title);
+    const slugInDB = await Article.findOne({ where: { slug: slug } });
+    if (slugInDB) throw new Error("This title already exists..");
 
     const article = await Article.create({
       slug: slug,
@@ -85,14 +86,14 @@ const createArticle = async (req, res) => {
     });
 
     for (const tag of tagList) {
-      const checkTag = await Tag.findByPk(tag);
+      const tagInDB = await Tag.findByPk(tag.trim());
 
-      if (!checkTag) {
-        const tagList = await Tag.create({ name: tag });
+      if (tagInDB) {
+        await article.addTagList(tagInDB);
+      } else if (tag.length > 2) {
+        const newTag = await Tag.create({ name: tag.trim() });
 
-        await article.addTagList(tagList);
-      } else {
-        await article.addTagList(checkTag);
+        await article.addTagList(newTag);
       }
     }
 
