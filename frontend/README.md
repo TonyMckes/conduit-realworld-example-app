@@ -2,12 +2,6 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-- Sign in/Sign up pages (URL: /#/login, /#/register )
-  Authentication can be easily switched to session/cookie based
-
-- Article page (URL: /#/article/article-slug-here )
-  Render markdown from server client side
-
 ## Available Scripts
 
 In the project directory, you can run:

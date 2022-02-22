@@ -11,6 +11,15 @@ function Footer() {
         <a href="https://thinkster.io">Thinkster</a>. Code &amp; design licensed
         under MIT.
       </span>
+
+      <ul className="nav navbar-nav pull-xs-right">
+        <a
+          className="nav-link"
+          href="https://github.com/TonyMckes/react-express-sequelize-realworld-example-app"
+        >
+          <i className="ion-social-github"></i> Source code
+        </a>
+      </ul>
     </div>
   );
 }

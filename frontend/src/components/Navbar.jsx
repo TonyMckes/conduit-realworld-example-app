@@ -12,6 +12,15 @@ function Navbar() {
         <Link className="navbar-brand" to="/">
           conduit
         </Link>
+        <ul className="nav navbar-nav pull-xs-left">
+          <a
+            className="nav-link"
+            href="https://github.com/TonyMckes/react-express-sequelize-realworld-example-app"
+          >
+            <i className="ion-social-github"></i> Source code
+          </a>
+        </ul>
+
         <ul className="nav navbar-nav pull-xs-right">
           <NavItem body="Home" icon="ion-compose" url="/" />
 

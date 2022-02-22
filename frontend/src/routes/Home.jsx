@@ -90,7 +90,7 @@ function FeedToggler({ isAuth, selectedFeed, selectedTagName }) {
   return (
     <div className="feed-toggle">
       <ul className="nav nav-pills outline-active">
-        {isAuth && <FeedNavLink tabName="feed" text="YourFeed" />}
+        {isAuth && <FeedNavLink tabName="feed" text="Your Feed" />}
 
         <FeedNavLink tabName="global" text="Global Feed" />
 
