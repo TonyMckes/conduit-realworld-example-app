@@ -41,7 +41,9 @@ export default function Article() {
         <div className="container page">
           <div className="row article-content">
             <div className="col-md-12">
-              <Markdown options={{ forceBlock: true }}>{body}</Markdown>
+              {body && (
+                <Markdown options={{ forceBlock: true }}>{body}</Markdown>
+              )}
               <ArticleTags tagList={tagList} />
             </div>
           </div>

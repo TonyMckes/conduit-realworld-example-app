@@ -50,7 +50,7 @@ export default function Profile() {
             <div className="col-xs-12 col-md-10 offset-md-1">
               <Avatar src={image} className="user-img" alt="author" />
               <h4>{authorName}</h4>
-              <Markdown options={{ forceBlock: true }}>{bio}</Markdown>
+              {bio && <Markdown options={{ forceBlock: true }}>{bio}</Markdown>}
 
               {username === loggedUser.username ? (
                 <Link

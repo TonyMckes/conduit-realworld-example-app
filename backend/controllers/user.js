@@ -21,13 +21,19 @@ const updateUser = async (req, res) => {
     const { loggedUser } = req;
     if (!loggedUser) throw new Error("You need to be logged in!");
 
-    const { email, username, password, image, bio } = req.body.user;
+    const {
+      user: { password },
+      user,
+    } = req.body;
 
-    if (email) loggedUser.email = email;
-    if (username) loggedUser.username = username;
-    if (password) loggedUser.password = await bcryptHash(password);
-    if (image) loggedUser.image = image;
-    if (bio) loggedUser.bio = bio;
+    if (password !== undefined) {
+      loggedUser.password = await bcryptHash(password);
+    }
+
+    Object.entries(user).forEach((entry) => {
+      const [key, value] = entry;
+      if (value !== undefined) loggedUser[key] = value;
+    });
 
     await loggedUser.save();
 
