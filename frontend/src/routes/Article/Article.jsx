@@ -1,4 +1,5 @@
 import axios from "axios";
+import Markdown from "markdown-to-jsx";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import ArticleMeta from "../../components/ArticleMeta";
@@ -40,7 +41,7 @@ export default function Article() {
         <div className="container page">
           <div className="row article-content">
             <div className="col-md-12">
-              <p>{body}</p>
+              <Markdown options={{ forceBlock: true }}>{body}</Markdown>
               <ArticleTags tagList={tagList} />
             </div>
           </div>

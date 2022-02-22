@@ -1,4 +1,5 @@
 import axios from "axios";
+import Markdown from "markdown-to-jsx";
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useParams } from "react-router-dom";
 import Avatar from "../../components/Avatar";
@@ -49,7 +50,7 @@ export default function Profile() {
             <div className="col-xs-12 col-md-10 offset-md-1">
               <Avatar src={image} className="user-img" alt="author" />
               <h4>{authorName}</h4>
-              <p>{bio}</p>
+              <Markdown options={{ forceBlock: true }}>{bio}</Markdown>
 
               {username === loggedUser.username ? (
                 <Link
