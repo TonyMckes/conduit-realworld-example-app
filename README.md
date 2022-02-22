@@ -2,7 +2,7 @@
 
 > ### React / Express.js / Sequelize codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.
 
-### [Demo app](https://react-expressjs-realworld-app.herokuapp.com/)&nbsp;&nbsp;&nbsp;&nbsp;![](https://heroku-status-badges.herokuapp.com/react-expressjs-realworld-app.herokuapp)
+### [Demo app](https://react-expressjs-realworld-app.herokuapp.com/)&nbsp;&nbsp;&nbsp;&nbsp;![](https://heroku-status-badges.herokuapp.com/react-expressjs-realworld-app)
 
 This codebase was created to demonstrate a fully fledged fullstack application built with **React / Express.js / Sequelize** including CRUD operations, authentication, routing, pagination, and more.
 
