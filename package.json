@@ -1,0 +1,20 @@
+{
+  "name": "react-express-sequelize-realworld-example-app",
+  "version": "1.0.0",
+  "description": "> ### React / Express.js / Sequelize codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.",
+  "main": "backend/index.js",
+  "scripts": {
+    "start": "npm start --prefix backend/",
+    "build": "cd frontend/ && npm install && npm run build && cd ../backend && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TonyMckes/react-express-sequelize-realworld-example-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TonyMckes/react-express-sequelize-realworld-example-app/issues"
+  },
+  "homepage": "https://github.com/TonyMckes/react-express-sequelize-realworld-example-app#readme"
+}
