@@ -26,14 +26,15 @@ const updateUser = async (req, res) => {
       user,
     } = req.body;
 
+    Object.entries(user).forEach((entry) => {
+      const [key, value] = entry;
+
+      if (value !== undefined && key !== "password") loggedUser[key] = value;
+    });
+
     if (password !== undefined) {
       loggedUser.password = await bcryptHash(password);
     }
-
-    Object.entries(user).forEach((entry) => {
-      const [key, value] = entry;
-      if (value !== undefined) loggedUser[key] = value;
-    });
 
     await loggedUser.save();
 
