@@ -1,25 +1,26 @@
+const { UnauthorizedError } = require("../helper/customErrors");
 const { bcryptHash } = require("../helper/bcrypt");
 
 //* Current User
-const currentUser = async (req, res) => {
+const currentUser = async (req, res, next) => {
   try {
     const { loggedUser } = req;
-    if (!loggedUser) throw new Error("You need to be logged in!");
+    if (!loggedUser) throw new UnauthorizedError();
 
     loggedUser.dataValues.email = req.headers.email;
     delete req.headers.email;
 
     res.json({ user: loggedUser });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 
 //* Update User
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
   try {
     const { loggedUser } = req;
-    if (!loggedUser) throw new Error("You need to be logged in!");
+    if (!loggedUser) throw new UnauthorizedError();
 
     const {
       user: { password },
@@ -32,7 +33,7 @@ const updateUser = async (req, res) => {
       if (value !== undefined && key !== "password") loggedUser[key] = value;
     });
 
-    if (password !== undefined) {
+    if (password !== undefined || password !== "") {
       loggedUser.password = await bcryptHash(password);
     }
 
@@ -40,7 +41,7 @@ const updateUser = async (req, res) => {
 
     res.json({ user: loggedUser });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 

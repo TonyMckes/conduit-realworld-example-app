@@ -1,19 +1,25 @@
 const { User } = require("../models");
 const { jwtSign } = require("../helper/jwt");
 const { bcryptHash, bcryptCompare } = require("../helper/bcrypt");
+const {
+  ValidationError,
+  FieldRequiredError,
+  AlreadyTakenError,
+  NotFoundError,
+} = require("../helper/customErrors");
 
 // Register
-const signUp = async (req, res) => {
+const signUp = async (req, res, next) => {
   try {
+    const { username, email, bio, image, password } = req.body.user;
+    if (!username) throw new FieldRequiredError(`A username`);
+    if (!email) throw new FieldRequiredError(`An email`);
+    if (!password) throw new FieldRequiredError(`A password`);
+
     const userExists = await User.findOne({
       where: { email: req.body.user.email },
     });
-    if (userExists) throw new Error("Email already exists! try logging in");
-
-    const { username, email, bio, image, password } = req.body.user;
-    if (!username) throw new Error(`A username is required`);
-    if (!email) throw new Error(`An email is required`);
-    if (!password) throw new Error(`A password is required`);
+    if (userExists) throw new AlreadyTakenError("Email", "try logging in");
 
     const newUser = await User.create({
       email: email,
@@ -25,27 +31,28 @@ const signUp = async (req, res) => {
 
     newUser.dataValues.token = await jwtSign(newUser);
 
-    res.json({ user: newUser });
+    res.status(201).json({ user: newUser });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 
 // Login
-const signIn = async (req, res) => {
+const signIn = async (req, res, next) => {
   try {
     const { user } = req.body;
 
     const existentUser = await User.findOne({ where: { email: user.email } });
-    if (!existentUser) throw new Error("Email doesn't exist! Sign in first");
+    if (!existentUser) throw new NotFoundError("Email", "sign in first");
 
     const pwd = await bcryptCompare(user.password, existentUser.password);
-    if (!pwd) throw new Error("Wrong email/password combination");
+    if (!pwd) throw new ValidationError("Wrong email/password combination");
 
     existentUser.dataValues.token = await jwtSign(user);
+
     res.json({ user: existentUser });
   } catch (error) {
-    res.status(422).json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 

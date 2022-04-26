@@ -3,6 +3,7 @@ const PORT = process.env.PORT || 3001;
 const express = require("express");
 const cors = require("cors");
 const { sequelize } = require("./models");
+const errorHandler = require("./middleware/errorHandler");
 
 const usersRoutes = require("./routes/users");
 const userRoutes = require("./routes/user");
@@ -33,6 +34,7 @@ app.use("/api/tags", tagsRoutes);
 app.get("*", (req, res) =>
   res.status(404).json({ errors: { body: ["Not found"] } }),
 );
+app.use(errorHandler);
 
 app.listen(PORT, () =>
   // console.log(`Server running on http://localhost:${PORT}`),

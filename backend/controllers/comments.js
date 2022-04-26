@@ -1,14 +1,20 @@
+const {
+  NotFoundError,
+  UnauthorizedError,
+  FieldRequiredError,
+  ForbiddenError,
+} = require("../helper/customErrors");
 const { appendFollowers } = require("../helper/helpers");
 const { Article, Comment, User } = require("../models");
 
 //? All Comments for Article
-const allComments = async (req, res) => {
+const allComments = async (req, res, next) => {
   try {
     const { loggedUser } = req;
     const { slug } = req.params;
 
     const article = await Article.findOne({ where: { slug: slug } });
-    if (!article) throw new Error("Article not found!");
+    if (!article) throw new NotFoundError("Article");
 
     const comments = await article.getComments({
       include: [
@@ -22,22 +28,22 @@ const allComments = async (req, res) => {
 
     res.json({ comments });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 
 //* Create Comment for Article
-const createComment = async (req, res) => {
+const createComment = async (req, res, next) => {
   try {
     const { loggedUser } = req;
-    if (!loggedUser) throw new Error("You need to login first!");
+    if (!loggedUser) throw new UnauthorizedError();
 
     const { body } = req.body.comment;
-    if (!body) throw new Error(`Comment body is required`);
+    if (!body) throw new FieldRequiredError("Comment body");
 
     const { slug } = req.params;
     const article = await Article.findOne({ where: { slug: slug } });
-    if (!article) throw new Error("Article not found!");
+    if (!article) throw new NotFoundError("Article");
 
     const comment = await Comment.create({
       body: body,
@@ -49,31 +55,32 @@ const createComment = async (req, res) => {
     comment.dataValues.author = loggedUser;
     await appendFollowers(loggedUser, loggedUser);
 
-    res.json({ comment });
+    res.status(201).json({ comment });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 
 //* Delete Comment for Article
-const deleteComment = async (req, res) => {
+const deleteComment = async (req, res, next) => {
   try {
     const { loggedUser } = req;
-    if (!loggedUser) throw new Error("You need to login first!");
+    if (!loggedUser) throw new UnauthorizedError();
 
     const { slug, commentId } = req.params;
 
-    const article = await Article.findOne({ where: { slug: slug } });
-    if (!article) throw new Error("Article not found!");
-
     const comment = await Comment.findByPk(commentId);
-    if (!comment) throw new Error("Comment not found!");
+    if (!comment) throw new NotFoundError("Comment");
+
+    if (loggedUser.id !== comment.userId) {
+      throw new ForbiddenError("comment");
+    }
 
     await comment.destroy();
 
     res.json({ message: { body: ["Comment deleted successfully"] } });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 

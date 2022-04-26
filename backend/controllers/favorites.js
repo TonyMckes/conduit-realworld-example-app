@@ -1,3 +1,4 @@
+const { UnauthorizedError, NotFoundError } = require("../helper/customErrors");
 const {
   appendFollowers,
   appendFavorites,
@@ -6,10 +7,10 @@ const {
 const { Article, Tag, User } = require("../models");
 
 //*  Favorite/Unfavorite Article
-const favoriteToggler = async (req, res) => {
+const favoriteToggler = async (req, res, next) => {
   try {
     const { loggedUser } = req;
-    if (!loggedUser) throw new Error("You need to login first!");
+    if (!loggedUser) throw new UnauthorizedError();
 
     const { slug } = req.params;
 
@@ -28,7 +29,7 @@ const favoriteToggler = async (req, res) => {
         },
       ],
     });
-    if (!article) throw new Error("Article not found!");
+    if (!article) throw new NotFoundError("Article");
 
     if (req.method === "POST") await article.addUser(loggedUser);
     if (req.method === "DELETE") await article.removeUser(loggedUser);
@@ -39,7 +40,7 @@ const favoriteToggler = async (req, res) => {
 
     res.json({ article });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 

@@ -1,4 +1,11 @@
 const {
+  AlreadyTakenError,
+  FieldRequiredError,
+  ForbiddenError,
+  NotFoundError,
+  UnauthorizedError,
+} = require("../helper/customErrors");
+const {
   appendFollowers,
   appendFavorites,
   appendTagList,
@@ -12,7 +19,7 @@ const includeOptions = [
 ];
 
 //? All Articles - by Author/by Tag/Favorited by user
-const allArticles = async (req, res) => {
+const allArticles = async (req, res, next) => {
   try {
     const { loggedUser } = req;
 
@@ -59,24 +66,24 @@ const allArticles = async (req, res) => {
 
     res.json({ articles: articles.rows, articlesCount: articles.count });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 
 //* Create Article
-const createArticle = async (req, res) => {
+const createArticle = async (req, res, next) => {
   try {
     const { loggedUser } = req;
-    if (!loggedUser) throw new Error("You need to login first!");
+    if (!loggedUser) throw new UnauthorizedError();
 
     const { title, description, body, tagList } = req.body.article;
-    if (!title) throw new Error(`A title is required`);
-    if (!description) throw new Error(`A description is required`);
-    if (!body) throw new Error(`Article body is required`);
+    if (!title) throw new FieldRequiredError("A title");
+    if (!description) throw new FieldRequiredError("A description");
+    if (!body) throw new FieldRequiredError("An article body");
 
     const slug = slugify(title);
     const slugInDB = await Article.findOne({ where: { slug: slug } });
-    if (slugInDB) throw new Error("This title already exists..");
+    if (slugInDB) throw new AlreadyTakenError("Title");
 
     const article = await Article.create({
       slug: slug,
@@ -105,17 +112,17 @@ const createArticle = async (req, res) => {
     await appendFollowers(loggedUser, loggedUser);
     await appendFavorites(loggedUser, article);
 
-    res.json({ article });
+    res.status(201).json({ article });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 
 //* Feed
-const articlesFeed = async (req, res) => {
+const articlesFeed = async (req, res, next) => {
   try {
     const { loggedUser } = req;
-    if (!loggedUser) throw new Error("You need to login first!");
+    if (!loggedUser) throw new UnauthorizedError();
 
     const followers = await loggedUser.getFollowing();
 
@@ -140,12 +147,12 @@ const articlesFeed = async (req, res) => {
 
     res.json({ articles, articlesCount: articles.length });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 
 // Single Article by slug
-const singleArticle = async (req, res) => {
+const singleArticle = async (req, res, next) => {
   try {
     const { loggedUser } = req;
 
@@ -154,7 +161,7 @@ const singleArticle = async (req, res) => {
       where: { slug: slug },
       include: includeOptions,
     });
-    if (!article) throw new Error("Article not found!");
+    if (!article) throw new NotFoundError("Article");
 
     appendTagList(article.tagList, article);
     await appendFollowers(loggedUser, article);
@@ -162,25 +169,25 @@ const singleArticle = async (req, res) => {
 
     res.json({ article });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 
 //* Update Article
-const updateArticle = async (req, res) => {
+const updateArticle = async (req, res, next) => {
   try {
     const { loggedUser } = req;
-    if (!loggedUser) throw new Error("You need to login first!");
+    if (!loggedUser) throw new UnauthorizedError();
 
     const { slug } = req.params;
     const article = await Article.findOne({
       where: { slug: slug },
       include: includeOptions,
     });
-    if (!article) throw new Error("Article not found!");
+    if (!article) throw new NotFoundError("Article");
 
     if (loggedUser.id !== article.author.id) {
-      throw new Error("You are not the author!");
+      throw new ForbiddenError("article");
     }
 
     const { title, description, body } = req.body.article;
@@ -198,32 +205,32 @@ const updateArticle = async (req, res) => {
 
     res.json({ article });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 
 //* Delete Article
-const deleteArticle = async (req, res) => {
+const deleteArticle = async (req, res, next) => {
   try {
     const { loggedUser } = req;
-    if (!loggedUser) throw new Error("You need to login first!");
+    if (!loggedUser) throw new UnauthorizedError();
 
     const { slug } = req.params;
     const article = await Article.findOne({
       where: { slug: slug },
       include: includeOptions,
     });
-    if (!article) throw new Error("Article not found!");
+    if (!article) throw new NotFoundError("Article");
 
     if (loggedUser.id !== article.author.id) {
-      throw new Error("You are not the author!");
+      throw new ForbiddenError("article");
     }
 
     await article.destroy();
 
     res.json({ message: { body: ["Article deleted successfully"] } });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 };
 
