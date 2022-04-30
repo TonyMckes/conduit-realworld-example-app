@@ -1,6 +1,6 @@
 import Markdown from "markdown-to-jsx";
 import { useEffect, useState } from "react";
-import { Outlet, useLocation, useParams } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import ArticleMeta from "../../components/ArticleMeta";
 import ArticlesButtons from "../../components/ArticlesButtons";
 import ArticleTags from "../../components/ArticleTags";
@@ -52,11 +52,7 @@ function Article() {
           </ArticleMeta>
         </div>
 
-        <div className="row">
-          <div className="col-xs-12 col-md-8 offset-md-2">
-            <Outlet />
-          </div>
-        </div>
+        <Outlet />
       </div>
     </div>
   );

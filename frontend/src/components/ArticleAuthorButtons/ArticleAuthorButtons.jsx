@@ -14,7 +14,7 @@ function ArticleAuthorButtons({ body, description, slug, tagList, title }) {
 
     deleteArticle({ headers, slug })
       .then(() => navigate("/"))
-      .catch((error) => console.error(error));
+      .catch(console.error);
   };
 
   return (

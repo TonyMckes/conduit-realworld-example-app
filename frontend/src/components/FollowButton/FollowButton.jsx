@@ -17,7 +17,7 @@ function FollowButton({ followersCount, following, handler, username }) {
 
     toggleFollow({ following, headers, username })
       .then(handler)
-      .catch((error) => console.error(error))
+      .catch(console.error)
       .finally(() => setLoading(false));
   };
 

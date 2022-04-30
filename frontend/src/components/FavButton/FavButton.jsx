@@ -17,7 +17,7 @@ function FavButton({ favorited, favoritesCount, handler, right, slug, text }) {
 
     toggleFav({ slug, favorited, headers })
       .then(handler)
-      .catch((error) => console.error(error))
+      .catch(console.error)
       .finally(() => setLoading(false));
   };
 

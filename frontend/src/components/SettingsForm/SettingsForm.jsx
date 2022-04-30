@@ -36,7 +36,7 @@ function SettingsForm() {
 
     userUpdate({ headers, bio, email, image, password, username })
       .then(setAuthState)
-      .catch((error) => console.error(error));
+      .catch(console.error);
     setInactive(true);
   };
 

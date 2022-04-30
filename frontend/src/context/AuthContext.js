@@ -31,7 +31,7 @@ function AuthProvider({ children }) {
 
     getUser({ headers })
       .then((loggedUser) => setAuthState((prev) => ({ ...prev, loggedUser })))
-      .catch((error) => console.error(error));
+      .catch(console.error);
   }, [headers, setAuthState]);
 
   return (

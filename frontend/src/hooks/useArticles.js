@@ -17,7 +17,7 @@ function useArticles({ location, tabName, tagName, username }) {
 
     getArticles({ headers, location, tabName, tagName, username })
       .then(setArticlesData)
-      .catch((error) => console.error(error))
+      .catch(console.error)
       .finally(() => setLoading(false));
   }, [headers, location, tabName, tagName, username]);
 

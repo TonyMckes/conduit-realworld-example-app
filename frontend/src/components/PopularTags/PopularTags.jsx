@@ -11,7 +11,7 @@ function PopularTags() {
 
     getTags()
       .then(setTags)
-      .catch((error) => console.error(error))
+      .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
 

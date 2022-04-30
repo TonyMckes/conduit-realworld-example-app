@@ -30,7 +30,7 @@ function ArticleEditorForm() {
 
         setForm({ body, description, tagList, title });
       })
-      .catch((error) => console.error(error));
+      .catch(console.error);
 
     return () => setForm(emptyForm);
   }, [headers, isAuth, loggedUser.username, navigate, slug, state]);
@@ -53,7 +53,7 @@ function ArticleEditorForm() {
 
     setArticle({ headers, slug, body, description, tagList, title })
       .then((slug) => navigate(`/article/${slug}`))
-      .catch((error) => setErrorMessage(error));
+      .catch(setErrorMessage);
   };
 
   return (

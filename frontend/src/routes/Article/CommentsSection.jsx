@@ -1,36 +1,21 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import Comments from "./Comments";
-import NewComment from "./NewComment";
+import { useState } from "react";
+import CommentEditor from "../../components/CommentEditor";
+import CommentList from "../../components/CommentList";
 
 function CommentsSection() {
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState("");
-  const { headers } = useAuth();
-  const { slug } = useParams();
+  const [comment, setComment] = useState({});
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await axios({
-          url: `api/articles/${slug}/comments`,
-          headers,
-        });
-
-        setComments(res.data.comments);
-      } catch (error) {
-        console.log(error);
-      }
-    })();
-  }, [slug, newComment, headers]);
+  const handleUpdates = (e) => {
+    setComment(e);
+  };
 
   return (
-    <>
-      <NewComment setNewComment={setNewComment} />
-      <Comments comments={comments} setNewComment={setNewComment} slug={slug} />
-    </>
+    <div className="row">
+      <div className="col-xs-12 col-md-8 offset-md-2">
+        <CommentEditor updateComments={handleUpdates} />
+        <CommentList triggerUpdate={comment} updateComments={handleUpdates} />
+      </div>
+    </div>
   );
 }
 
