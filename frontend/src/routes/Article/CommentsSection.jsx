@@ -1,14 +1,14 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useAuth } from "../../helpers/AuthContextProvider";
+import { useAuth } from "../../context/AuthContext";
 import Comments from "./Comments";
 import NewComment from "./NewComment";
 
 function CommentsSection() {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const { headerToken } = useAuth();
+  const { headers } = useAuth();
   const { slug } = useParams();
 
   useEffect(() => {
@@ -16,7 +16,7 @@ function CommentsSection() {
       try {
         const res = await axios({
           url: `api/articles/${slug}/comments`,
-          headers: headerToken,
+          headers,
         });
 
         setComments(res.data.comments);
@@ -24,7 +24,7 @@ function CommentsSection() {
         console.log(error);
       }
     })();
-  }, [slug, newComment, headerToken]);
+  }, [slug, newComment, headers]);
 
   return (
     <>

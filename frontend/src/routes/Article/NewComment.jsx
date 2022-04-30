@@ -2,11 +2,11 @@ import axios from "axios";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Avatar from "../../components/Avatar";
-import { useAuth } from "../../helpers/AuthContextProvider";
+import { useAuth } from "../../context/AuthContext";
 
 function NewComment({ setNewComment }) {
   const [form, setForm] = useState({ body: "" });
-  const { headerToken, isAuth, loggedUser } = useAuth();
+  const { headers, isAuth, loggedUser } = useAuth();
   const { slug } = useParams();
 
   const handleSubmit = async (e) => {
@@ -16,7 +16,7 @@ function NewComment({ setNewComment }) {
       const res = await axios.post(
         `api/articles/${slug}/comments`,
         { comment: { body: form.body } },
-        { headers: headerToken },
+        { headers },
       );
 
       setNewComment(res.data.comment);
@@ -43,7 +43,7 @@ function NewComment({ setNewComment }) {
       </div>
       <div className="card-footer">
         <Avatar
-          alt="author"
+          alt={loggedUser.username}
           src={loggedUser.image}
           className="comment-author-img"
         />

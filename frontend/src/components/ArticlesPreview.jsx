@@ -1,65 +1,60 @@
-import axios from "axios";
 import { Link } from "react-router-dom";
 import ArticleTags from "../components/ArticleTags";
-import { useAuth } from "../helpers/AuthContextProvider";
 import ArticleMeta from "./ArticleMeta";
-import { FavButton } from "./Buttons";
+import FavButton from "./FavButton";
 
-function ArticlesPreview({ articlesData, loading, setArticlesData }) {
-  const { articles } = articlesData || {};
-  const { headerToken, isAuth } = useAuth();
+function ArticlesPreview({ articles, loading, setArticlesData }) {
+  // TODO: Can be improved
+  const handleFav = (article) => {
+    // favorited, favoritesCount
+    const items = [...articles];
 
-  const handleFav = async ({ slug, favorited, index }) => {
-    if (isAuth) {
-      try {
-        const res = await axios({
-          url: `api/articles/${slug}/favorite`,
-          method: favorited ? "DELETE" : "POST",
-          headers: headerToken,
-        });
+    const updatedArticles = items.map((item) =>
+      item.slug === article.slug ? { ...item, ...article } : item,
+    );
 
-        if (res.data.errors) return console.log(res.data.errors.body);
-
-        const items = [...articles];
-
-        items[index] = res.data.article;
-
-        setArticlesData({ ...articlesData, articles: items });
-      } catch (error) {
-        console.log(error);
-      }
-    } else alert("You need to login first");
+    setArticlesData((prev) => ({ ...prev, articles: updatedArticles }));
   };
 
-  return loading ? (
-    <div className="article-preview">Loading articles...</div>
-  ) : articles?.length > 0 ? (
-    articles.map((article, index) => {
-      const { slug, title, description, tagList } = article;
+  return articles?.length > 0 ? (
+    articles.map((article) => {
+      const {
+        author,
+        createdAt,
+        description,
+        favorited,
+        favoritesCount,
+        slug,
+        tagList,
+        title,
+      } = article;
 
       return (
         <div className="article-preview" key={slug}>
-          <ArticleMeta article={article}>
+          <ArticleMeta author={author} createdAt={createdAt}>
             <FavButton
-              article={article}
+              favorited={favorited}
+              favoritesCount={favoritesCount}
               handler={handleFav}
-              index={index}
-              compact
+              right
+              slug={slug}
             />
           </ArticleMeta>
-
-          <Link to={`/article/${slug}`} className="preview-link">
+          <Link
+            to={`/article/${slug}`}
+            state={article}
+            className="preview-link"
+          >
             <h1>{title}</h1>
-
             <p>{description}</p>
-
             <span>Read more...</span>
-
             <ArticleTags tagList={tagList} />
           </Link>
         </div>
       );
     })
+  ) : loading ? (
+    <div className="article-preview">Loading articles...</div>
   ) : (
     <div className="article-preview">No articles available.</div>
   );

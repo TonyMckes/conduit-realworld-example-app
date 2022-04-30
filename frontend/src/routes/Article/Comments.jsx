@@ -1,21 +1,21 @@
 import axios from "axios";
 import { Link } from "react-router-dom";
 import Avatar from "../../components/Avatar";
-import { useAuth } from "../../helpers/AuthContextProvider";
+import { useAuth } from "../../context/AuthContext";
 import dateFormatter from "../../helpers/dateFormatter";
 
 function Comments({ comments, setNewComment, slug }) {
-  const { headerToken, isAuth, loggedUser } = useAuth();
+  const { headers, isAuth, loggedUser } = useAuth();
 
   const handleDelete = (commentId) => {
     const confirmation = window.confirm("Want to delete the comment?");
 
     if (isAuth) {
       if (!confirmation) return;
-
+      console.log(slug, commentId);
       axios
         .delete(`api/articles/${slug}/comments/${commentId}`, {
-          headers: headerToken,
+          headers,
         })
         .then((res) => {
           if (res.data.errors) return console.log(res.data.errors.body);
@@ -33,10 +33,18 @@ function Comments({ comments, setNewComment, slug }) {
         </div>
 
         <div className="card-footer">
-          <Link to={`/profile/${username}`} className="comment-author">
-            <Avatar alt="author" src={image} className="comment-author-img" />
+          <Link
+            to={`/profile/${username}`}
+            // state={{ bio, followersCount, following, image }}
+            className="comment-author"
+          >
+            <Avatar alt={username} src={image} className="comment-author-img" />
           </Link>{" "}
-          <Link to={`/profile/${username}`} className="comment-author">
+          <Link
+            to={`/profile/${username}`}
+            // state={{ bio, followersCount, following, image }}
+            className="comment-author"
+          >
             {username}
           </Link>
           <span className="date-posted">{dateFormatter(createdAt)}</span>

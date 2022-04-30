@@ -1,41 +1,38 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import ArticlePagination from "../../components/ArticlePagination";
+import ArticlesPagination from "../../components/ArticlesPagination";
 import ArticlesPreview from "../../components/ArticlesPreview";
-import useAxios from "../../hooks/useAxios";
+import useArticleList from "../../hooks/useArticles";
 
-export default function AuthorFavArticles() {
-  const [articlesData, setArticlesData] = useState({});
-  const { articles } = articlesData || {};
+function ProfileArticles() {
   const { username } = useParams();
 
-  const { data, loading } = useAxios({
-    url: `api/articles?author=${username}`,
-    dep: username,
+  const { articles, articlesCount, loading, setArticlesData } = useArticleList({
+    location: "profile",
+    username,
   });
 
-  useEffect(() => {
-    setArticlesData(data);
-  }, [data]);
-
   return loading ? (
-    <div className="article-preview">Loading {username} articles</div>
-  ) : articles?.length > 0 ? (
+    <div className="article-preview">
+      <em>Loading {username} articles...</em>
+    </div>
+  ) : articles.length > 0 ? (
     <>
       <ArticlesPreview
+        articles={articles}
         loading={loading}
-        articlesData={articlesData}
         setArticlesData={setArticlesData}
       />
 
-      <ArticlePagination
-        articlesData={articlesData}
+      <ArticlesPagination
+        articlesCount={articlesCount}
+        location="profile"
         setArticlesData={setArticlesData}
         username={username}
-        location="profile"
       />
     </>
   ) : (
-    <div className="article-preview">{username} doesn't have articles</div>
+    <div className="article-preview">{username} doesn't have articles.</div>
   );
 }
+
+export default ProfileArticles;
