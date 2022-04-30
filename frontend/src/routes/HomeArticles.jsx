@@ -22,13 +22,14 @@ function HomeArticles() {
       <ArticlesPreview
         articles={articles}
         loading={loading}
-        setArticlesData={setArticlesData}
+        updateArticles={setArticlesData}
       />
 
       <ArticlesPagination
         articlesCount={articlesCount}
         location={tabName}
-        setArticlesData={setArticlesData}
+        tagName={tagName}
+        updateArticles={setArticlesData}
       />
     </>
   ) : (

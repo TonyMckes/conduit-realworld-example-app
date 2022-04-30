@@ -20,13 +20,13 @@ function ProfileFavArticles() {
       <ArticlesPreview
         articles={articles}
         loading={loading}
-        setArticlesData={setArticlesData}
+        updateArticles={setArticlesData}
       />
 
       <ArticlesPagination
         articlesCount={articlesCount}
         location="favorites"
-        setArticlesData={setArticlesData}
+        updateArticles={setArticlesData}
         username={username}
       />
     </>

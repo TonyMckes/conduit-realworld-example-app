@@ -20,13 +20,13 @@ function ProfileArticles() {
       <ArticlesPreview
         articles={articles}
         loading={loading}
-        setArticlesData={setArticlesData}
+        updateArticles={setArticlesData}
       />
 
       <ArticlesPagination
         articlesCount={articlesCount}
         location="profile"
-        setArticlesData={setArticlesData}
+        updateArticles={setArticlesData}
         username={username}
       />
     </>
