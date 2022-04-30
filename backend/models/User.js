@@ -53,14 +53,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       email: DataTypes.STRING,
       username: DataTypes.STRING,
-      bio: {
-        type: DataTypes.TEXT,
-        defaultValue: null,
-      },
-      image: {
-        type: DataTypes.TEXT,
-        defaultValue: null,
-      },
+      bio: DataTypes.TEXT,
+      image: DataTypes.TEXT,
       password: DataTypes.STRING,
     },
     {
