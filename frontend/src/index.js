@@ -11,6 +11,7 @@ import ArticleEditor from "./routes/ArticleEditor";
 import Home from "./routes/Home";
 import HomeArticles from "./routes/HomeArticles";
 import Login from "./routes/Login";
+import NotFound from "./routes/NotFound";
 import Profile from "./routes/Profile/Profile";
 import ProfileArticles from "./routes/Profile/ProfileArticles";
 import ProfileFavArticles from "./routes/Profile/ProfileFavArticles";
@@ -45,6 +46,7 @@ ReactDOM.render(
               <Route path="favorites" element={<ProfileFavArticles />} />
             </Route>
           </Route>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
     </HashRouter>

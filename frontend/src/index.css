@@ -18,3 +18,11 @@ button:focus {
   cursor: pointer;
   user-select: none;
 }
+
+.not-found {
+  display: flex;
+  height: 85vh;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}

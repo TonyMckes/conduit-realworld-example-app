@@ -13,6 +13,7 @@ function Article() {
   const [article, setArticle] = useState(state || {});
   const { title, body, tagList, createdAt, author } = article || {};
   const { headers, isAuth } = useAuth();
+  const navigate = useNavigate();
   const { slug } = useParams();
 
   useEffect(() => {
@@ -20,8 +21,11 @@ function Article() {
 
     getArticle({ slug, headers })
       .then(setArticle)
-      .catch((error) => console.error(error));
-  }, [isAuth, slug, headers, state]);
+      .catch((error) => {
+        console.error(error);
+        navigate("/not-found", { replace: true });
+      });
+  }, [isAuth, slug, headers, state, navigate]);
 
   return (
     <div className="article-page">

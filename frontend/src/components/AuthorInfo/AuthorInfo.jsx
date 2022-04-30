@@ -1,6 +1,6 @@
 import Markdown from "markdown-to-jsx";
 import { useEffect, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import getProfile from "../../services/getProfile";
 import Avatar from "../Avatar";
@@ -13,14 +13,18 @@ function AuthorInfo() {
   );
   const { headers, loggedUser } = useAuth();
   const { username } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (state) return;
 
     getProfile({ headers, username })
       .then(setAuthor)
-      .catch((error) => console.error(error));
-  }, [username, headers, state]);
+      .catch((error) => {
+        console.error(error);
+        navigate("/not-found", { replace: true });
+      });
+  }, [username, headers, state, navigate]);
 
   const followHandler = ({ followersCount, following }) => {
     setAuthor((prev) => ({ ...prev, followersCount, following }));
