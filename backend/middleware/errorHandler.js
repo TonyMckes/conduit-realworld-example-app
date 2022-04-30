@@ -3,7 +3,7 @@ const {
   NotFoundError,
   UnauthorizedError,
   ValidationError,
-} = require("../error/validationError");
+} = require("../helper/customErrors");
 
 const errorHandler = (error, req, res, next) => {
   console.log("\x1b[31m%s\x1b[0m", "▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼");
