@@ -39,7 +39,7 @@ const allArticles = async (req, res, next) => {
           ...(author && { where: { username: author } }),
         },
       ],
-      limit: limit,
+      limit: parseInt(limit),
       offset: offset * limit,
       order: [["createdAt", "DESC"]],
     };
@@ -120,6 +120,7 @@ const createArticle = async (req, res, next) => {
 
 //* Feed
 const articlesFeed = async (req, res, next) => {
+  // BUG: Feed pagination is not working
   try {
     const { loggedUser } = req;
     if (!loggedUser) throw new UnauthorizedError();
