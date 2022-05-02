@@ -3,7 +3,6 @@ import errorHandler from "../helpers/errorHandler";
 
 // prettier-ignore
 async function getArticles({ headers, limit = 3, location, page = 0, tagName, username }) {
-  // BUG: Feed pagination not working
   try {
     const url = {
       favorites: `api/articles?favorited=${username}&&limit=${limit}&&offset=${page}`,

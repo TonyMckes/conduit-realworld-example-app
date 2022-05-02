@@ -120,33 +120,30 @@ const createArticle = async (req, res, next) => {
 
 //* Feed
 const articlesFeed = async (req, res, next) => {
-  // BUG: Feed pagination is not working
   try {
     const { loggedUser } = req;
     if (!loggedUser) throw new UnauthorizedError();
 
-    const followers = await loggedUser.getFollowing();
+    const { limit = 3, offset = 0 } = req.query;
+    const authors = await loggedUser.getFollowing();
 
-    let articles = [];
-    for (const author of followers) {
-      const articlesByAuthor = await author.getArticles({
-        include: includeOptions,
-        limit: 10,
-        order: [["createdAt", "DESC"]],
-      });
+    const articles = await Article.findAndCountAll({
+      include: includeOptions,
+      limit: parseInt(limit),
+      offset: offset * limit,
+      order: [["createdAt", "DESC"]],
+      where: { userId: authors.map((author) => author.id) },
+    });
 
-      for (const article of articlesByAuthor) {
-        const articleTags = await article.getTagList();
+    for (const article of articles.rows) {
+      const articleTags = await article.getTagList();
 
-        appendTagList(articleTags, article);
-        await appendFollowers(loggedUser, article);
-        await appendFavorites(loggedUser, article);
-
-        articles.push(article);
-      }
+      appendTagList(articleTags, article);
+      await appendFollowers(loggedUser, article);
+      await appendFavorites(loggedUser, article);
     }
 
-    res.json({ articles, articlesCount: articles.length });
+    res.json({ articles: articles.rows, articlesCount: articles.count });
   } catch (error) {
     next(error);
   }

@@ -3,7 +3,6 @@ import ArticlesPreview from "../components/ArticlesPreview";
 import { useFeedContext } from "../context/FeedContext";
 import useArticleList from "../hooks/useArticles";
 
-// BUG: Feed pagination not working
 function HomeArticles() {
   const { tabName, tagName } = useFeedContext();
 

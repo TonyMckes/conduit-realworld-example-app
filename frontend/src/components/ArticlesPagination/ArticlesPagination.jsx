@@ -19,27 +19,24 @@ function ArticlesPagination({
   };
 
   return (
-    // BUG: Pagination in "Feed" not working: temporally disabled
-    location !== "feed" && (
-      <ReactPaginate
-        activeClassName="active"
-        breakClassName="page-item"
-        breakLabel="..."
-        breakLinkClassName="page-link"
-        containerClassName="pagination pagination-sm"
-        nextClassName="page-item"
-        nextLabel={<i className="ion-arrow-right-b"></i>}
-        nextLinkClassName="page-link"
-        onPageChange={handlePageChange}
-        pageClassName="page-item"
-        pageCount={totalPages}
-        pageLinkClassName="page-link"
-        previousClassName="page-item"
-        previousLabel={<i className="ion-arrow-left-b"></i>}
-        previousLinkClassName="page-link"
-        renderOnZeroPageCount={null}
-      />
-    )
+    <ReactPaginate
+      activeClassName="active"
+      breakClassName="page-item"
+      breakLabel="..."
+      breakLinkClassName="page-link"
+      containerClassName="pagination pagination-sm"
+      nextClassName="page-item"
+      nextLabel={<i className="ion-arrow-right-b"></i>}
+      nextLinkClassName="page-link"
+      onPageChange={handlePageChange}
+      pageClassName="page-item"
+      pageCount={totalPages}
+      pageLinkClassName="page-link"
+      previousClassName="page-item"
+      previousLabel={<i className="ion-arrow-left-b"></i>}
+      previousLinkClassName="page-link"
+      renderOnZeroPageCount={null}
+    />
   );
 }
 
