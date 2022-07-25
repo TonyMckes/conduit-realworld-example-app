@@ -4,7 +4,7 @@ const { Tag } = require("../models");
 const { appendTagList } = require("../helper/helpers");
 
 // All Tags
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   try {
     const tagList = await Tag.findAll();
 
@@ -12,7 +12,7 @@ router.get("/", async (req, res) => {
 
     res.json({ tags });
   } catch (error) {
-    res.json({ errors: { body: [error.message] } });
+    next(error);
   }
 });
 
