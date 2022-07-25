@@ -24,8 +24,11 @@ app.use(express.json());
   }
 })();
 
-app.use("/", express.static("../frontend/build"));
-// app.get("/", (req, res) => res.json({ status: "API is running on /api" }));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("../frontend/build"));
+} else {
+  app.get("/", (req, res) => res.json({ status: "API is running on /api" }));
+}
 app.use("/api/users", usersRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/articles", articlesRoutes);
@@ -37,6 +40,5 @@ app.get("*", (req, res) =>
 app.use(errorHandler);
 
 app.listen(PORT, () =>
-  // console.log(`Server running on http://localhost:${PORT}`),
-  console.log(`Server running on port: ${PORT}`),
+  console.log(`Server running on http://localhost:${PORT}`),
 );
