@@ -1,20 +1,28 @@
 {
-  "name": "react-express-sequelize-realworld-example-app",
+  "name": "conduit-realworld-example-app",
   "version": "1.0.0",
   "description": "> ### React / Express.js / Sequelize codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.",
-  "main": "backend/index.js",
+  "main": "index.js",
   "scripts": {
-    "start": "npm start --prefix backend/",
-    "build": "cd frontend/ && npm install && npm run build && cd ../backend && npm install"
+    "start": "npm run build -w frontend && npm run start -w backend",
+    "dev": "concurrently \"npm run dev -w backend\" \"npm run start -w frontend\""
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TonyMckes/react-express-sequelize-realworld-example-app.git"
+    "url": "git+https://github.com/TonyMckes/conduit-realworld-example-app.git"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/TonyMckes/react-express-sequelize-realworld-example-app/issues"
+    "url": "https://github.com/TonyMckes/conduit-realworld-example-app/issues"
   },
-  "homepage": "https://github.com/TonyMckes/react-express-sequelize-realworld-example-app#readme"
+  "homepage": "https://github.com/TonyMckes/conduit-realworld-example-app#readme",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "devDependencies": {
+    "concurrently": "^7.3.0"
+  }
 }
