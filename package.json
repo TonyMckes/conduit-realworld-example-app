@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run build -w frontend && npm run start -w backend",
-    "dev": "concurrently \"npm run dev -w backend\" \"npm run start -w frontend\""
+    "dev": "concurrently \"npm run dev -w backend\" \"npm run start -w frontend\"",
+    "test": "concurrently \"npm test -w backend\" \"npm test -w frontend\""
   },
   "repository": {
     "type": "git",
