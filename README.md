@@ -4,7 +4,7 @@
 
 ### [Demo app](https://conduit-realworld-example-app.herokuapp.com/)&nbsp;&nbsp;&nbsp;&nbsp;![](https://heroku-status-badges.herokuapp.com/conduit-realworld-example-app)
 
-This codebase was created to demonstrate a fully fledged fullstack application built with **React / Express.js / Sequelize** including CRUD operations, authentication, routing, pagination, and more.
+This codebase was created to demonstrate a fully fledged fullstack application built with **React / Express.js / Sequelize / PostgreSQL** including CRUD operations, authentication, routing, pagination, and more.
 
 For more information on how to this works with other frontends/backends, head over to the [RealWorld](https://github.com/gothinkster/realworld) repo.
 
