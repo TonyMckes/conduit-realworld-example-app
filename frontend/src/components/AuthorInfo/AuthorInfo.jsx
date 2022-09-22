@@ -9,14 +9,14 @@ import FollowButton from "../FollowButton";
 function AuthorInfo() {
   const { state } = useLocation();
   const [{ bio, followersCount, following, image }, setAuthor] = useState(
-    state || {},
+    state || {}
   );
   const { headers, loggedUser } = useAuth();
   const { username } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (state) return;
+    if (state && state.bio === bio) return;
 
     getProfile({ headers, username })
       .then(setAuthor)

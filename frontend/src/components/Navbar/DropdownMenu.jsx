@@ -36,6 +36,7 @@ function DropdownMenu() {
           icon="ion-person"
           text="Profile"
           url={`/profile/${username}`}
+          state={loggedUser}
         />
         <DropdownItem icon="ion-gear-a" text="Settings" url="/settings" />
         <div className="dropdown-divider"></div>
