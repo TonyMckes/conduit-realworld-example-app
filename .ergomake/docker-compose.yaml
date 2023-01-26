@@ -1,0 +1,26 @@
+version: '3.1'
+
+services:
+  app:
+    build:
+      context: ..
+    environment:
+      DB_USER: exampleUserName
+      DB_PASSWORD: examplePassword
+      DB_DATABASE: exampleDB
+      DB_HOST: "db"
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: exampleUserName
+      POSTGRES_PASSWORD: examplePassword
+      POSTGRES_DB: exampleDB
+    ports:
+      - 5432:5432
+
