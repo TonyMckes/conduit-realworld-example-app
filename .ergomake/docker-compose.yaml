@@ -2,8 +2,9 @@ version: '3.1'
 
 services:
   app:
-    build:
-      context: ..
+    # build:
+    #   context: ..
+    image: lucasfcosta/realworld-example
     environment:
       DB_USER: exampleUserName
       DB_PASSWORD: examplePassword
@@ -15,7 +16,7 @@ services:
       - "3000:3000"
     depends_on:
       - db
-    
+
   db:
     image: postgres
     environment:
@@ -24,4 +25,3 @@ services:
       POSTGRES_DB: exampleDB
     ports:
       - "5432:5432"
-
