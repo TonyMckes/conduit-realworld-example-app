@@ -18,9 +18,11 @@
   "scripts": {
     "dev": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\"",
     "start": "npm run build -w frontend && npm run start -w backend",
-    "test": "concurrently \"npm test -w backend\" \"npm test -w frontend\""
+    "test": "vitest"
   },
   "devDependencies": {
-    "concurrently": "^7.3.0"
+    "@vitejs/plugin-react-swc": "^3.2.0",
+    "concurrently": "^7.3.0",
+    "vitest": "^0.29.7"
   }
 }

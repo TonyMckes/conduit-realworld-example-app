@@ -4,8 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development node --watch index.js",
-    "start": "NODE_ENV=production node index.js",
-    "test": "jest"
+    "start": "NODE_ENV=production node index.js"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
@@ -17,7 +16,6 @@
     "sequelize": "^6.14.1"
   },
   "devDependencies": {
-    "jest": "^28.1.3",
     "sequelize-cli": "^6.4.1"
   }
 }
