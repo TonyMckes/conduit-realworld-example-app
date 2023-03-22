@@ -8,16 +8,16 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "bcrypt": "^5.0.1",
+    "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.0",
-    "express": "^4.17.2",
-    "jsonwebtoken": "^8.5.1",
-    "pg": "^8.7.3",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "pg": "^8.10.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.14.1"
+    "sequelize": "^6.29.3"
   },
   "devDependencies": {
-    "sequelize-cli": "^6.4.1"
+    "sequelize-cli": "^6.6.0"
   }
 }
