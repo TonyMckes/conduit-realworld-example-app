@@ -17,6 +17,7 @@
   ],
   "scripts": {
     "dev": "concurrently --names 'Node,Vite' -c 'green,blue' 'npm run dev -w backend' 'npm run dev -w frontend'",
+    "sqlz": "npx -w backend sequelize-cli",
     "start": "npm run build -w frontend && npm run start -w backend",
     "test": "vitest"
   },
