@@ -1,4 +1,5 @@
 require("dotenv").config();
+const env = process.env.NODE_ENV || "development";
 const PORT = process.env.PORT || 3001;
 const express = require("express");
 const cors = require("cors");
@@ -18,9 +19,9 @@ app.use(express.json());
 (async () => {
   try {
     await sequelize.sync({ alter: true });
-    // await sequelize.authenticate();
+    console.log(`Connection with ${env} database has been established.`);
   } catch (error) {
-    console.error(error);
+    console.error("Unable to connect to the database:", error);
   }
 })();
 

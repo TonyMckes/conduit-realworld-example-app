@@ -1,30 +1,27 @@
+/** @type {import('sequelize').Options} */
 module.exports = {
   development: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    host: "127.0.0.1",
-    dialect: "postgres",
-    logging: false
+    username: process.env.DEV_DB_USERNAME,
+    password: process.env.DEV_DB_PASSWORD,
+    database: process.env.DEV_DB_NAME,
+    host: process.env.DEV_DB_HOSTNAME,
+    dialect: process.env.DEV_DB_DIALECT,
+    logging: process.env.DEV_DB_LOGGING,
   },
   test: {
-    username: "root",
-    password: null,
-    database: "database_test",
-    host: "127.0.0.1",
-    dialect: "mysql",
+    username: process.env.TEST_DB_USERNAME,
+    password: process.env.TEST_DB_PASSWORD,
+    database: process.env.TEST_DB_NAME,
+    host: process.env.TEST_DB_HOSTNAME,
+    dialect: process.env.TEST_DB_DIALECT,
+    logging: process.env.TEST_DB_LOGGING,
   },
   production: {
-    username: process.env.PG_USER,
-    password: process.env.PG_PASSWORD,
-    database: process.env.PG_DATABASE,
-    host: process.env.PG_HOST,
-    dialect: "postgres",
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
-      },
-    },
+    username: process.env.PROD_DB_USERNAME,
+    password: process.env.PROD_DB_PASSWORD,
+    database: process.env.PROD_DB_NAME,
+    host: process.env.PROD_DB_HOSTNAME,
+    dialect: process.env.PROD_DB_DIALECT,
+    logging: process.env.PROD_DB_LOGGING,
   },
 };
