@@ -24,6 +24,7 @@
   "devDependencies": {
     "@vitejs/plugin-react-swc": "^3.2.0",
     "concurrently": "^7.6.0",
+    "cypress": "^12.16.0",
     "vitest": "^0.29.7"
   }
 }
