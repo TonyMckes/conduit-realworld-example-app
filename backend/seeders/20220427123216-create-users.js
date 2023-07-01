@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -10,9 +10,19 @@ module.exports = {
         password: `examplePwd${index + 1}`,
         createdAt: new Date(),
         updatedAt: new Date(),
-      }));
+      }))
 
-    await queryInterface.bulkInsert("Users", users, {});
+      const newUser = {
+          username: `auto-user`,
+          email: `auto-user@mail.com`,
+          password: `autoPwd`,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+      }
+
+      const allUsers = [...users, newUser]
+
+    await queryInterface.bulkInsert("Users", allUsers, {});
   },
 
   async down(queryInterface, Sequelize) {
