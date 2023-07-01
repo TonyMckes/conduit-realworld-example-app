@@ -1,4 +1,5 @@
 import { signup } from "../../pages"
+import {login} from "../../pages/ui/Login";
 
 describe('Sign up', () => {
 
@@ -17,5 +18,11 @@ describe('Sign up', () => {
         signup.openSignupPage()
         signup.checkSignupTitle()
         signup.registerUser('test', 'test@test.com', 'xyzXYZ123_')
+    })
+
+    it('Should do login user',  () => {
+        login.openLoginPage()
+        login.checkLoginTitle()
+        login.loginUser('test', 'test@test.com', 'xyzXYZ123_')
     })
 })
