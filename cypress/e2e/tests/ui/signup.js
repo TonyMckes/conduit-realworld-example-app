@@ -1,6 +1,8 @@
-import { signup, login } from "../../pages"
+import { signup, login, loginAPI, common } from "../../pages"
+import { name, email, password } from '../../../fixtures/ui/user.json'
+// import userApi from '../../../fixtures/api/userApi.json'
 
-describe('Sign up', () => {
+describe('Sign up - sign in suite', () => {
 
     before(() => {
         cy.exec('npx -w backend sequelize-cli db:seed:undo:all')
@@ -10,25 +12,25 @@ describe('Sign up', () => {
     })
 
     beforeEach(() => {
-        cy.visit('/')
+        common.openPage('/')
     })
 
     it('Should do register user', () => {
         signup.openSignupPage()
         signup.checkSignupTitle()
-        signup.registerUser('test', 'test@test.com', 'xyzXYZ123_')
+        signup.registerUser(name, email, password)
     })
 
     it('Should do login user',  () => {
         login.openLoginPage()
         login.checkLoginTitle()
-        login.loginUser('test', 'test@test.com', 'xyzXYZ123_')
+        login.loginUser(name, email, password)
     })
 
     it('should do logout user',  () => {
-        login.openLoginPage()
-        login.checkLoginTitle()
-        login.loginUser('test', 'test@test.com', 'xyzXYZ123_')
+        // loginAPI.userLogin(userApi.email, userApi.password) // NOT WORKING
+        loginAPI.userLogin(email, password)
+        common.reloadPage()
         login.logoutUser()
     })
 })
