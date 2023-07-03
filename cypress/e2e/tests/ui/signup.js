@@ -3,7 +3,6 @@ import { name, email, password } from '../../../fixtures/ui/user.json'
 // import userApi from '../../../fixtures/api/userApi.json'
 
 describe('Sign up - sign in suite', () => {
-
     before(() => {
         cy.exec('npx -w backend sequelize-cli db:seed:undo:all')
             .its('code').should('eq', 0)
