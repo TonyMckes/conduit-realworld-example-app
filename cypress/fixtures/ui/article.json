@@ -1,0 +1,6 @@
+{
+  "title": "Article title",
+  "description": "Article description",
+  "text": "Article text",
+  "tags": "React,Redux,Axios"
+}
