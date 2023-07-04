@@ -15,7 +15,7 @@ function Profile() {
       </div>
 
       <ContainerRow>
-        <div className="col-xs-12 col-md-10 offset-md-1">
+        <div className="col-xs-12 col-md-10 offset-md-1 article-list">
           <div className="articles-toggle">
             <ul className="nav nav-pills outline-active">
               <NavItem text="My Articles" url="" state={state} />

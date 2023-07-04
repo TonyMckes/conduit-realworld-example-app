@@ -1,4 +1,4 @@
-import { header } from "../../pages"
+import { header, profile } from "../../pages"
 import { convertStringToArray, parsedArticleUrl } from "../../../support/utils"
 
 class Article {
@@ -12,6 +12,10 @@ class Article {
     articleTitleLoc = '.article-page h1'
     articleTextLoc = '.article-page .article-content p'
     articleTagsListLoc = '.article-page .tag-list'
+    articleListItemLocator = '.article-preview'
+    articleListItemLinkLocator = '.preview-link'
+    buttonDeleteArticleLocator = '.article-actions button i.ion-trash-a'
+
 
     openNewArticlePage() {
         cy.get(header.newArticleLocator).click()
@@ -35,6 +39,18 @@ class Article {
             const tagText = tag.text()
             expect(arrayFromTags).to.include(tagText)
         })
+    }
+
+    deleteArticle(title) {
+        const parsedUrl = parsedArticleUrl(title.toLowerCase())
+
+        cy.get(this.articleListItemLocator).should('have.length', 1)
+        cy.get(this.articleListItemLinkLocator).should('contain', title).click()
+        cy.url().should('include', `${this.articleUrl}${parsedUrl}`)
+
+        cy.get(this.buttonDeleteArticleLocator).click()
+        cy.on('window:confirm', () => true)
+
     }
 }
 

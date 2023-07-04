@@ -1,4 +1,4 @@
-import {common, article, loginAPI} from "../../pages"
+import {common, article, loginAPI, header, home } from "../../pages"
 import { name, email, password } from '../../../fixtures/ui/user.json'
 import { title, description, text, tags } from '../../../fixtures/ui/article.json'
 
@@ -17,13 +17,18 @@ describe('Sign up - sign in suite', () => {
         common.reloadPage()
     })
 
-    it.only('Should create article', () => {
+    it('Should create article', () => {
         article.openNewArticlePage()
         article.addNewArticle(title,description,text,tags)
     })
 
-    it('Should delete article', () => {
+    it.only('Should delete article', () => {
+        article.openNewArticlePage()
+        article.addNewArticle(title,description,text,tags)
 
+        header.openProfilePage(name)
+        article.deleteArticle(title)
+        home.checkEmptyArticlesText()
     })
 
     it('Should edit article', () => {
