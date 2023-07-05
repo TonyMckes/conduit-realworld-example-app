@@ -1,5 +1,6 @@
 import { header } from "../../pages"
 import { parsedArticleUrl } from "../../../support/utils"
+import {name} from "../../../fixtures/api/userApi.json";
 
 class Article {
     newArticleUrl = '/#/editor'
@@ -45,13 +46,35 @@ class Article {
     deleteArticle(title) {
         const parsedUrl = parsedArticleUrl(title.toLowerCase())
 
-        cy.get(this.articleListItemLocator).should('have.length', 1)
         cy.get(this.articleListItemLinkLocator).contains(title).click()
         cy.url().should('include', `${this.articleUrl}${parsedUrl}`)
 
         cy.get(this.buttonDeleteArticleLocator).click()
         cy.on('window:confirm', () => true)
+    }
 
+    checkIsArticleExists(title, isExists) {
+        cy.log('Article title: ', title)
+        if (isExists) {
+            cy.get(this.articleListItemLocator)
+                .contains(title)
+                .should('be.visible')
+        } else {
+            cy.get('body')
+                .then((body) => {
+                    if (body.find(this.articleListItemLocator).length > 0) {
+                        cy.get(this.articleListItemLocator)
+                            .contains(title)
+                            .should('not.exist')
+                    }
+                })
+        }
+    }
+
+    editArticle(title) {
+        const parsedUrl = parsedArticleUrl(title.toLowerCase())
+
+        cy.get(this.articleListItemLocator).should('have.length', 1)
     }
 }
 

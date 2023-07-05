@@ -5,6 +5,10 @@ class Profile {
     tabFavoriteArticlesLocator = '.articles-toggle ul a[href$="/favorites"]'
     articleListLocator = '.article-list'
 
+    verifyProfileUrl() {
+        cy.url().should('include', this.urlProfile)
+    }
+
     checkProfileTitle(name) {
         cy.get(this.titleLocator).should('have.text', name)
     }

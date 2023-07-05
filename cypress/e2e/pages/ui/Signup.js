@@ -7,24 +7,54 @@ class Signup {
     inputUsernameLocator = '.auth-page input[name=username]'
     inputEmailLocator = '.auth-page input[name=email]'
     inputPasswordLocator = '.auth-page input[name=password]'
-    btnSignupLocator = '.auth-page button'
+    buttonSignupLocator = '.auth-page button'
+    linkSignInToYourAccountLocator = '.auth-page a[href$="/login"]'
 
-    openSignupPage() {
-        cy.get(header.menuSignUpLocator).click()
+    verifySignupUrl() {
         cy.url().should('include', this.urlSignup)
     }
     
-    checkSignupTitle() {
+    verifySignupTitle() {
         cy.get(this.titleLocator).should('have.text', this.titleText)
     }
 
-    registerUser(name, email, password) {
+    verifySignupPageIsOpened() {
+        this.verifySignupUrl()
+        this.verifySignupTitle()
+    }
+
+    inputUserName(name) {
         cy.get(this.inputUsernameLocator).type(name)
+    }
+
+    inputUserEmail(email) {
         cy.get(this.inputEmailLocator).type(email)
+    }
+
+    inputUserPassword(password) {
         cy.get(this.inputPasswordLocator).type(password)
-        cy.get(this.btnSignupLocator).click()
-        cy.url().should('include', home.urlHome)
-        cy.get(header.menuUserDropdownLocator).should('contain.text', name)
+    }
+
+    clickSignUpButton() {
+        cy.get(this.buttonSignupLocator).click()
+    }
+
+    clickSignInToYourAccount() {
+        cy.get(this.linkSignInToYourAccountLocator).click()
+    }
+
+    openSignupPage() {
+        header.clickSignupItem()
+        this.verifySignupPageIsOpened()
+    }
+
+    registerUser(name, email, password) {
+        this.inputUserName(name)
+        this.inputUserEmail(email)
+        this.inputUserPassword(password)
+        this.clickSignUpButton()
+        home.verifyHomeUrl()
+        header.verifyUserNameIsDisplayed(name, true)
     }
 }
 

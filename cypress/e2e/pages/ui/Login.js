@@ -7,28 +7,64 @@ class Login {
     inputEmailLocator = '.auth-page input[name=email]'
     inputPasswordLocator = '.auth-page input[name=password]'
     loginButtonLocator = '.auth-page button'
+    errorAuthMessageLocator = '.auth-page .error-messages li'
+    errorAuthMessageText = 'Email not found sign in first'
+    linkNeedAnAccountLocator = '.auth-page a[href$="/register"]'
 
-    openLoginPage() {
-        cy.get(header.menuLoginLocator).click()
+    verifyLoginUrl() {
         cy.url().should('include', this.urlLogin)
     }
 
-    checkLoginTitle() {
+    verifyLoginTitle() {
         cy.get(this.titleLocator).should('have.text', this.titleText)
     }
 
-    loginUser(name, email, password) {
-        cy.get(this.inputEmailLocator).type(email)
-        cy.get(this.inputPasswordLocator).type(password)
-        cy.get(this.loginButtonLocator).click()
-        cy.url().should('include', home.urlHome)
-        cy.get(header.menuUserDropdownLocator).should('contain.text', name)
+    verifyErrorAuthMessage() {
+        cy.get(this.errorAuthMessageLocator).should('have.text', this.errorAuthMessageText)
     }
 
-    logoutUser() {
-        cy.get(header.menuUserDropdownLocator).click()
-        cy.get(header.itemLogoutLocator).click()
-        cy.get(header.menuLoginLocator).should('be.visible')
+    verifyLoginPageIsOpened() {
+        this.verifyLoginUrl()
+        this.verifyLoginTitle()
+    }
+
+    inputUserEmail(email) {
+        cy.get(this.inputEmailLocator).type(email)
+    }
+
+    inputUserPassword(password) {
+        cy.get(this.inputPasswordLocator).type(password)
+    }
+
+    clickLoginButton() {
+        cy.get(this.loginButtonLocator).click()
+    }
+
+    clickNeedAnAccount() {
+        cy.get(this.linkNeedAnAccountLocator).click()
+    }
+
+    openLoginPage() {
+        header.clickLoginItem()
+        this.verifyLoginPageIsOpened()
+    }
+
+    fillLoginFormAndSubmit(name, email, password) {
+        this.inputUserEmail(email)
+        this.inputUserPassword(password)
+        this.clickLoginButton()
+    }
+
+    loginUser(name, email, password) {
+        this.fillLoginFormAndSubmit(name, email, password)
+        home.verifyHomeUrl()
+        header.verifyUserNameIsDisplayed(name, true)
+    }
+
+    logoutUser(userName) {
+        header.clickUserDropdownMenu()
+        header.clickUserDropdownMenuLogoutItem()
+        header.verifyUserNameIsDisplayed(userName, false)
     }
 }
 
