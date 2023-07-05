@@ -1,16 +1,16 @@
-import { header } from "../index"
+import { header, home } from "../index"
 
 class Login {
-    loginUrl = '/#/login'
+    urlLogin = '/#/login'
     titleLocator = '.auth-page h1'
     titleText = 'Sign in'
-    emailLocator = '.auth-page input[name=email]'
-    passwordLocator = '.auth-page input[name=password]'
+    inputEmailLocator = '.auth-page input[name=email]'
+    inputPasswordLocator = '.auth-page input[name=password]'
     loginButtonLocator = '.auth-page button'
 
     openLoginPage() {
-        cy.get(header.loginLocator).click()
-        cy.url().should('include', this.loginUrl)
+        cy.get(header.menuLoginLocator).click()
+        cy.url().should('include', this.urlLogin)
     }
 
     checkLoginTitle() {
@@ -18,16 +18,17 @@ class Login {
     }
 
     loginUser(name, email, password) {
-        cy.get(this.emailLocator).type(email)
-        cy.get(this.passwordLocator).type(password)
+        cy.get(this.inputEmailLocator).type(email)
+        cy.get(this.inputPasswordLocator).type(password)
         cy.get(this.loginButtonLocator).click()
-        cy.get(header.userDropdownLocator).should('contain.text', name)
+        cy.url().should('include', home.urlHome)
+        cy.get(header.menuUserDropdownLocator).should('contain.text', name)
     }
 
     logoutUser() {
-        cy.get(header.userDropdownLocator).click()
-        cy.get(header.logoutLocator).click()
-        cy.get(header.loginLocator).should('be.visible')
+        cy.get(header.menuUserDropdownLocator).click()
+        cy.get(header.itemLogoutLocator).click()
+        cy.get(header.menuLoginLocator).should('be.visible')
     }
 }
 

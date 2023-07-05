@@ -1,17 +1,17 @@
-import { header } from "../index"
+import { header, home } from "../index"
 
 class Signup {
-    signupUrl = '/#/register'
+    urlSignup = '/#/register'
     titleLocator = '.auth-page h1'
     titleText = 'Sign up'
-    usernameLocator = '.auth-page input[name=username]'
-    emailLocator = '.auth-page input[name=email]'
-    passwordLocator = '.auth-page input[name=password]'
-    signupButtonLocator = '.auth-page button'
+    inputUsernameLocator = '.auth-page input[name=username]'
+    inputEmailLocator = '.auth-page input[name=email]'
+    inputPasswordLocator = '.auth-page input[name=password]'
+    btnSignupLocator = '.auth-page button'
 
     openSignupPage() {
-        cy.get(header.signUpLocator).click()
-        cy.url().should('include', this.signupUrl)
+        cy.get(header.menuSignUpLocator).click()
+        cy.url().should('include', this.urlSignup)
     }
     
     checkSignupTitle() {
@@ -19,11 +19,12 @@ class Signup {
     }
 
     registerUser(name, email, password) {
-        cy.get(this.usernameLocator).type(name)
-        cy.get(this.emailLocator).type(email)
-        cy.get(this.passwordLocator).type(password)
-        cy.get(this.signupButtonLocator).click()
-        cy.get(header.userDropdownLocator).should('contain.text', name)
+        cy.get(this.inputUsernameLocator).type(name)
+        cy.get(this.inputEmailLocator).type(email)
+        cy.get(this.inputPasswordLocator).type(password)
+        cy.get(this.btnSignupLocator).click()
+        cy.url().should('include', home.urlHome)
+        cy.get(header.menuUserDropdownLocator).should('contain.text', name)
     }
 }
 

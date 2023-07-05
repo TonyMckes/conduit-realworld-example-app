@@ -1,17 +1,17 @@
 import { profile } from "../index"
 
 class Header {
-    signUpLocator = '.navbar a[href$="register"]'
-    loginLocator = '.navbar a[href$="login"]'
-    userDropdownLocator = '.navbar .dropdown'
-    logoutLocator = '.dropdown-menu a[href$="#/"]'
-    newArticleLocator = '.navbar a[href$="editor"]'
-    profileLocator = '.dropdown-menu a[href*="#/profile"]'
+    menuSignUpLocator = '.navbar a[href$="register"]'
+    menuLoginLocator = '.navbar a[href$="login"]'
+    menuNewArticleLocator = '.navbar a[href$="editor"]'
+    menuUserDropdownLocator = '.navbar .dropdown'
+    itemProfileLocator = '.dropdown-menu a[href*="#/profile"]'
+    itemLogoutLocator = '.dropdown-menu a[href$="#/"]'
 
     openProfilePage(name) {
-        cy.get(this.userDropdownLocator).click()
-        cy.get(this.profileLocator).click()
-        cy.url().should('include', profile.profileUrl)
+        cy.get(this.menuUserDropdownLocator).click()
+        cy.get(this.itemProfileLocator).click()
+        cy.url().should('include', profile.urlProfile)
         profile.checkProfileTitle(name)
     }
 }

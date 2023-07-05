@@ -1,13 +1,13 @@
-import { signup, login, loginAPI, common } from "../../pages"
+import { signup, login, loginAPI, common } from '../../pages'
 import { name, email, password } from '../../../fixtures/ui/user.json'
-// import userApi from '../../../fixtures/api/userApi.json'
+import userApi from '../../../fixtures/api/userApi.json'
+import { setUpSeed } from "../../../support/utils"
 
 describe('Sign up - sign in suite', () => {
+    const { email: userName, password: userPassword } = userApi
+
     before(() => {
-        cy.exec('npx -w backend sequelize-cli db:seed:undo:all')
-            .its('code').should('eq', 0)
-        cy.exec('npx -w backend sequelize-cli db:seed:all')
-            .its('code').should('eq', 0)
+        setUpSeed()
     })
 
     beforeEach(() => {
@@ -27,8 +27,7 @@ describe('Sign up - sign in suite', () => {
     })
 
     it('should do logout user',  () => {
-        // loginAPI.userLogin(userApi.email, userApi.password) // NOT WORKING
-        loginAPI.userLogin(email, password)
+        loginAPI.userLogin(userName, userPassword)
         common.reloadPage()
         login.logoutUser()
     })

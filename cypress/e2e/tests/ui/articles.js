@@ -1,37 +1,45 @@
-import {common, article, loginAPI, header, home } from "../../pages"
-import { name, email, password } from '../../../fixtures/ui/user.json'
-import { title, description, text, tags } from '../../../fixtures/ui/article.json'
+import { common, article, loginAPI, header, home } from '../../pages'
+import { name, email, password } from '../../../fixtures/api/userApi.json'
+import { getArticleObj, setUpSeed } from "../../../support/utils"
+import { articleAPI } from "../../pages/api/ArticleAPI"
 
 describe('Sign up - sign in suite', () => {
     before(() => {
-        cy.exec('npx -w backend sequelize-cli db:seed:undo:all')
-            .its('code').should('eq', 0)
-        cy.exec('npx -w backend sequelize-cli db:seed:all')
-            .its('code').should('eq', 0)
-        loginAPI.userRegister(name, email, password) // why we need register a new user???
+        setUpSeed()
     })
 
-    beforeEach(() => {
-        common.openPage('/')
-        loginAPI.userLogin(email, password)
-        common.reloadPage()
+    describe('Should create article', () => {
+        const { title, description, text, tags } = getArticleObj()
+
+        beforeEach(() => {
+            common.openPage('/')
+            loginAPI.userLogin(email, password)
+            common.reloadPage()
+        })
+
+        it('Should create article', () => {
+            article.openNewArticlePage()
+            article.addNewArticle(title,description,text,tags)
+        })
     })
 
-    it('Should create article', () => {
-        article.openNewArticlePage()
-        article.addNewArticle(title,description,text,tags)
+    describe('Should delete article', () => {
+        const newArticle = getArticleObj()
+
+        beforeEach(() => {
+            common.openPage('/')
+            loginAPI.userLogin(email, password)
+            common.reloadPage()
+            articleAPI.createArticle(newArticle)
+            common.reloadPage()
+        })
+
+        it('Should delete article', () => {
+            header.openProfilePage(name)
+            article.deleteArticle(newArticle.title)
+            home.checkTextEmptyArticles()
+        })
     })
 
-    it.only('Should delete article', () => {
-        article.openNewArticlePage()
-        article.addNewArticle(title,description,text,tags)
-
-        header.openProfilePage(name)
-        article.deleteArticle(title)
-        home.checkEmptyArticlesText()
-    })
-
-    it('Should edit article', () => {
-
-    })
+    describe('Should edit article', () => {})
 })
