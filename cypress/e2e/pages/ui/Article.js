@@ -1,5 +1,5 @@
-import { header, profile } from "../../pages"
-import { convertStringToArray, parsedArticleUrl } from "../../../support/utils"
+import { header } from "../../pages"
+import { parsedArticleUrl } from "../../../support/utils"
 
 class Article {
     newArticleUrl = '/#/editor'
@@ -18,18 +18,19 @@ class Article {
 
 
     openNewArticlePage() {
-        cy.get(header.newArticleLocator).click()
+        cy.get(header.menuNewArticleLocator).click()
         cy.url().should('include', this.newArticleUrl)
     }
 
     addNewArticle(title, description, text, tags) {
         const parsedUrl = parsedArticleUrl(title.toLowerCase())
-        const arrayFromTags = convertStringToArray(tags)
 
         cy.get(this.inputNewArticleTitleLoc).type(title)
         cy.get(this.inputNewArticleDescriptionLoc).type(description)
         cy.get(this.inputNewArticleTextLoc).type(text)
-        cy.get(this.inputNewArticleTagsLoc).type(tags)
+        for (const tag of tags) {
+            cy.get(this.inputNewArticleTagsLoc).type(`${tag},`)
+        }
         cy.get(this.btnNewArticlePublishLoc).click()
 
         cy.url().should('include', `${this.articleUrl}${parsedUrl}`)
@@ -37,7 +38,7 @@ class Article {
         cy.get(this.articleTextLoc).should('have.text', text)
         cy.get(`${this.articleTagsListLoc} li`).each((tag) => {
             const tagText = tag.text()
-            expect(arrayFromTags).to.include(tagText)
+            expect(tags).to.include(tagText)
         })
     }
 
@@ -45,7 +46,7 @@ class Article {
         const parsedUrl = parsedArticleUrl(title.toLowerCase())
 
         cy.get(this.articleListItemLocator).should('have.length', 1)
-        cy.get(this.articleListItemLinkLocator).should('contain', title).click()
+        cy.get(this.articleListItemLinkLocator).contains(title).click()
         cy.url().should('include', `${this.articleUrl}${parsedUrl}`)
 
         cy.get(this.buttonDeleteArticleLocator).click()

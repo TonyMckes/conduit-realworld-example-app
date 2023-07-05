@@ -1,5 +1,5 @@
 import 'cypress-plugin-api'
-import {commonApi} from "./CommonAPI"
+import { setItemToLS } from "../../../support/utils"
 
 class LoginAPI {
     userRegister(name, email, password) {
@@ -12,9 +12,7 @@ class LoginAPI {
                     email: email,
                     password: password
                 }
-            },
-            failOnStatusCode: false,
-            alias: 'registerUser'
+            }
         }).then((response) => {
             expect(response.status).to.equal(201)
         })
@@ -43,7 +41,7 @@ class LoginAPI {
                 loggedUser: response.body.user
             }
 
-           commonApi.setItemToLS('loggedUser', loggedUser)
+           setItemToLS('loggedUser', loggedUser)
         })
     }
 }

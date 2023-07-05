@@ -1,9 +1,10 @@
 class Home {
-    emptyArticlesTextLocator = '.home-page .feed-toggle + div'
-    emptyArticlesText = 'Articles not available.'
+    urlHome = '/#/'
+    textEmptyArticlesLocator = '.home-page .feed-toggle + div'
+    textEmptyArticles = 'Articles not available.'
 
-    checkEmptyArticlesText() {
-        cy.get(this.emptyArticlesTextLocator).should('have.text', this.emptyArticlesText)
+    checkTextEmptyArticles() {
+        cy.get(this.textEmptyArticlesLocator).should('have.text', this.textEmptyArticles)
     }
 }
 
