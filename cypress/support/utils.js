@@ -29,6 +29,14 @@ export const getArticleObj = () => {
     }
 }
 
+export const getRandomUser = () => {
+    return {
+        name: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: faker.internet.password()
+    }
+}
+
 export const setItemToLS = (key, value) => {
     cy.window().then((win) => {
         cy.log(JSON.stringify(value))

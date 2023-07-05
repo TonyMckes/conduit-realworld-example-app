@@ -20,6 +20,23 @@ class ArticleAPI {
                 }
             }).then((response) => {
                 expect(response.status).to.equal(201)
+                cy.log('Article title: ', article.title)
+            })
+        })
+    }
+
+    getArticlesCount(userName) {
+        getAuthTokenFromLS('loggedUser').then((token) => {
+            return cy.api({
+                method: 'GET',
+                url: `http://localhost:3000/api/articles?author=${userName}`,
+                headers: {
+                    'Authorization': token
+                }
+            }).then((response) => {
+                expect(response.status).to.equal(200)
+                console.log(response.body)
+                return response.body.articlesCount
             })
         })
     }
