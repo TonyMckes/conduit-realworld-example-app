@@ -20,7 +20,7 @@ class ArticleAPI {
                 }
             }).then((response) => {
                 expect(response.status).to.equal(201)
-                cy.log('Article title: ', article.title)
+                cy.log('ARTICLE TITLE: ', article.title)
             })
         })
     }
@@ -36,6 +36,7 @@ class ArticleAPI {
             }).then((response) => {
                 expect(response.status).to.equal(200)
                 console.log(response.body)
+                console.log('ARTICLE COUNTS VALUE - API.GETARTICLES', response.body.articlesCount)
                 return response.body.articlesCount
             })
         })
