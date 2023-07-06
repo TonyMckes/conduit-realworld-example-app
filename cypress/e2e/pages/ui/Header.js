@@ -17,6 +17,10 @@ class Header {
         cy.get(this.menuLoginLocator).click()
     }
 
+    clickNewArticleItem() {
+        cy.get(this.menuNewArticleLocator).click()
+    }
+
     clickUserDropdownMenu() {
         cy.get(this.menuUserDropdownLocator).click()
     }
@@ -28,16 +32,9 @@ class Header {
     clickUserDropdownMenuLogoutItem() {
         cy.get(this.itemLogoutLocator).click()
     }
-    // TODO
+    // TODO: need to use to further tests
     clickUserDropdownMenuSettingsItem() {
         cy.get(this.itemSettingsLocator).click()
-    }
-
-    openProfilePage(name) {
-        this.clickUserDropdownMenu()
-        this.clickUserDropdownMenuProfileItem()
-        profile.verifyProfileUrl()
-        profile.checkProfileTitle(name)
     }
 
     verifyUserNameIsDisplayed(name, isDisplayed) {

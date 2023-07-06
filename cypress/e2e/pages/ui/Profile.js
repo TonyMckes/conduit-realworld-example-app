@@ -1,16 +1,29 @@
+import { header } from "../index"
+
 class Profile {
     urlProfile = '/#/profile'
-    titleLocator = '.profile-page h4'
-    tabMyArticlesLocator = '.articles-toggle ul li:first-child'
-    tabFavoriteArticlesLocator = '.articles-toggle ul a[href$="/favorites"]'
+    title = '.profile-page h4'
+    tabMyArticles = '.articles-toggle ul li:first-child'
+    tabFavoriteArticles = '.articles-toggle ul a[href$="/favorites"]'
     articleListLocator = '.article-list'
 
     verifyProfileUrl() {
         cy.url().should('include', this.urlProfile)
     }
 
-    checkProfileTitle(name) {
-        cy.get(this.titleLocator).should('have.text', name)
+    verifyProfileTitle(name) {
+        cy.get(this.title).should('have.text', name)
+    }
+
+    verifyTabIsActive(tabLocator) {
+        cy.get(tabLocator).find('a').should('have.class', 'active')
+    }
+
+    openProfilePage(name) {
+        header.clickUserDropdownMenu()
+        header.clickUserDropdownMenuProfileItem()
+        this.verifyProfileUrl()
+        this.verifyProfileTitle(name)
     }
 }
 
