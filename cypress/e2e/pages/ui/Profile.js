@@ -3,7 +3,7 @@ import { header } from "../index"
 class Profile {
     urlProfile = '/#/profile'
     title = '.profile-page h4'
-    tabMyArticles = '.articles-toggle ul li:first-child'
+    tabMyArticles = '.articles-toggle ul li:first-child a'
     tabFavoriteArticles = '.articles-toggle ul a[href$="/favorites"]'
     articleListLocator = '.article-list'
 
@@ -16,7 +16,11 @@ class Profile {
     }
 
     verifyTabIsActive(tabLocator) {
-        cy.get(tabLocator).find('a').should('have.class', 'active')
+        cy.get(tabLocator).should('have.class', 'active')
+    }
+
+    clickArticlesTab(tabLocator) {
+        cy.get(tabLocator).click()
     }
 
     openProfilePage(name) {

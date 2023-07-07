@@ -18,7 +18,8 @@ class Article {
     articleListItemLink = '.preview-link'
     buttonDeleteArticle = '.article-actions button i.ion-trash-a'
     buttonEditArticle = '.article-actions button a[href*="/editor/"]'
-
+    buttonArticleLike = '.article-meta button'
+    noFavoritesMessageT = `doesn't have favorites`
 
     verifyNewArticlePageUrl = () => {
         cy.url().should('include', this.newArticleUrl)
@@ -60,6 +61,10 @@ class Article {
         })
         cy.get(`${fieldLocator}:invalid`).should('have.length', 1)
         this.verifyNewArticlePageUrl()
+    }
+
+    verifyNoFavoritesMessage = () => {
+        cy.get(this.articleListItem).should('contain.text', this.noFavoritesMessageT)
     }
 
     inputArticleTitle = (title) => {
@@ -105,6 +110,10 @@ class Article {
         cy.get(this.buttonEditArticle).click()
     }
 
+    clickArticleLikeButton = () => {
+        cy.get(this.buttonArticleLike).click({ force: true })
+    }
+
     selectArticleByTitle = (title) => {
         this.clickSpecificArticle(title)
         this.verifyArticleUrl(title)
@@ -115,9 +124,15 @@ class Article {
         this.verifyNewArticlePageUrl()
     }
 
-    openMyArticlesTab = (name) => {
+    // TODO: refactor to clickArticlesTab
+    openProfilePageMyArticlesTab = (name) => {
         profile.openProfilePage(name)
         profile.verifyTabIsActive(profile.tabMyArticles)
+    }
+
+    openArticlesTab = (tabLocator) => {
+        profile.clickArticlesTab(tabLocator)
+        profile.verifyTabIsActive(tabLocator)
     }
 
     addNewArticle = (title, description, text, tags) => {
@@ -133,6 +148,18 @@ class Article {
         this.clickDeleteArticleButton()
         cy.on('window:confirm', () => true)
         home.checkTextEmptyArticles()
+    }
+
+    toggleFavoriteArticle = (title, isAlreadyFavorite) => {
+        cy.contains(this.articleListItem, title).within(() => {
+            this.checkIsArticleAlreadyFavorite(isAlreadyFavorite)
+            this.clickArticleLikeButton()
+        })
+    }
+
+    checkIsArticleAlreadyFavorite = (isAlreadyFavorite) => {
+        const condition = isAlreadyFavorite ? 'have.class' : 'not.have.class'
+        cy.get(this.buttonArticleLike).should(condition, 'active')
     }
 
     checkIsArticleExists= (title, isExists) => {

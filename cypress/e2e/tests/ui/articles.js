@@ -1,6 +1,6 @@
-import { common, article, loginAPI } from '../../pages'
+import { common, article, loginAPI, profile } from '../../pages'
 import { name, email, password } from '../../../fixtures/api/userApi.json'
-import { getArticleObj, setUpSeed } from "../../../support/utils"
+import { getArticleObj, setUpSeed, loginViaApiAndReload } from "../../../support/utils"
 import { articleAPI } from "../../pages/api/ArticleAPI"
 
 describe('Articles suite', () => {
@@ -58,7 +58,7 @@ describe('Articles suite', () => {
         })
     })
 
-    describe('should delete the article and check the result via UI', () => { // the test takes 7 second
+    describe('should delete the article and check the result via UI', () => {
         const newArticle = getArticleObj()
 
         beforeEach(() => {
@@ -67,18 +67,18 @@ describe('Articles suite', () => {
             common.reloadPage()
             articleAPI.createArticle(newArticle)
             common.reloadPage()
-            article.openMyArticlesTab(name)
+            article.openProfilePageMyArticlesTab(name)
             article.checkIsArticleExists(newArticle.title, true)
         })
 
         it('should delete the article and check the result via UI', () => {
             article.deleteArticle(newArticle.title)
-            article.openMyArticlesTab(name)
+            article.openProfilePageMyArticlesTab(name)
             article.checkIsArticleExists(newArticle.title, false)
         })
     })
 
-    describe('should delete the article and check the result via API', () => { // the test takes 8 second and fails
+    describe('should delete the article and check the result via API', () => {
         const newArticle = getArticleObj()
 
         beforeEach(() => {
@@ -93,7 +93,7 @@ describe('Articles suite', () => {
             cy.intercept('GET', `**/articles?author=${name}*`).as('getArticles')
             let articlesCount = 0
 
-            article.openMyArticlesTab(name)
+            article.openProfilePageMyArticlesTab(name)
             article.checkIsArticleExists(newArticle.title, true)
             cy.wait('@getArticles').then(({response}) => {
                 expect(response.statusCode).to.eq(200)
@@ -122,13 +122,59 @@ describe('Articles suite', () => {
             common.reloadPage()
             articleAPI.createArticle(newArticle)
             common.reloadPage()
-            article.openMyArticlesTab(name)
+            article.openProfilePageMyArticlesTab(name)
             article.checkIsArticleExists(newArticle.title, true)
         })
 
         it('should edit an existing article', () => {
             article.editArticle(newArticle, newArticle2)
             article.verifyArticleData(newArticle2.title, newArticle2.description, newArticle2.text, newArticle.tags)
+        })
+    })
+
+    describe('should add article to favorite articles list', () => {
+        const newArticle = getArticleObj()
+
+        beforeEach(() => {
+            common.openPage('/')
+            loginAPI.userLogin(email, password)
+            common.reloadPage()
+            articleAPI.createArticle(newArticle)
+            common.reloadPage()
+            article.openProfilePageMyArticlesTab(name)
+            article.checkIsArticleExists(newArticle.title, true)
+            article.openArticlesTab(profile.tabFavoriteArticles)
+            article.checkIsArticleExists(newArticle.title, false)
+            article.openArticlesTab(profile.tabMyArticles)
+        })
+
+        it('should add article to favorite articles list', () => {
+            article.toggleFavoriteArticle(newArticle.title, false)
+            article.openArticlesTab(profile.tabFavoriteArticles)
+            article.checkIsArticleExists(newArticle.title, true)
+        })
+    })
+
+    describe('should delete article from favorite articles list', () => {
+        const newArticle = getArticleObj()
+
+        beforeEach(() => {
+            common.openPage('/')
+            loginAPI.userLogin(email, password)
+            common.reloadPage()
+            articleAPI.createArticle(newArticle)
+            common.reloadPage()
+            article.openProfilePageMyArticlesTab(name)
+            article.checkIsArticleExists(newArticle.title, true)
+            article.toggleFavoriteArticle(newArticle.title, false)
+            article.openArticlesTab(profile.tabFavoriteArticles)
+            article.checkIsArticleExists(newArticle.title, true)
+        })
+
+        it('should add article to favorite articles list', () => {
+            article.toggleFavoriteArticle(newArticle.title, true)
+            common.reloadPage()
+            article.checkIsArticleExists(newArticle.title, false)
         })
     })
 })
