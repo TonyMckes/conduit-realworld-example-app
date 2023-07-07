@@ -1,4 +1,4 @@
-import {header, home, profile} from "../../pages"
+import { header, home, profile } from "../../pages"
 import { parsedArticleUrl } from "../../../support/utils"
 
 class Article {
@@ -9,13 +9,16 @@ class Article {
     inputNewArticleText = '.editor-page form textarea[name="body"]'
     inputNewArticleTags = '.editor-page form input[name="tags"]'
     buttonNewArticlePublish = '.editor-page form button[type="submit"]'
+    buttonNewArticlePublishT = 'Publish Article'
+    buttonUpdateArticleT = 'Update Article'
     articleTitle = '.article-page h1'
     articleText = '.article-page .article-content p'
     articleTagsList = '.article-page .tag-list'
     articleListItem = '.article-preview'
     articleListItemLink = '.preview-link'
     buttonDeleteArticle = '.article-actions button i.ion-trash-a'
-    buttonEditArticle = '.article-actions button a[href$="/editor/evil"]'
+    buttonEditArticle = '.article-actions button a[href*="/editor/"]'
+
 
     verifyNewArticlePageUrl = () => {
         cy.url().should('include', this.newArticleUrl)
@@ -60,25 +63,34 @@ class Article {
     }
 
     inputArticleTitle = (title) => {
-        cy.get(this.inputNewArticleTitle).type(title)
+        cy.get(this.inputNewArticleTitle).clear().type(title)
     }
 
     inputArticleDescription = (description) => {
-        cy.get(this.inputNewArticleDescription).type(description)
+        cy.get(this.inputNewArticleDescription).clear().type(description)
     }
 
     inputArticleText = (text) => {
-        cy.get(this.inputNewArticleText).type(text)
+        cy.get(this.inputNewArticleText).clear().type(text)
     }
 
     inputArticleTags = (tags) => {
+        cy.get(this.inputNewArticleTags).clear()
         for (const tag of tags) {
             cy.get(this.inputNewArticleTags).type(`${tag},`)
         }
     }
 
     clickPublishArticleButton = () => {
-        cy.get(this.buttonNewArticlePublish).click()
+        cy.get(this.buttonNewArticlePublish)
+            .should('have.text', this.buttonNewArticlePublishT)
+            .click()
+    }
+
+    clickUpdateArticleButton = () => {
+        cy.get(this.buttonNewArticlePublish)
+            .should('have.text', this.buttonUpdateArticleT)
+            .click()
     }
 
     clickSpecificArticle = (title) => {
@@ -88,7 +100,7 @@ class Article {
     clickDeleteArticleButton = () => {
         cy.get(this.buttonDeleteArticle).click()
     }
-    // TODO: need to use to further tests
+
     clickEditArticleButton = () => {
         cy.get(this.buttonEditArticle).click()
     }
@@ -141,11 +153,14 @@ class Article {
         }
     }
 
-    // editArticle = (title) => {
-    //     const parsedUrl = parsedArticleUrl(title.toLowerCase())
-    //
-    //     cy.get(this.articleListItem).should('have.length', 1)
-    // }
+    editArticle = (currentArticle, newArticle) => {
+        this.selectArticleByTitle(currentArticle.title)
+        this.clickEditArticleButton()
+        this.inputArticleTitle(newArticle.title)
+        this.inputArticleDescription(newArticle.description)
+        this.inputArticleText(newArticle.text)
+        this.clickUpdateArticleButton()
+    }
 }
 
 export const article = new Article()
