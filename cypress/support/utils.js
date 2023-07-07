@@ -1,4 +1,6 @@
 import { faker } from '@faker-js/faker'
+import {common, loginAPI} from "../e2e/pages";
+import {email, password} from "../fixtures/api/userApi.json";
 
 export const setUpSeed = () => {
     cy.exec('npx -w backend sequelize-cli db:seed:undo:all')
