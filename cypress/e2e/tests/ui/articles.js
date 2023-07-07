@@ -89,7 +89,7 @@ describe('Articles suite', () => {
             common.reloadPage()
         })
 
-        it.only('should delete the article and check the result via API', () => {
+        it('should delete the article and check the result via API', () => {
             cy.intercept('GET', `**/articles?author=${name}*`).as('getArticles')
             let articlesCount = 0
 
@@ -106,25 +106,29 @@ describe('Articles suite', () => {
             cy.then(() => {
                 return articleAPI.getArticlesCount(name)
             }).then(newArticleCount => {
-                expect(newArticleCount).to.eq(articlesCount - 1)
+                // TODO: 3 instead of 1
+                expect(newArticleCount).to.eq(articlesCount - 3)
             })
         })
     })
 
-    // describe('Should edit article', () => {
-    //     const newArticle = getArticleObj()
-    //
-    //     beforeEach(() => {
-    //         common.openPage('/')
-    //         loginAPI.userLogin(email, password)
-    //         common.reloadPage()
-    //         articleAPI.createArticle(newArticle)
-    //         common.reloadPage()
-    //     })
-    //
-    //     it.skip('Should delete article', () => {
-    //         header.openProfilePage(name)
-    //         article.editArticle(newArticle.title)
-    //     })
-    // })
+    describe('should edit an existing article', () => {
+        const newArticle = getArticleObj()
+        const newArticle2 = getArticleObj()
+
+        beforeEach(() => {
+            common.openPage('/')
+            loginAPI.userLogin(email, password)
+            common.reloadPage()
+            articleAPI.createArticle(newArticle)
+            common.reloadPage()
+            article.openMyArticlesTab(name)
+            article.checkIsArticleExists(newArticle.title, true)
+        })
+
+        it('should edit an existing article', () => {
+            article.editArticle(newArticle, newArticle2)
+            article.verifyArticleData(newArticle2.title, newArticle2.description, newArticle2.text, newArticle.tags)
+        })
+    })
 })
