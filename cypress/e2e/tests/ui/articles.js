@@ -1,6 +1,12 @@
-import { common, article, loginAPI, profile } from '../../pages'
+import { common, article, profile } from '../../pages'
 import { name, email, password } from '../../../fixtures/api/userApi.json'
-import { getArticleObj, setUpSeed, loginViaApiAndReload } from "../../../support/utils"
+import {
+    getNewArticle,
+    setUpSeed,
+    loginViaApi,
+    getArticleFieldActions,
+    getArticleFieldSelectors, createArticleViaApi
+} from "../../../support/utils"
 import { articleAPI } from "../../pages/api/ArticleAPI"
 
 describe('Articles suite', () => {
@@ -9,39 +15,26 @@ describe('Articles suite', () => {
     })
 
     describe('should create a new article with filled mandatory fields', () => {
-        const { title, description, text, tags } = getArticleObj()
+        const newArticle = getNewArticle()
 
         beforeEach(() => {
-            common.openPage('/')
-            loginAPI.userLogin(email, password)
-            common.reloadPage()
+            loginViaApi(email, password)
         })
 
         it('should create a new article', () => {
             article.openNewArticlePage()
-            article.addNewArticle(title,description,text,tags)
-            article.verifyArticleData(title, description, text, tags)
+            article.addNewArticle(newArticle)
+            article.verifyArticleData(newArticle)
         })
     })
 
     describe('should not create a new article without filled mandatory fields', () => {
-        const articleObj = getArticleObj()
-        const fieldActions = {
-            title: article.inputArticleTitle,
-            description: article.inputArticleDescription,
-            text: article.inputArticleText
-        }
-        const fieldSelectors = {
-            title: () => article.inputNewArticleTitle,
-            description: () => article.inputNewArticleDescription,
-            text: () => article.inputNewArticleText,
-            tags: () => article.inputNewArticleTags
-        }
+        const newArticle = getNewArticle()
+        const fieldActions = getArticleFieldActions()
+        const fieldSelectors = getArticleFieldSelectors()
 
         beforeEach(() => {
-            common.openPage('/')
-            loginAPI.userLogin(email, password)
-            common.reloadPage()
+            loginViaApi(email, password)
         })
 
         Object.keys(fieldActions).forEach((field) => {
@@ -49,7 +42,7 @@ describe('Articles suite', () => {
                 article.openNewArticlePage()
                 Object.keys(fieldActions).forEach((otherField) => {
                     if (otherField !== field) {
-                        fieldActions[otherField](articleObj[otherField])
+                        fieldActions[otherField](newArticle[otherField])
                     }
                 })
                 article.clickPublishArticleButton()
@@ -59,42 +52,33 @@ describe('Articles suite', () => {
     })
 
     describe('should delete the article and check the result via UI', () => {
-        const newArticle = getArticleObj()
+        const newArticle = getNewArticle()
 
         beforeEach(() => {
-            common.openPage('/')
-            loginAPI.userLogin(email, password)
-            common.reloadPage()
-            articleAPI.createArticle(newArticle)
-            common.reloadPage()
-            article.openProfilePageMyArticlesTab(name)
-            article.checkIsArticleExists(newArticle.title, true)
+            loginViaApi(email, password)
+            createArticleViaApi(newArticle)
+            article.verifyShouldArticleExists(newArticle.title, true)
         })
 
         it('should delete the article and check the result via UI', () => {
             article.deleteArticle(newArticle.title)
-            article.openProfilePageMyArticlesTab(name)
-            article.checkIsArticleExists(newArticle.title, false)
+            article.verifyShouldArticleExists(newArticle.title, false)
         })
     })
 
     describe('should delete the article and check the result via API', () => {
-        const newArticle = getArticleObj()
+        const newArticle = getNewArticle()
 
         beforeEach(() => {
-            common.openPage('/')
-            loginAPI.userLogin(email, password)
-            common.reloadPage()
-            articleAPI.createArticle(newArticle)
-            common.reloadPage()
+            loginViaApi(email, password)
+            createArticleViaApi(newArticle)
         })
 
         it('should delete the article and check the result via API', () => {
             cy.intercept('GET', `**/articles?author=${name}*`).as('getArticles')
             let articlesCount = 0
 
-            article.openProfilePageMyArticlesTab(name)
-            article.checkIsArticleExists(newArticle.title, true)
+            article.verifyShouldArticleExists(newArticle.title, true)
             cy.wait('@getArticles').then(({response}) => {
                 expect(response.statusCode).to.eq(200)
                 articlesCount = response.body.articlesCount
@@ -113,36 +97,28 @@ describe('Articles suite', () => {
     })
 
     describe('should edit an existing article', () => {
-        const newArticle = getArticleObj()
-        const newArticle2 = getArticleObj()
+        const newArticle = getNewArticle()
+        const newArticle2 = getNewArticle()
 
         beforeEach(() => {
-            common.openPage('/')
-            loginAPI.userLogin(email, password)
-            common.reloadPage()
-            articleAPI.createArticle(newArticle)
-            common.reloadPage()
-            article.openProfilePageMyArticlesTab(name)
-            article.checkIsArticleExists(newArticle.title, true)
+            loginViaApi(email, password)
+            createArticleViaApi(newArticle)
+            article.verifyShouldArticleExists(newArticle.title, true)
         })
 
         it('should edit an existing article', () => {
             article.editArticle(newArticle, newArticle2)
-            article.verifyArticleData(newArticle2.title, newArticle2.description, newArticle2.text, newArticle.tags)
+            article.verifyArticleData({...newArticle2, tags: newArticle.tags})
         })
     })
 
     describe('should add article to favorite articles list', () => {
-        const newArticle = getArticleObj()
+        const newArticle = getNewArticle()
 
         beforeEach(() => {
-            common.openPage('/')
-            loginAPI.userLogin(email, password)
-            common.reloadPage()
-            articleAPI.createArticle(newArticle)
-            common.reloadPage()
-            article.openProfilePageMyArticlesTab(name)
-            article.checkIsArticleExists(newArticle.title, true)
+            loginViaApi(email, password)
+            createArticleViaApi(newArticle)
+            article.verifyShouldArticleExists(newArticle.title, true)
             article.openArticlesTab(profile.tabFavoriteArticles)
             article.checkIsArticleExists(newArticle.title, false)
             article.openArticlesTab(profile.tabMyArticles)
@@ -156,16 +132,12 @@ describe('Articles suite', () => {
     })
 
     describe('should delete article from favorite articles list', () => {
-        const newArticle = getArticleObj()
+        const newArticle = getNewArticle()
 
         beforeEach(() => {
-            common.openPage('/')
-            loginAPI.userLogin(email, password)
-            common.reloadPage()
-            articleAPI.createArticle(newArticle)
-            common.reloadPage()
-            article.openProfilePageMyArticlesTab(name)
-            article.checkIsArticleExists(newArticle.title, true)
+            loginViaApi(email, password)
+            createArticleViaApi(newArticle)
+            article.verifyShouldArticleExists(newArticle.title, true)
             article.toggleFavoriteArticle(newArticle.title, false)
             article.openArticlesTab(profile.tabFavoriteArticles)
             article.checkIsArticleExists(newArticle.title, true)
