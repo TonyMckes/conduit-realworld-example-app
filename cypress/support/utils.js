@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
-import {common, loginAPI} from "../e2e/pages";
-import {email, password} from "../fixtures/api/userApi.json";
+import { article, common, loginAPI } from "../e2e/pages";
+import { articleAPI } from "../e2e/pages/api/ArticleAPI";
 
 export const setUpSeed = () => {
     cy.exec('npx -w backend sequelize-cli db:seed:undo:all')
@@ -18,7 +18,7 @@ export const getUniqueUserName = () => {
 
 export const parsedArticleUrl = (title) => title.replace(/\s/g, '-')
 
-export const getArticleObj = () => {
+export const getNewArticle = () => {
     return {
         title: faker.word.noun(),
         description: faker.lorem.sentence(),
@@ -28,6 +28,23 @@ export const getArticleObj = () => {
             faker.word.adjective(),
             faker.word.adjective()
             ]
+    }
+}
+
+export const getArticleFieldActions = () => {
+    return {
+        title: article.inputArticleTitle,
+        description: article.inputArticleDescription,
+        text: article.inputArticleText
+    }
+}
+
+export const getArticleFieldSelectors = () => {
+    return {
+        title: () => article.inputNewArticleTitle,
+        description: () => article.inputNewArticleDescription,
+        text: () => article.inputNewArticleText,
+        tags: () => article.inputNewArticleTags
     }
 }
 
@@ -52,4 +69,15 @@ export const getAuthTokenFromLS = (key) => {
         cy.log(item.headers.Authorization)
         return cy.wrap(item.headers.Authorization)
     })
+}
+
+export const loginViaApi = (email, password) => {
+    common.openPage('/')
+    loginAPI.userLogin(email, password)
+    common.reloadPage()
+}
+
+export const createArticleViaApi = (articleData) => {
+    articleAPI.createArticle(articleData)
+    common.reloadPage()
 }

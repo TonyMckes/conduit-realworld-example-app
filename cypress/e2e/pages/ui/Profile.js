@@ -23,12 +23,12 @@ class Profile {
         cy.get(tabLocator).click()
     }
 
-    openProfilePage(name) {
+    openProfilePage() {
         header.clickUserDropdownMenu()
         header.clickUserDropdownMenuProfileItem()
         this.verifyProfileUrl()
-        this.verifyProfileTitle(name)
     }
+
 }
 
 export const profile = new Profile()

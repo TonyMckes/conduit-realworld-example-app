@@ -45,11 +45,16 @@ class Article {
         })
     }
 
-    verifyArticleData = (title, description, text, tags) => {
-        this.verifyArticleUrl(title)
-        this.verifyArticleTitle(title)
-        this.verifyArticleText(text)
-        this.verifyArticleTags(tags)
+    verifyArticleData = (articleData) => {
+        this.verifyArticleUrl(articleData.title)
+        this.verifyArticleTitle(articleData.title)
+        this.verifyArticleText(articleData.text)
+        this.verifyArticleTags(articleData.tags)
+    }
+
+    verifyShouldArticleExists = (articleTitle, is) => {
+        this.openProfilePageMyArticlesTab()
+        this.checkIsArticleExists(articleTitle, is)
     }
 
     verifyErrorArticleCreationMessage = (fieldLocator) => {
@@ -124,9 +129,8 @@ class Article {
         this.verifyNewArticlePageUrl()
     }
 
-    // TODO: refactor to clickArticlesTab
-    openProfilePageMyArticlesTab = (name) => {
-        profile.openProfilePage(name)
+    openProfilePageMyArticlesTab = () => {
+        profile.openProfilePage()
         profile.verifyTabIsActive(profile.tabMyArticles)
     }
 
@@ -135,11 +139,11 @@ class Article {
         profile.verifyTabIsActive(tabLocator)
     }
 
-    addNewArticle = (title, description, text, tags) => {
-        this.inputArticleTitle(title)
-        this.inputArticleDescription(description)
-        this.inputArticleText(text)
-        this.inputArticleTags(tags)
+    addNewArticle = (articleData) => {
+        this.inputArticleTitle(articleData.title)
+        this.inputArticleDescription(articleData.description)
+        this.inputArticleText(articleData.text)
+        this.inputArticleTags(articleData.tags)
         this.clickPublishArticleButton()
     }
 
@@ -148,6 +152,15 @@ class Article {
         this.clickDeleteArticleButton()
         cy.on('window:confirm', () => true)
         home.checkTextEmptyArticles()
+    }
+
+    editArticle = (currentArticle, newArticle) => {
+        this.selectArticleByTitle(currentArticle.title)
+        this.clickEditArticleButton()
+        this.inputArticleTitle(newArticle.title)
+        this.inputArticleDescription(newArticle.description)
+        this.inputArticleText(newArticle.text)
+        this.clickUpdateArticleButton()
     }
 
     toggleFavoriteArticle = (title, isAlreadyFavorite) => {
@@ -163,6 +176,7 @@ class Article {
     }
 
     checkIsArticleExists= (title, isExists) => {
+        cy.log(title)
         cy.log('Article title: ', title)
         if (isExists) {
             cy.get(this.articleListItem)
@@ -180,14 +194,6 @@ class Article {
         }
     }
 
-    editArticle = (currentArticle, newArticle) => {
-        this.selectArticleByTitle(currentArticle.title)
-        this.clickEditArticleButton()
-        this.inputArticleTitle(newArticle.title)
-        this.inputArticleDescription(newArticle.description)
-        this.inputArticleText(newArticle.text)
-        this.clickUpdateArticleButton()
-    }
 }
 
 export const article = new Article()
