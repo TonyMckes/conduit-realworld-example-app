@@ -1,152 +1,153 @@
 import { common, article, profile } from '../../pages'
 import { name, email, password } from '../../../fixtures/api/userApi.json'
 import {
-    getNewArticle,
-    setUpSeed,
-    loginViaApi,
-    getArticleFieldActions,
-    getArticleFieldSelectors, createArticleViaApi
-} from "../../../support/utils"
-import { articleAPI } from "../../pages/api/ArticleAPI"
+  getNewArticle,
+  setUpSeed,
+  loginViaApi,
+  getArticleFieldActions,
+  getArticleFieldSelectors,
+  createArticleViaApi
+} from '../../../support/utils'
+import { articleAPI } from '../../pages/api/ArticleAPI'
 
 describe('Articles suite', () => {
-    before(() => {
-        setUpSeed()
+  before(() => {
+    setUpSeed()
+  })
+
+  describe('should create a new article with filled mandatory fields', () => {
+    const newArticle = getNewArticle()
+
+    beforeEach(() => {
+      loginViaApi(email, password)
     })
 
-    describe('should create a new article with filled mandatory fields', () => {
-        const newArticle = getNewArticle()
+    it('should create a new article', () => {
+      article.openNewArticlePage()
+      article.addNewArticle(newArticle)
+      article.verifyArticleData(newArticle)
+    })
+  })
 
-        beforeEach(() => {
-            loginViaApi(email, password)
-        })
+  describe('should not create a new article without filled mandatory fields', () => {
+    const newArticle = getNewArticle()
+    const fieldActions = getArticleFieldActions()
+    const fieldSelectors = getArticleFieldSelectors()
 
-        it('should create a new article', () => {
-            article.openNewArticlePage()
-            article.addNewArticle(newArticle)
-            article.verifyArticleData(newArticle)
-        })
+    beforeEach(() => {
+      loginViaApi(email, password)
     })
 
-    describe('should not create a new article without filled mandatory fields', () => {
-        const newArticle = getNewArticle()
-        const fieldActions = getArticleFieldActions()
-        const fieldSelectors = getArticleFieldSelectors()
-
-        beforeEach(() => {
-            loginViaApi(email, password)
+    Object.keys(fieldActions).forEach((field) => {
+      it(`should not create a new article without filled mandatory ${field} field`, () => {
+        article.openNewArticlePage()
+        Object.keys(fieldActions).forEach((otherField) => {
+          if (otherField !== field) {
+            fieldActions[otherField](newArticle[otherField])
+          }
         })
+        article.clickPublishArticleButton()
+        article.verifyErrorArticleCreationMessage(fieldSelectors[field]())
+      })
+    })
+  })
 
-        Object.keys(fieldActions).forEach((field) => {
-            it(`should not create a new article without filled mandatory ${field} field`, () => {
-                article.openNewArticlePage()
-                Object.keys(fieldActions).forEach((otherField) => {
-                    if (otherField !== field) {
-                        fieldActions[otherField](newArticle[otherField])
-                    }
-                })
-                article.clickPublishArticleButton()
-                article.verifyErrorArticleCreationMessage(fieldSelectors[field]())
-            })
-        })
+  describe('should delete the article and check the result via UI', () => {
+    const newArticle = getNewArticle()
+
+    beforeEach(() => {
+      loginViaApi(email, password)
+      createArticleViaApi(newArticle)
+      article.verifyShouldArticleExists(newArticle.title, true)
     })
 
-    describe('should delete the article and check the result via UI', () => {
-        const newArticle = getNewArticle()
+    it('should delete the article and check the result via UI', () => {
+      article.deleteArticle(newArticle.title)
+      article.verifyShouldArticleExists(newArticle.title, false)
+    })
+  })
 
-        beforeEach(() => {
-            loginViaApi(email, password)
-            createArticleViaApi(newArticle)
-            article.verifyShouldArticleExists(newArticle.title, true)
-        })
+  describe('should delete the article and check the result via API', () => {
+    const newArticle = getNewArticle()
 
-        it('should delete the article and check the result via UI', () => {
-            article.deleteArticle(newArticle.title)
-            article.verifyShouldArticleExists(newArticle.title, false)
-        })
+    beforeEach(() => {
+      loginViaApi(email, password)
+      createArticleViaApi(newArticle)
     })
 
-    describe('should delete the article and check the result via API', () => {
-        const newArticle = getNewArticle()
+    it('should delete the article and check the result via API', () => {
+      cy.intercept('GET', `**/articles?author=${name}*`).as('getArticles')
+      let articlesCount = 0
 
-        beforeEach(() => {
-            loginViaApi(email, password)
-            createArticleViaApi(newArticle)
-        })
+      article.verifyShouldArticleExists(newArticle.title, true)
+      cy.wait('@getArticles').then(({ response }) => {
+        expect(response.statusCode).to.eq(200)
+        articlesCount = response.body.articlesCount
+        console.log('ARTICLE COUNTS VARIABLE VALUE', articlesCount)
+        cy.log('ARTICLE COUNTS VARIABLE VALUE', articlesCount)
+      })
+      article.deleteArticle(newArticle.title)
 
-        it('should delete the article and check the result via API', () => {
-            cy.intercept('GET', `**/articles?author=${name}*`).as('getArticles')
-            let articlesCount = 0
+      cy.then(() => {
+        return articleAPI.getArticlesCount(name)
+      }).then((newArticleCount) => {
+        // TODO: 3 instead of 1
+        expect(newArticleCount).to.eq(articlesCount - 3)
+      })
+    })
+  })
 
-            article.verifyShouldArticleExists(newArticle.title, true)
-            cy.wait('@getArticles').then(({response}) => {
-                expect(response.statusCode).to.eq(200)
-                articlesCount = response.body.articlesCount
-                console.log('ARTICLE COUNTS VARIABLE VALUE', articlesCount)
-                cy.log('ARTICLE COUNTS VARIABLE VALUE', articlesCount)
-            })
-            article.deleteArticle(newArticle.title)
+  describe('should edit an existing article', () => {
+    const newArticle = getNewArticle()
+    const newArticle2 = getNewArticle()
 
-            cy.then(() => {
-                return articleAPI.getArticlesCount(name)
-            }).then(newArticleCount => {
-                // TODO: 3 instead of 1
-                expect(newArticleCount).to.eq(articlesCount - 3)
-            })
-        })
+    beforeEach(() => {
+      loginViaApi(email, password)
+      createArticleViaApi(newArticle)
+      article.verifyShouldArticleExists(newArticle.title, true)
     })
 
-    describe('should edit an existing article', () => {
-        const newArticle = getNewArticle()
-        const newArticle2 = getNewArticle()
+    it('should edit an existing article', () => {
+      article.editArticle(newArticle, newArticle2)
+      article.verifyArticleData({ ...newArticle2, tags: newArticle.tags })
+    })
+  })
 
-        beforeEach(() => {
-            loginViaApi(email, password)
-            createArticleViaApi(newArticle)
-            article.verifyShouldArticleExists(newArticle.title, true)
-        })
+  describe('should add article to favorite articles list', () => {
+    const newArticle = getNewArticle()
 
-        it('should edit an existing article', () => {
-            article.editArticle(newArticle, newArticle2)
-            article.verifyArticleData({...newArticle2, tags: newArticle.tags})
-        })
+    beforeEach(() => {
+      loginViaApi(email, password)
+      createArticleViaApi(newArticle)
+      article.verifyShouldArticleExists(newArticle.title, true)
+      article.openArticlesTab(profile.tabFavoriteArticles)
+      article.checkIsArticleExists(newArticle.title, false)
+      article.openArticlesTab(profile.tabMyArticles)
     })
 
-    describe('should add article to favorite articles list', () => {
-        const newArticle = getNewArticle()
+    it('should add article to favorite articles list', () => {
+      article.toggleFavoriteArticle(newArticle.title, false)
+      article.openArticlesTab(profile.tabFavoriteArticles)
+      article.checkIsArticleExists(newArticle.title, true)
+    })
+  })
 
-        beforeEach(() => {
-            loginViaApi(email, password)
-            createArticleViaApi(newArticle)
-            article.verifyShouldArticleExists(newArticle.title, true)
-            article.openArticlesTab(profile.tabFavoriteArticles)
-            article.checkIsArticleExists(newArticle.title, false)
-            article.openArticlesTab(profile.tabMyArticles)
-        })
+  describe('should delete article from favorite articles list', () => {
+    const newArticle = getNewArticle()
 
-        it('should add article to favorite articles list', () => {
-            article.toggleFavoriteArticle(newArticle.title, false)
-            article.openArticlesTab(profile.tabFavoriteArticles)
-            article.checkIsArticleExists(newArticle.title, true)
-        })
+    beforeEach(() => {
+      loginViaApi(email, password)
+      createArticleViaApi(newArticle)
+      article.verifyShouldArticleExists(newArticle.title, true)
+      article.toggleFavoriteArticle(newArticle.title, false)
+      article.openArticlesTab(profile.tabFavoriteArticles)
+      article.checkIsArticleExists(newArticle.title, true)
     })
 
-    describe('should delete article from favorite articles list', () => {
-        const newArticle = getNewArticle()
-
-        beforeEach(() => {
-            loginViaApi(email, password)
-            createArticleViaApi(newArticle)
-            article.verifyShouldArticleExists(newArticle.title, true)
-            article.toggleFavoriteArticle(newArticle.title, false)
-            article.openArticlesTab(profile.tabFavoriteArticles)
-            article.checkIsArticleExists(newArticle.title, true)
-        })
-
-        it('should add article to favorite articles list', () => {
-            article.toggleFavoriteArticle(newArticle.title, true)
-            common.reloadPage()
-            article.checkIsArticleExists(newArticle.title, false)
-        })
+    it('should add article to favorite articles list', () => {
+      article.toggleFavoriteArticle(newArticle.title, true)
+      common.reloadPage()
+      article.checkIsArticleExists(newArticle.title, false)
     })
+  })
 })
