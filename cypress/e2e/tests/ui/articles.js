@@ -27,6 +27,10 @@ describe('Articles suite', () => {
       article.addNewArticle(newArticle)
       article.verifyArticleData(newArticle)
     })
+
+    afterEach(() => {
+      articleAPI.deleteArticle(newArticle)
+    })
   })
 
   describe('should not create a new article without filled mandatory fields', () => {
@@ -111,6 +115,10 @@ describe('Articles suite', () => {
       article.editArticle(newArticle, newArticle2)
       article.verifyArticleData({ ...newArticle2, tags: newArticle.tags })
     })
+
+    afterEach(() => {
+      articleAPI.deleteArticle(newArticle2)
+    })
   })
 
   describe('should add article to favorite articles list', () => {
@@ -130,6 +138,10 @@ describe('Articles suite', () => {
       article.openArticlesTab(profile.tabFavoriteArticles)
       article.checkIsArticleExists(newArticle.title, true)
     })
+
+    afterEach(() => {
+      articleAPI.deleteArticle(newArticle)
+    })
   })
 
   describe('should delete article from favorite articles list', () => {
@@ -148,6 +160,10 @@ describe('Articles suite', () => {
       article.toggleFavoriteArticle(newArticle.title, true)
       common.reloadPage()
       article.checkIsArticleExists(newArticle.title, false)
+    })
+
+    afterEach(() => {
+      articleAPI.deleteArticle(newArticle)
     })
   })
 })

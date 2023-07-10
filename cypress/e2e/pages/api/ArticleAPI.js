@@ -27,6 +27,24 @@ class ArticleAPI {
     })
   }
 
+    deleteArticle(article) {
+        getAuthTokenFromLS('loggedUser').then((token) => {
+            return cy
+                .api({
+                    method: 'DELETE',
+                    url: `http://localhost:3000/api/articles/${article.title}`,
+                    headers: {
+                        Authorization: token
+                    }
+                })
+                .then((response) => {
+                    expect(response.status).to.equal(200)
+                    expect(response.body.message.body[0]).to.equal('Article deleted successfully')
+                    cy.log('ARTICLE TITLE: ', article.title)
+                })
+        })
+    }
+
   getArticlesCount(userName) {
     getAuthTokenFromLS('loggedUser').then((token) => {
       return cy
