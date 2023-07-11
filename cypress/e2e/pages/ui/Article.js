@@ -20,6 +20,7 @@ class Article {
   buttonEditArticle = '.article-actions button a[href*="/editor/"]'
   buttonArticleLike = '.article-meta button'
   noFavoritesMessageT = `doesn't have favorites`
+  noArticlesMessageT = `doesn't have articles`
 
   verifyNewArticlePageUrl = () => {
     cy.url().should('include', this.newArticleUrl)
@@ -72,6 +73,10 @@ class Article {
 
   verifyNoFavoritesMessage = () => {
     cy.get(this.articleListItem).should('contain.text', this.noFavoritesMessageT)
+  }
+
+  verifyNoArticleMessages = () => {
+    cy.get(this.articleListItem).should('contain.text', this.noArticlesMessageT)
   }
 
   inputArticleTitle = (title) => {

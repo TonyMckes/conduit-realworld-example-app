@@ -27,23 +27,23 @@ class ArticleAPI {
     })
   }
 
-    deleteArticle(article) {
-        getAuthTokenFromLS('loggedUser').then((token) => {
-            return cy
-                .api({
-                    method: 'DELETE',
-                    url: `http://localhost:3000/api/articles/${article.title}`,
-                    headers: {
-                        Authorization: token
-                    }
-                })
-                .then((response) => {
-                    expect(response.status).to.equal(200)
-                    expect(response.body.message.body[0]).to.equal('Article deleted successfully')
-                    cy.log('ARTICLE TITLE: ', article.title)
-                })
+  deleteArticle(article) {
+    getAuthTokenFromLS('loggedUser').then((token) => {
+      return cy
+        .api({
+          method: 'DELETE',
+          url: `http://localhost:3000/api/articles/${article.title}`,
+          headers: {
+            Authorization: token
+          }
         })
-    }
+        .then((response) => {
+          expect(response.status).to.equal(200)
+          expect(response.body.message.body[0]).to.equal('Article deleted successfully')
+          cy.log('ARTICLE TITLE: ', article.title)
+        })
+    })
+  }
 
   getArticlesCount(userName) {
     getAuthTokenFromLS('loggedUser').then((token) => {
@@ -58,7 +58,7 @@ class ArticleAPI {
         .then((response) => {
           expect(response.status).to.equal(200)
           console.log(response.body)
-          console.log('ARTICLE COUNTS VALUE - API.GETARTICLES', response.body.articlesCount)
+          console.log('ARTICLE COUNTS VALUE - API.GET_ARTICLES', response.body.articlesCount)
           return response.body.articlesCount
         })
     })

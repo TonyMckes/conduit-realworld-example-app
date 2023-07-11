@@ -12,7 +12,20 @@ import { articleAPI } from '../../pages/api/ArticleAPI'
 
 describe('Articles suite', () => {
   before(() => {
-    setUpSeed()
+    setUpSeed(['add-user.js'])
+  })
+
+  describe('should see empty articles and favorite messages', () => {
+    beforeEach(() => {
+      loginViaApi(email, password)
+    })
+
+    it('should see empty articles and favorite messages', () => {
+      profile.openProfilePage()
+      article.verifyNoArticleMessages()
+      article.openArticlesTab(profile.tabFavoriteArticles)
+      article.verifyNoFavoritesMessage()
+    })
   })
 
   describe('should create a new article with filled mandatory fields', () => {
