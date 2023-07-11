@@ -2,9 +2,11 @@ import { faker } from '@faker-js/faker'
 import { article, common, loginAPI } from '../e2e/pages'
 import { articleAPI } from '../e2e/pages/api/ArticleAPI'
 
-export const setUpSeed = () => {
-  cy.exec('npx -w backend sequelize-cli db:seed:undo:all').its('code').should('eq', 0)
-  cy.exec('npx -w backend sequelize-cli db:seed:all').its('code').should('eq', 0)
+export const setUpSeed = (seedFiles) => {
+  cy.exec(`npx -w backend sequelize-cli db:seed:undo:all`).its('code').should('eq', 0)
+  seedFiles.forEach((seedFile) => {
+    cy.exec(`npx -w backend sequelize-cli db:seed --seed ${seedFile}`).its('code').should('eq', 0)
+  })
 }
 
 export const getUniqueUserName = () => {

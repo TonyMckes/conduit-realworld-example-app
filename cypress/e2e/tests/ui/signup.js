@@ -8,7 +8,7 @@ describe('Sign up - sign in suite', () => {
   const { name: randomName, email: randomEmail, password: randomPassword } = getRandomUser()
 
   before(() => {
-    setUpSeed()
+    setUpSeed(['add-user.js'])
   })
 
   beforeEach(() => {
