@@ -1,4 +1,4 @@
-import { common, article, profile } from '../../pages'
+import { common, article, profile, home } from '../../pages'
 import { name, email, password } from '../../../fixtures/api/userApi.json'
 import {
   getNewArticle,
@@ -173,6 +173,26 @@ describe('Articles suite', () => {
       article.toggleFavoriteArticle(newArticle.title, true)
       common.reloadPage()
       article.checkIsArticleExists(newArticle.title, false)
+    })
+
+    afterEach(() => {
+      articleAPI.deleteArticle(newArticle)
+    })
+  })
+
+  describe('should create a new article and check it is displayed on home page global feed tab', () => {
+    const newArticle = getNewArticle()
+
+    beforeEach(() => {
+      loginViaApi(email, password)
+      createArticleViaApi(newArticle)
+    })
+
+    it('should create a new article and check it is displayed on home page global feed tab', () => {
+      home.openHomePage()
+      home.verifyNoArticleMessages()
+      home.openHomeArticlesTab(home.tabGlobalFeed)
+      article.checkIsArticleExists(newArticle.title, true)
     })
 
     afterEach(() => {
