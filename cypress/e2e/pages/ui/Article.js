@@ -154,7 +154,7 @@ class Article {
     this.selectArticleByTitle(title)
     this.clickDeleteArticleButton()
     cy.on('window:confirm', () => true)
-    home.checkTextEmptyArticles()
+    home.verifyNoArticleMessages()
   }
 
   editArticle = (currentArticle, newArticle) => {
