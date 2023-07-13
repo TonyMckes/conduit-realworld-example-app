@@ -199,4 +199,46 @@ describe('Articles suite', () => {
       articleAPI.deleteArticle(newArticle)
     })
   })
+
+  describe('should verify no articles with specific tag "react"', () => {
+    let newArticle = getNewArticle()
+    newArticle = { ...newArticle, tags: ['red', 'green', 'yellow']}
+
+    beforeEach(() => {
+      loginViaApi(email, password)
+      createArticleViaApi(newArticle)
+    })
+
+    it('should verify no articles with specific tag', () => {
+      home.openHomePage()
+      home.clickSpecificTag('react')
+      home.verifyTabIsActive(home.tabTag)
+      home.verifyNoArticleMessages()
+    })
+
+    afterEach(() => {
+      articleAPI.deleteArticle(newArticle)
+    })
+  })
+
+  describe('should verify the article with specific tag', () => {
+    let newArticle = getNewArticle()
+    newArticle = { ...newArticle, tags: ['react', 'green', 'yellow']}
+
+    beforeEach(() => {
+      loginViaApi(email, password)
+      createArticleViaApi(newArticle)
+    })
+
+    it('should verify no articles with specific tag "react"', () => {
+      home.openHomePage()
+      home.clickSpecificTag('react')
+      home.verifyTabIsActive(home.tabTag)
+      article.checkIsArticleExists(newArticle.title, true)
+    })
+
+    afterEach(() => {
+      articleAPI.deleteArticle(newArticle)
+    })
+  })
 })

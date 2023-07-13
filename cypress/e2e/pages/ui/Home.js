@@ -21,8 +21,17 @@ class Home {
     cy.get(tabLocator).should('have.class', 'active')
   }
 
+  verifyTagIsVisibleInPopularTags = (tagLocator) => {
+    cy.get(home.tagButton).contains(tagLocator).should('be.visible').as('tag')
+  }
+
   clickArticlesTab = (tabLocator) => {
     cy.get(tabLocator).click()
+  }
+
+  clickSpecificTag = (tagLocator) => {
+    this.verifyTagIsVisibleInPopularTags(tagLocator)
+    cy.get('@tag').click()
   }
 
   openHomeArticlesTab = (tabLocator) => {
