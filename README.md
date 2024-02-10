@@ -113,11 +113,13 @@ To run the project, follow these steps:
 
 #### Running Tests
 
-To run tests, simply run the following command:
+To start e2e-testing, simply run the tool.
 
 ```bash
-npm run test
+npm run cypress:open
 ```
+
+You can find some cypress example tests in `cypress/e2e/` to learn from.
 
 #### Production
 
