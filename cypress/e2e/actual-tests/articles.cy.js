@@ -26,5 +26,9 @@ describe('Adding article', () => {
         cy.get('input[name="tags"').type(tags);
 
         cy.contains("button", "Publish Article").click()
+        
+        cy.get('h1').should('have.text', title);
+        cy.get('p').should('have.text', content);
+
     })
 })
