@@ -10,28 +10,36 @@ const user = {
   
   describe("Conduit testing", () => {
     beforeEach(() => {
+      let token = "";
       // Clears the database and creates a new user
       cy.request("GET", "http://localhost:3001/api/testing/reset/");
-      cy.request("POST", "http://localhost:3001/api/users/", user);
-      cy.visit("http://localhost:3000");
+      //cy.request("POST", "http://localhost:3001/api/users/", user);
+      //cy.visit("http://localhost:3000");
 
       //Posts an article for testing
-      cy.request({
-        method: "POST",
-        url: "http://localhost:3001/api/articles/",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
-        },
-        body: {
-          article: {
-            title: "Test article title",
-            description: "We're testing :)",
-            body: "Here's some text",
-            tagList: ["tag", "tags"],
-          },
-        },
-      });
+      cy.request("POST", "http://localhost:3001/api/users/", user).then(
+        (response) => {
+          console.log(response);
+          token = response.body.user.token;
+          console.log(token);
+          cy.request({
+            method: "POST",
+            url: "http://localhost:3001/api/articles/",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Token ${token}`,
+            },
+            body: {
+              article: {
+                title: "Test title",
+                description: "We're testing :)",
+                body: "Here's some text",
+                tagList: ["tag", "tags"],
+              },
+            },
+          });
+        }
+      );
     });
   
   
@@ -43,7 +51,7 @@ const user = {
   
         const email = user.user.email;
         const password = user.user.password;
-  
+
         cy.contains("Sign in");
   
         cy.get('input[name="email"]').type(email);
@@ -63,13 +71,37 @@ const user = {
       it("Delete article", () => {
         cy.contains("Global Feed").click();
         cy.contains("Test title").click();
-        cy.get(".nav-item").contains("Delete Article").click(); // Delete an article
+
+        // Delete an article
+        cy.contains("Delete Article").click(); 
+
+        //Checking the window alert box
+        cy.on('window:alert', (text) => {
+          expect(text).to.contains('This is an alert!');
+          cy.contains("OK").click();
+        });
+
+        // Go to own profile and check that the article is no longer there
+        cy.contains(user.user.username).click();
+        cy.contains("Profile").click();
+        cy.contains('Test title').should('not.exist');
+
       });
   
-      //it("Add a comment", () => {
-      //  cy.contains("conduit");
-      //});
+      //Adds a comment to an article
+      it("Add a comment", () => {
+        const comment = 'This is a comment.';
 
+        //Navigates to an article
+        cy.contains("Global Feed").click();
+        cy.contains("Read more...").click();
+
+        //Adds a comment to the article and checks that it has been added
+        cy.get('[placeholder="Write a comment..."]').type(comment);
+        cy.contains("Post Comment").click();
+        cy.contains("This is a comment.").should("exist");
+
+      });
     });
   });
   
