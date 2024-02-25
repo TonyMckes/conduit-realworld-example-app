@@ -86,5 +86,18 @@ describe("Conduit testing", () => {
       // Assert that a favorited article is found
       cy.get(".article-preview").should("exist");
     });
+
+    it("Allows following authors", () => {
+      cy.contains("Global Feed").click();
+      cy.contains("Read more...").click();
+
+      cy.contains("Follow").click(); // Follow an author
+
+      cy.get("button").should("contain", "Unfollow");
+
+      cy.contains("Home").click();
+
+      cy.get(".article-preview").should("exist");
+    });
   });
 });
