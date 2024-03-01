@@ -1,0 +1,13 @@
+version: "1"
+volumes:
+  psql:
+services:
+  psql:
+    image: postgres # latest version
+    environment:
+      POSTGRES_USER: ${TEST_DB_USERNAME}
+      POSTGRES_PASSWORD: ${TEST_DB_PASSWORD} # ONLY in development !
+    # volumes:
+    #   - psql:/var/lib/postgresql/data # save data between restarts
+    ports:
+      - 5432:5432

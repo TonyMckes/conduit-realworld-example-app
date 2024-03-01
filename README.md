@@ -22,7 +22,7 @@ Before you run the project, make sure that you have the following tools and soft
 - [Git](https://git-scm.com/downloads)
 - [Node.js](https://nodejs.org/en/download/) `v18.11.0+`
 - [NPM](https://www.npmjs.com/) (usually included with Node.js)
-- SQL database
+- Docker
 
 ### Installation
 
@@ -31,13 +31,13 @@ To install the project on your computer, follow these steps:
 1. Clone the repository to your local machine.
 
    ```bash
-   git clone https://github.com/TonyMckes/conduit-realworld-example-app.git
+   git clone https://github.com/Toopemus/conduit-realworld-e2e-testing.git
    ```
 
 2. Navigate to the project directory.
 
    ```bash
-   cd conduit-realworld-example-app
+   cd conduit-realworld-e2e-testing
    ```
 
 3. Install project dependencies by running the command:
@@ -49,9 +49,9 @@ To install the project on your computer, follow these steps:
 ### Configuration
 
 1. Create a `.env` file in the root directory of the project
-2. Add the required environment variables as specified in the [`.env.example`](backend/.env.example) file
-3. (Optional) update the Sequelize configuration parameters in the [`config.js`](backend/config/config.js) file
-4. If you are **not** using PostgreSQL, you may also have to install the driver for your database:
+2. Copy the environment variables as specified in the [`.env.example`](backend/.env.example) file
+3. ~~(Optional) update the Sequelize configuration parameters in the [`config.js`](backend/config/config.js) file~~
+4. ~~If you are **not** using PostgreSQL, you may also have to install the driver for your database:~~
 
    <details>
    <summary>Use one of the following commands to install:</summary><br/>
@@ -75,7 +75,12 @@ To install the project on your computer, follow these steps:
 
 5. Create database specified by configuration by executing
 
-   > :warning: Please, make sure you have already created a superuser for your database.
+   > You should have docker engine running. In most cases this means you need to start the Docker Desktop app
+
+   ```bash
+   # spin up the database in backend/
+   docker compose up
+   ```
 
    ```bash
    npm run sqlz -- db:create
@@ -108,11 +113,13 @@ To run the project, follow these steps:
 
 #### Running Tests
 
-To run tests, simply run the following command:
+To start e2e-testing, simply run the tool.
 
 ```bash
-npm run test
+npm run cypress:open
 ```
+
+You can find some cypress example tests in `cypress/e2e/` to learn from.
 
 #### Production
 
