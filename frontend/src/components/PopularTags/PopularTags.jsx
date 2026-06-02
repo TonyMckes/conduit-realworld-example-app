@@ -25,7 +25,7 @@ function PopularTags() {
           ) : loading ? (
             <p>Loading tags...</p>
           ) : (
-            <p>Tags list not available</p>
+            <p>No tags are available yet. Try refreshing the feed later.</p>
           )}
         </div>
       </div>

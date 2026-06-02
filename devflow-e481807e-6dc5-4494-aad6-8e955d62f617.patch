@@ -1,0 +1,13 @@
+diff --git a/frontend/src/components/PopularTags/PopularTags.jsx b/frontend/src/components/PopularTags/PopularTags.jsx
+index b69b5ae..cb2d780 100644
+--- a/frontend/src/components/PopularTags/PopularTags.jsx
++++ b/frontend/src/components/PopularTags/PopularTags.jsx
+@@ -25,7 +25,7 @@ function PopularTags() {
+           ) : loading ? (
+             <p>Loading tags...</p>
+           ) : (
+-            <p>Tags list not available</p>
++            <p>No tags are available yet. Try refreshing the feed later.</p>
+           )}
+         </div>
+       </div>
