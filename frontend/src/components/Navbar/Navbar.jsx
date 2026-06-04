@@ -11,7 +11,7 @@ function Navbar() {
     <nav className="navbar navbar-light">
       <div className="container">
         <Link className="navbar-brand" to="/">
-          conduit
+          free-e2e-test
         </Link>
 
         <SourceCodeLink left />
