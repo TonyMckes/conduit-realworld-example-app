@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
-const privateKey = process.env.JWT_KEY;
+const privateKey =
+  process.env.JWT_KEY ||
+  (process.env.NODE_ENV === "production" ? undefined : "conduit-dev-jwt-key");
 
 module.exports.jwtSign = async (payload) => {
   return jwt.sign(

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "db:migrate": "node scripts/sync-database.js",
+    "db:sync": "node scripts/sync-database.js",
+    "demo:seed": "node scripts/demo-seed.js",
     "dev": "node --watch index.js",
     "sqlz": "npx sequelize-cli",
     "start": "node index.js"
@@ -15,7 +18,8 @@
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.8"
+    "sequelize": "^6.37.8",
+    "sql.js": "^1.14.1"
   },
   "devDependencies": {
     "sequelize-cli": "^6.6.5"

@@ -10,6 +10,35 @@ This codebase was created to demonstrate a fully fledged fullstack application b
 
 ---
 
+## Windows MVP Demo Quick Start
+
+For the ByteDance MVP demo on Windows, use the local SQLite development
+database. No MySQL or PostgreSQL setup is required.
+
+```powershell
+cd E:\ByteDance\sandbox-repo
+npm.cmd install
+npm.cmd run db:migrate
+npm.cmd run demo:seed
+npm.cmd run dev:win
+```
+
+Open `http://localhost:3000/` and log in with:
+
+```text
+email: mvpuser@example.com
+password: 12345678
+```
+
+The fixed demo article URLs use HashRouter, for example:
+
+```text
+http://localhost:3000/#/article/ai-mvp-word-count-10
+http://localhost:3000/#/article/ai-mvp-word-count-301
+```
+
+Detailed Chinese acceptance steps are in [`docs/mvp-demo.md`](docs/mvp-demo.md).
+
 ## Getting Started
 
 These instructions will help you install and run the project on your local machine for development and testing.

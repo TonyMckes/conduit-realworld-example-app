@@ -36,6 +36,9 @@ dist
 .env.development.local
 .env.test.local
 .env.production.local
+backend/storage/*.sqlite
+backend/storage/*.sqlite-*
+!backend/storage/.gitkeep
 
 #log files
 npm-debug.log*
