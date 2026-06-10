@@ -35,6 +35,9 @@ function ArticlesPreview({ articles, loading, updateArticles }) {
             <h1>{article.title}</h1>
             <p>{article.description}</p>
             <span>Read more...</span>
+            <span className="read-count">
+              <i className="ion-eye"></i> {article.readCount}
+            </span>
             <ArticleTags tagList={article.tagList} />
           </Link>
         </div>

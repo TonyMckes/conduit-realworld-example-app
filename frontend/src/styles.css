@@ -1224,6 +1224,20 @@ footer .attribution {
   vertical-align: middle;
 }
 
+.article-preview .preview-link .read-count {
+  display: inline-block;
+  margin-left: 1rem;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: var(--text-light);
+  vertical-align: middle;
+}
+
+.article-preview .preview-link .read-count i {
+  margin-right: 0.2rem;
+  font-size: 0.9rem;
+}
+
 .article-preview .preview-link ul {
   float: right;
   max-width: 50%;
