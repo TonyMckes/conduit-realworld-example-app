@@ -4,6 +4,7 @@ const {
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
+  ValidationError,
 } = require("../helper/customErrors");
 const {
   appendFollowers,
@@ -76,10 +77,14 @@ const createArticle = async (req, res, next) => {
     const { loggedUser } = req;
     if (!loggedUser) throw new UnauthorizedError();
 
-    const { title, description, body, tagList } = req.body.article;
+    const { title, description, body, tagList, coverImage } = req.body.article;
     if (!title) throw new FieldRequiredError("A title");
     if (!description) throw new FieldRequiredError("A description");
     if (!body) throw new FieldRequiredError("An article body");
+
+    if (coverImage && coverImage.length > 2048) {
+      throw new ValidationError("coverImage must not exceed 2048 characters");
+    }
 
     const slug = slugify(title);
     const slugInDB = await Article.findOne({ where: { slug: slug } });
@@ -90,6 +95,7 @@ const createArticle = async (req, res, next) => {
       title: title,
       description: description,
       body: body,
+      coverImage: coverImage || null,
     });
 
     for (const tag of tagList) {
@@ -153,17 +159,35 @@ const articlesFeed = async (req, res, next) => {
 const singleArticle = async (req, res, next) => {
   try {
     const { loggedUser } = req;
-
     const { slug } = req.params;
-    const article = await Article.findOne({
+    const { lang } = req.query;
+
+    let article = await Article.findOne({
       where: { slug: slug },
       include: includeOptions,
     });
     if (!article) throw new NotFoundError("Article");
 
+    // If lang=en, try to fetch the English version via relatedArticle
+    if (lang === "en" && article.relatedArticleId) {
+      const enArticle = await Article.findOne({
+        where: { id: article.relatedArticleId },
+        include: includeOptions,
+      });
+      if (enArticle) {
+        article = enArticle;
+      }
+    }
+
+    // Determine if an English version exists
+    const hasEnVersion =
+      article.language === "zh" && article.relatedArticleId !== null;
+
     appendTagList(article.tagList, article);
     await appendFollowers(loggedUser, article);
     await appendFavorites(loggedUser, article);
+
+    article.dataValues.has_en_version = hasEnVersion;
 
     res.json({ article });
   } catch (error) {
@@ -188,13 +212,19 @@ const updateArticle = async (req, res, next) => {
       throw new ForbiddenError("article");
     }
 
-    const { title, description, body } = req.body.article;
+    const { title, description, body, coverImage } = req.body.article;
     if (title) {
       article.slug = slugify(title);
       article.title = title;
     }
     if (description) article.description = description;
     if (body) article.body = body;
+    if (coverImage !== undefined) {
+      if (coverImage && coverImage.length > 2048) {
+        throw new ValidationError("coverImage must not exceed 2048 characters");
+      }
+      article.coverImage = coverImage || null;
+    }
     await article.save();
 
     appendTagList(article.tagList, article);
