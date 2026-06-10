@@ -31,6 +31,13 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "articleId",
         timestamps: false,
       });
+
+      // Related article (self-referencing for translations)
+      this.belongsTo(this, {
+        foreignKey: "relatedArticleId",
+        as: "relatedArticle",
+        constraints: false,
+      });
     }
 
     toJSON() {
@@ -47,6 +54,21 @@ module.exports = (sequelize, DataTypes) => {
       title: DataTypes.STRING,
       description: DataTypes.TEXT,
       body: DataTypes.TEXT,
+      coverImage: {
+        type: DataTypes.STRING(2048),
+        allowNull: true,
+        validate: {
+          len: [0, 2048],
+        },
+      },
+      language: {
+        type: DataTypes.STRING,
+        defaultValue: "zh",
+      },
+      relatedArticleId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
     },
     {
       sequelize,
