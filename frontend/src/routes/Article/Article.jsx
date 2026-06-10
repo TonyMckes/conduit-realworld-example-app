@@ -1,11 +1,12 @@
 import Markdown from "markdown-to-jsx";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import ArticleMeta from "../../components/ArticleMeta";
 import ArticlesButtons from "../../components/ArticlesButtons";
 import ArticleTags from "../../components/ArticleTags";
 import BannerContainer from "../../components/BannerContainer";
 import { useAuth } from "../../context/AuthContext";
+import { computeReadingStats } from "../../helpers/readingStats";
 import getArticle from "../../services/getArticle";
 
 function Article() {
@@ -27,6 +28,8 @@ function Article() {
       });
   }, [isAuth, slug, headers, state, navigate]);
 
+  const readingStats = useMemo(() => computeReadingStats(body), [body]);
+
   return (
     <div className="article-page">
       <BannerContainer>
@@ -41,6 +44,10 @@ function Article() {
           <div className="col-md-12">
             {body && <Markdown options={{ forceBlock: true }}>{body}</Markdown>}
             <ArticleTags tagList={tagList} />
+            <div style={{ color: "#999", fontSize: "0.85em", marginTop: "1rem" }}>
+              <span>📖</span>{" "}
+              共 {readingStats.wordCount} 字 · 预计阅读 {readingStats.readingTime}
+            </div>
           </div>
         </div>
 
