@@ -47,6 +47,11 @@ module.exports = (sequelize, DataTypes) => {
       title: DataTypes.STRING,
       description: DataTypes.TEXT,
       body: DataTypes.TEXT,
+      status: {
+        type: DataTypes.ENUM("draft", "published"),
+        allowNull: false,
+        defaultValue: "published",
+      },
     },
     {
       sequelize,

@@ -23,7 +23,7 @@ const allArticles = async (req, res, next) => {
   try {
     const { loggedUser } = req;
 
-    const { author, tag, favorited, limit = 3, offset = 0 } = req.query;
+    const { author, tag, favorited, draft, limit = 3, offset = 0 } = req.query;
     const searchOptions = {
       include: [
         {
@@ -43,6 +43,13 @@ const allArticles = async (req, res, next) => {
       offset: offset * limit,
       order: [["createdAt", "DESC"]],
     };
+
+    // 默认只返回已发布文章，除非明确请求草稿
+    if (draft === "true") {
+      searchOptions.where = { status: "draft" };
+    } else {
+      searchOptions.where = { status: "published" };
+    }
 
     let articles = { rows: [], count: 0 };
     if (favorited) {
@@ -76,7 +83,7 @@ const createArticle = async (req, res, next) => {
     const { loggedUser } = req;
     if (!loggedUser) throw new UnauthorizedError();
 
-    const { title, description, body, tagList } = req.body.article;
+    const { title, description, body, tagList, status } = req.body.article;
     if (!title) throw new FieldRequiredError("A title");
     if (!description) throw new FieldRequiredError("A description");
     if (!body) throw new FieldRequiredError("An article body");
@@ -90,6 +97,7 @@ const createArticle = async (req, res, next) => {
       title: title,
       description: description,
       body: body,
+      status: status || "published",
     });
 
     for (const tag of tagList) {
@@ -132,7 +140,10 @@ const articlesFeed = async (req, res, next) => {
       limit: parseInt(limit),
       offset: offset * limit,
       order: [["createdAt", "DESC"]],
-      where: { userId: authors.map((author) => author.id) },
+      where: {
+        userId: authors.map((author) => author.id),
+        status: "published",
+      },
     });
 
     for (const article of articles.rows) {
@@ -188,13 +199,14 @@ const updateArticle = async (req, res, next) => {
       throw new ForbiddenError("article");
     }
 
-    const { title, description, body } = req.body.article;
+    const { title, description, body, status } = req.body.article;
     if (title) {
       article.slug = slugify(title);
       article.title = title;
     }
     if (description) article.description = description;
     if (body) article.body = body;
+    if (status) article.status = status;
     await article.save();
 
     appendTagList(article.tagList, article);

@@ -25,10 +25,10 @@ function ArticleEditorForm() {
     if (state || !slug) return;
 
     getArticle({ headers, slug })
-      .then(({ author: { username }, body, description, tagList, title }) => {
+      .then(({ author: { username }, body, description, tagList, title, status }) => {
         if (username !== loggedUser.username) redirect();
 
-        setForm({ body, description, tagList, title });
+        setForm({ body, description, tagList, title, status });
       })
       .catch(console.error);
 
@@ -48,16 +48,19 @@ function ArticleEditorForm() {
     setForm((form) => ({ ...form, tagList: value.split(/,| /) }));
   };
 
-  const formSubmit = (e) => {
-    e.preventDefault();
-
-    setArticle({ headers, slug, body, description, tagList, title })
+  const formSubmit = (status = "published") => {
+    setArticle({ headers, slug, body, description, tagList, title, status })
       .then((slug) => navigate(`/article/${slug}`))
       .catch(setErrorMessage);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    formSubmit("published");
+  };
+
   return (
-    <form onSubmit={formSubmit}>
+    <form onSubmit={handleSubmit}>
       <fieldset>
         {errorMessage && <span className="error-messages">{errorMessage}</span>}
         <FormFieldset
@@ -99,9 +102,18 @@ function ArticleEditorForm() {
           <div className="tag-list"></div>
         </FormFieldset>
 
-        <button className="btn btn-lg pull-xs-right btn-primary" type="submit">
-          {slug ? "Update Article" : "Publish Article"}
-        </button>
+        <div className="article-editor-buttons">
+          <button
+            className="btn btn-lg btn-primary"
+            type="button"
+            onClick={() => formSubmit("draft")}
+          >
+            Save as Draft
+          </button>
+          <button className="btn btn-lg pull-xs-right btn-primary" type="submit">
+            {slug ? "Update Article" : "Publish Article"}
+          </button>
+        </div>
       </fieldset>
     </form>
   );

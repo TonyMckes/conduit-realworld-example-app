@@ -6,7 +6,7 @@ function SourceCodeLink({ left, right }) {
       <li className="nav-item">
         <a
           className="nav-link"
-          href="https://github.com/TonyMckes/conduit-realworld-example-app"
+          href="https://www.bytedance.com"
         >
           <i className="ion-social-github"></i> Source code
         </a>

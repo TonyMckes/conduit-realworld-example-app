@@ -15,6 +15,7 @@ import Login from "./routes/Login";
 import NotFound from "./routes/NotFound";
 import Profile from "./routes/Profile/Profile";
 import ProfileArticles from "./routes/Profile/ProfileArticles";
+import ProfileDrafts from "./routes/Profile/ProfileDrafts";
 import ProfileFavArticles from "./routes/Profile/ProfileFavArticles";
 import Settings from "./routes/Settings";
 import SignUp from "./routes/SignUp";
@@ -45,6 +46,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Route path="profile/:username" element={<Profile />}>
               <Route index element={<ProfileArticles />} />
               <Route path="favorites" element={<ProfileFavArticles />} />
+              <Route path="drafts" element={<ProfileDrafts />} />
             </Route>
           </Route>
           <Route path="*" element={<NotFound />} />
@@ -56,5 +58,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+// or to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();

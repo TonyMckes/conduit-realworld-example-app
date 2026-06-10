@@ -2,7 +2,7 @@ import axios from "axios";
 import errorHandler from "../helpers/errorHandler";
 
 // prettier-ignore
-async function getArticles({ headers, limit = 3, location, page = 0, tagName, username }) {
+async function getArticles({ headers, limit = 3, location, page = 0, tagName, username, isDraft }) {
   try {
     const url = {
       favorites: `api/articles?favorited=${username}&&limit=${limit}&&offset=${page}`,
@@ -10,6 +10,7 @@ async function getArticles({ headers, limit = 3, location, page = 0, tagName, us
       global: `api/articles?limit=${limit}&&offset=${page}`,
       profile: `api/articles?author=${username}&&limit=${limit}&&offset=${page}`,
       tag: `api/articles?tag=${tagName}&&limit=${limit}&&offset=${page}`,
+      drafts: `api/articles?author=${username}&&draft=true&&limit=${limit}&&offset=${page}`,
     };
 
     const { data } = await axios({ url: url[location], headers });

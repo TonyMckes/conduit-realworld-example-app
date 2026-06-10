@@ -20,6 +20,7 @@ function Profile() {
             <ul className="nav nav-pills outline-active">
               <NavItem text="My Articles" url="" state={state} />
               <NavItem text="Favorited Articles" url="favorites" state={state} />
+              <NavItem text="My Drafts" url="drafts" state={state} />
             </ul>
           </div>
           <Outlet />
