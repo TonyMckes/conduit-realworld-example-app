@@ -1,7 +1,34 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import ArticleMeta from "../ArticleMeta";
 import ArticleTags from "../ArticleTags";
 import FavButton from "../FavButton";
+
+const DEFAULT_COVER = "/images/default-cover.svg";
+
+function CoverImage({ coverImage }) {
+  const [imgError, setImgError] = useState(false);
+
+  if (!coverImage || imgError) {
+    return (
+      <div className="cover-image-container cover-image-placeholder">
+        <img src={DEFAULT_COVER} alt="" className="cover-image" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="cover-image-container">
+      <img
+        src={coverImage}
+        alt="Cover"
+        className="cover-image"
+        loading="lazy"
+        onError={() => setImgError(true)}
+      />
+    </div>
+  );
+}
 
 function ArticlesPreview({ articles, loading, updateArticles }) {
   const handleFav = (article) => {
@@ -32,6 +59,7 @@ function ArticlesPreview({ articles, loading, updateArticles }) {
             state={article}
             className="preview-link"
           >
+            <CoverImage coverImage={article.coverImage} />
             <h1>{article.title}</h1>
             <p>{article.description}</p>
             <span>Read more...</span>
