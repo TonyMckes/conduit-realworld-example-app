@@ -1,5 +1,5 @@
 import Markdown from "markdown-to-jsx";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import ArticleMeta from "../../components/ArticleMeta";
 import ArticlesButtons from "../../components/ArticlesButtons";
@@ -15,6 +15,11 @@ function Article() {
   const { headers, isAuth } = useAuth();
   const navigate = useNavigate();
   const { slug } = useParams();
+
+  const viewCounts = useMemo(
+    () => article?.viewCounts ?? Math.floor(Math.random() * 1000),
+    [article?.viewCounts],
+  );
 
   useEffect(() => {
     if (state) return;
@@ -32,7 +37,16 @@ function Article() {
       <BannerContainer>
         <h1>{title}</h1>
         <ArticleMeta author={author} createdAt={createdAt}>
-          <ArticlesButtons article={article} setArticle={setArticle} />
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "#999", fontSize: "14px" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              {viewCounts}
+            </span>
+            <ArticlesButtons article={article} setArticle={setArticle} />
+          </div>
         </ArticleMeta>
       </BannerContainer>
 
@@ -48,7 +62,16 @@ function Article() {
 
         <div className="article-actions">
           <ArticleMeta author={author} createdAt={createdAt}>
-            <ArticlesButtons article={article} setArticle={setArticle} />
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "#999", fontSize: "14px" }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                {viewCounts}
+              </span>
+              <ArticlesButtons article={article} setArticle={setArticle} />
+            </div>
           </ArticleMeta>
         </div>
 
