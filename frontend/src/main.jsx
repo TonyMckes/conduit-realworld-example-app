@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import App from "./App";
 import AuthProvider from "./context/AuthContext";
+import { I18nProvider } from "./context/I18nContext";
 import "./styles.css";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
@@ -22,6 +23,7 @@ import SignUp from "./routes/SignUp";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <HashRouter>
+      <I18nProvider>
       <AuthProvider>
         <Routes>
           <Route element={<App />}>
@@ -50,6 +52,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AuthProvider>
+      </I18nProvider>
     </HashRouter>
   </React.StrictMode>,
   );
