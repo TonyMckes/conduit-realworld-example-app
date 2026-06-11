@@ -16,7 +16,10 @@ function CommentList({ triggerUpdate, updateComments }) {
   }, [slug, triggerUpdate]);
 
   const handleClick = (commentId) => {
-    if (!isAuth) alert("You need to login first");
+    if (!isAuth) {
+      alert("You need to login first");
+      return;
+    }
 
     const confirmation = window.confirm("Want to delete the comment?");
     if (!confirmation) return;

@@ -17,7 +17,7 @@ function CommentEditor({ updateComments }) {
 
     postComment({ body, headers, slug })
       .then(updateComments)
-      .then(setForm({ body: "" }))
+      .then(() => setForm({ body: "" }))
       .catch(console.error);
   };
 
