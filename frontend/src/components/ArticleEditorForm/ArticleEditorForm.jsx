@@ -5,14 +5,18 @@ import getArticle from "../../services/getArticle";
 import setArticle from "../../services/setArticle";
 import FormFieldset from "../FormFieldset";
 
-const emptyForm = { title: "", description: "", body: "", tagList: "" };
+const COVER_URL_REGEX = /^https?:\/\/.{1,2045}$/;
+
+const emptyForm = { title: "", description: "", body: "", tagList: "", coverImage: "" };
 
 function ArticleEditorForm() {
   const { state } = useLocation();
-  const [{ title, description, body, tagList }, setForm] = useState(
+  const [{ title, description, body, tagList, coverImage }, setForm] = useState(
     state || emptyForm,
   );
   const [errorMessage, setErrorMessage] = useState("");
+  const [coverValid, setCoverValid] = useState(true);
+  const [coverTouched, setCoverTouched] = useState(false);
   const { isAuth, headers, loggedUser } = useAuth();
 
   const navigate = useNavigate();
@@ -25,10 +29,10 @@ function ArticleEditorForm() {
     if (state || !slug) return;
 
     getArticle({ headers, slug })
-      .then(({ author: { username }, body, description, tagList, title }) => {
+      .then(({ author: { username }, body, coverImage, description, tagList, title }) => {
         if (username !== loggedUser.username) redirect();
 
-        setForm({ body, description, tagList, title });
+        setForm({ body, coverImage: coverImage || "", description, tagList, title });
       })
       .catch(console.error);
 
@@ -42,6 +46,13 @@ function ArticleEditorForm() {
     setForm((form) => ({ ...form, [type]: value }));
   };
 
+  const coverInputHandler = (e) => {
+    const value = e.target.value;
+    setForm((form) => ({ ...form, coverImage: value }));
+    setCoverTouched(true);
+    setCoverValid(!value || COVER_URL_REGEX.test(value));
+  };
+
   const tagsInputHandler = (e) => {
     const value = e.target.value;
 
@@ -51,7 +62,7 @@ function ArticleEditorForm() {
   const formSubmit = (e) => {
     e.preventDefault();
 
-    setArticle({ headers, slug, body, description, tagList, title })
+    setArticle({ headers, slug, body, description, tagList, title, coverImage })
       .then((slug) => navigate(`/article/${slug}`))
       .catch(setErrorMessage);
   };
@@ -87,6 +98,21 @@ function ArticleEditorForm() {
             value={body}
             onChange={inputHandler}
           ></textarea>
+        </fieldset>
+
+        <fieldset className="form-group">
+          <input
+            className={`form-control${coverTouched ? (coverValid ? " is-valid" : " is-invalid") : ""}`}
+            placeholder="Cover image URL (http/https)"
+            name="coverImage"
+            value={coverImage}
+            onChange={coverInputHandler}
+          />
+          {coverTouched && !coverValid && (
+            <span className="form-text text-muted">
+              URL must start with http:// or https:// and be at most 2048 characters
+            </span>
+          )}
         </fieldset>
 
         <FormFieldset
