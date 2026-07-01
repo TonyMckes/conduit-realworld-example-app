@@ -1,0 +1,114 @@
+name: E2E & API Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Needed to publish the HTML report to GitHub Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Postgres for the Conduit backend.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: conduit
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout test framework
+        uses: actions/checkout@v4
+
+      - name: Checkout Conduit app (system under test)
+        uses: actions/checkout@v4
+        with:
+          repository: TonyMckes/conduit-realworld-example-app
+          path: conduit-app
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # ---- Boot the application under test -------------------------------
+      # NOTE: this is the part most likely to need tuning for your fork.
+      # Confirm the DB env-var names against conduit-app/backend/.env.example
+      # and adjust below if the app fails to connect.
+      - name: Install & seed Conduit
+        working-directory: conduit-app
+        env:
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: conduit
+        run: |
+          npm install
+          npm run sqlz -- db:migrate || true
+          npm run sqlz -- db:seed:all || true
+
+      - name: Start Conduit in the background
+        working-directory: conduit-app
+        env:
+          PGHOST: localhost
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: conduit
+        run: npm run dev &
+
+      - name: Wait for app to be ready
+        run: |
+          npx --yes wait-on http://localhost:3000 http://localhost:3001/api/tags -t 90000
+
+      # ---- Run the tests -------------------------------------------------
+      - name: Install test dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run tests
+        env:
+          BASE_URL: http://localhost:3000
+          API_URL: http://localhost:3001/api
+        run: npm test
+
+      - name: Upload HTML report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: playwright-report
+
+  # Publishes the report at https://<user>.github.io/<repo>/
+  deploy-report:
+    needs: test
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy report to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

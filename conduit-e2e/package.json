@@ -1,0 +1,42 @@
+{
+  "name": "conduit-e2e",
+  "version": "1.0.0",
+  "description": "End-to-end and API test framework for the RealWorld (Conduit) application, built with Playwright and TypeScript.",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:api": "playwright test --project=api",
+    "test:ui": "playwright test --project=chromium",
+    "test:headed": "playwright test --project=chromium --headed",
+    "test:ui-mode": "playwright test --ui",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen $BASE_URL",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "progress": "node scripts/update-progress.mjs"
+  },
+  "keywords": [
+    "playwright",
+    "typescript",
+    "e2e",
+    "api-testing",
+    "test-automation",
+    "qa",
+    "realworld",
+    "conduit"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@eslint/js": "^9.39.4",
+    "@faker-js/faker": "^9.0.0",
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^22.7.0",
+    "dotenv": "^16.4.5",
+    "eslint": "^9.39.4",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.62.1"
+  }
+}
