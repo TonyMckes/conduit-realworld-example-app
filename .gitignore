@@ -41,3 +41,22 @@ dist
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Local databases
+*.sqlite
+*.sqlite3
+
+# Personal / local-only files
+conduit-e2e/PROGRESS.md
+conduit-e2e/scripts/update-progress.mjs
+
+# Auto-generated Playwright init files (not part of the project)
+/playwright.config.ts
+/tests/

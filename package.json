@@ -22,8 +22,13 @@
     "test": "vitest"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.0.1",
     "@vitejs/plugin-react-swc": "^4.2.3",
     "concurrently": "^9.2.1",
     "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^9.9.0"
   }
 }
