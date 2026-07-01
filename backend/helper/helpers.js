@@ -18,7 +18,6 @@ const appendFavorites = async (loggedUser, article) => {
 };
 
 const appendFollowers = async (loggedUser, toAppend) => {
-  //
   if (toAppend?.author) {
     const author = await toAppend.getAuthor();
 
@@ -27,8 +26,7 @@ const appendFollowers = async (loggedUser, toAppend) => {
 
     const followersCount = await author.countFollowers();
     toAppend.author.dataValues.followersCount = followersCount;
-    //
-  } else {
+  } else if (typeof toAppend?.hasFollower === "function") {
     const following = await toAppend.hasFollower(
       loggedUser ? loggedUser : null,
     );
@@ -36,6 +34,11 @@ const appendFollowers = async (loggedUser, toAppend) => {
 
     const followersCount = await toAppend.countFollowers();
     toAppend.dataValues.followersCount = followersCount;
+  } else {
+    if (toAppend?.dataValues) {
+      toAppend.dataValues.following = false;
+      toAppend.dataValues.followersCount = 0;
+    }
   }
 };
 
