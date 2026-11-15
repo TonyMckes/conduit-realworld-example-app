@@ -5,3 +5,10 @@ export default function dateFormatter(date) {
     year: "numeric",
   });
 }
+
+export function dateTimeFormatter(date) {
+  return new Date(date).toLocaleString("en", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}

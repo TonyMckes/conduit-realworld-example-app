@@ -26,3 +26,78 @@ button:focus {
   justify-content: center;
   flex-direction: column;
 }
+
+/* Article editor: changes not saved because of a concurrent update */
+.editor-notice {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--brand);
+  border-radius: 0.25rem;
+  background-color: var(--bg-light);
+}
+
+.editor-notice-warning {
+  border-left-color: var(--danger);
+}
+
+.unsaved-edits {
+  margin-bottom: 1.5rem;
+}
+
+.unsaved-edits ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.unsaved-edit.highlighted {
+  border-color: var(--danger-light);
+}
+
+.unsaved-edit summary {
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.unsaved-edit del {
+  color: var(--danger);
+}
+
+.unsaved-edit ins {
+  color: var(--brand-dark);
+}
+
+.unsaved-edit-tag {
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 10rem;
+  background-color: var(--bg-light);
+  color: var(--text-disabled);
+  font-size: 0.8rem;
+}
+
+.unsaved-edit-diff {
+  max-height: 20rem;
+  margin: 0;
+  padding: 0.5rem;
+  overflow: auto;
+  background-color: var(--bg-light);
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.unsaved-edit-diff .diff-added {
+  color: var(--brand-dark);
+  background-color: #e6f6e9;
+}
+
+.unsaved-edit-diff .diff-removed {
+  color: var(--danger);
+  background-color: #f9ecec;
+}
+
+.unsaved-edit-diff .diff-folded {
+  color: var(--text-muted);
+}

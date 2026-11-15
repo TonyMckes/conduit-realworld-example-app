@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ User, Tag, Comment }) {
+    static associate({ User, Tag, Comment, UnsavedEdit }) {
       // define association here
 
       // Users
@@ -15,6 +15,12 @@ module.exports = (sequelize, DataTypes) => {
 
       // Comments
       this.hasMany(Comment, { foreignKey: "articleId", onDelete: "cascade" });
+
+      // Edits rejected because of a concurrent update (see UnsavedEdit)
+      this.hasMany(UnsavedEdit, {
+        foreignKey: "articleId",
+        onDelete: "cascade",
+      });
 
       // Tag list
       this.belongsToMany(Tag, {
@@ -34,9 +40,10 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
+      // `id` is exposed so an editor can still address the article after its
+      // slug was changed (title edited) from another editor.
       return {
         ...this.get(),
-        id: undefined,
         userId: undefined,
       };
     }
@@ -51,6 +58,10 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Article",
+      // Optimistic locking: adds an integer `version` column that is
+      // incremented on every save, and makes `save()` throw an
+      // OptimisticLockError when the row was changed since it was read.
+      version: true,
     },
   );
   return Article;

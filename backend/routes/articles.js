@@ -25,10 +25,13 @@ router.delete("/:slug", verifyToken, deleteArticle);
 
 const favoritesRoutes = require("./articles/favorites");
 const commentsRoutes = require("./articles/comments");
+const unsavedEditsRoutes = require("./articles/unsavedEdits");
 
 //> Favorites routes
 router.use("/", favoritesRoutes);
 //> Comments routes
 router.use("/", commentsRoutes);
+//> Unsaved edits routes
+router.use("/", unsavedEditsRoutes);
 
 module.exports = router;
